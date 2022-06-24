@@ -48,7 +48,7 @@ if (testTransactions) {
 log.info("Starting Gremlin Server instances for native testing of ${executionName}")
 log.info("Transactions validated (enabled with -DincludeNeo4j and only available on port 45940): " + testTransactions)
 
-def platformAgnosticBaseDirPath = tinkerpopRootDir.replace("\\", "/")
+def platformAgnosticBaseDirPath = "${tinkerpopRootDir}".replace("\\", "/")
 def platformAgnosticGremlinServerDir = platformAgnosticBaseDirPath + "/gremlin-server"
 def platformAgnosticSettingsFile = platformAgnosticGremlinServerDir + "/src/test/resources/org" +
         "/apache/tinkerpop/gremlin/server/gremlin-server-integration.yaml"
