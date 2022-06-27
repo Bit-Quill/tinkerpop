@@ -187,7 +187,10 @@ jobs:
     name: .NET
     timeout-minutes: 20
     needs: smoke
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK11
@@ -199,10 +202,16 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x'
-      - name: Build with Maven
+      - name: Build with Maven for Linux
+        if: contains(matrix.os, 'ubuntu')
         run: |
           touch gremlin-dotnet/src/.glv
           touch gremlin-dotnet/test/.glv
+          mvn clean install -pl -:gremlin-javascript,-:gremlin-python,-:gremlint -q -DskipTests -Dci
+          mvn verify -pl :gremlin-dotnet,:gremlin-dotnet-tests -P gremlin-dotnet -DincludeNeo4j
+      - name: Build with Maven for Windows
+        if: contains(matrix.os, 'windows')
+        run: |
           mvn clean install -pl -:gremlin-javascript,-:gremlin-python,-:gremlint -q -DskipTests -Dci
           mvn verify -pl :gremlin-dotnet,:gremlin-dotnet-tests -P gremlin-dotnet -DincludeNeo4j
   neo4j-gremlin:
