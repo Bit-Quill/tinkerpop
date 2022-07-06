@@ -653,7 +653,7 @@ func (serializer *graphBinaryTypeSerializer) getType(val interface{}) (dataType,
 		return longType, nil
 	case int32, uint16:
 		return intType, nil
-	case int8, int16: // GraphBinary doesn't have a type for signed 1-byte integer, serializing int8 as Short instead.
+	case int8, int16: // GraphBinary doesn't have a type for signed 8-bit integer, serializing int8 as Short instead.
 		return shortType, nil
 	case uint8:
 		return byteType, nil
