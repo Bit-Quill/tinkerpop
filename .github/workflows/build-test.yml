@@ -34,12 +34,12 @@ jobs:
         with:
           dotnet-version: '6.0.x'
       - name: Create .glv files - Windows
-        if: if matrix.os == 'windows-latest'
+        if: contains(matrix.os, 'windows')
         run: |
           echo $null >> gremlin-dotnet/src/.glv
           echo $null >> gremlin-dotnet/test/.glv
       - name: Create .glv files - Windows
-        if: if matrix.os == 'ubuntu-latest'
+        if: contains(matrix.os, 'ubuntu')
         run: |
           touch gremlin-dotnet/src/.glv
           touch gremlin-dotnet/test/.glv
