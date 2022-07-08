@@ -27,8 +27,8 @@ const DriverRemoteConnection = require('../lib/driver/driver-remote-connection')
 const Client = require('../lib/driver/client');
 const PlainTextSaslAuthenticator = require('../lib/driver/auth/plain-text-sasl-authenticator');
 
-const serverUrl = 'ws://localhost:45940/gremlin';
-const serverAuthUrl = 'wss://localhost:45941/gremlin';
+const serverUrl = 'ws://127.0.0.1:45940/gremlin';
+const serverAuthUrl = 'wss://127.0.0.1:45941/gremlin';
 
 /** @returns {DriverRemoteConnection} */
 exports.getConnection = function getConnection(traversalSource) {
