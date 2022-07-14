@@ -28,7 +28,7 @@ const DriverRemoteConnection = require('../../lib/driver/driver-remote-connectio
 const PlainTextSaslAuthenticator = require('../../lib/driver/auth/plain-text-sasl-authenticator');
 
 let connection;
-const badServerAuthUrl = 'ws://localhost:45941/gremlin';
+const badServerAuthUrl = 'ws://gremlin-server-test-js:45941/gremlin';
 
 describe('DriverRemoteConnection', function () {
   context('with PlainTextSaslAuthenticator', function () {
