@@ -21,14 +21,14 @@
 
 #endregion
 
+using Gremlin.Net.Driver.Messages;
+using Gremlin.Net.Process;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Gremlin.Net.Driver.Messages;
-using Gremlin.Net.Process;
 
 namespace Gremlin.Net.Driver
 {
@@ -85,6 +85,7 @@ namespace Gremlin.Net.Driver
         {
             var receiver = new ResponseHandlerForSingleRequestMessage<T>();
             _callbackByRequestId.GetOrAdd(requestMessage.RequestId, receiver);
+            Console.WriteLine($"Added callback for {requestMessage.RequestId}, now {_callbackByRequestId.Count}");
             _writeQueue.Enqueue(requestMessage);
             BeginSendingMessages();
             return receiver.Result;
@@ -93,7 +94,11 @@ namespace Gremlin.Net.Driver
         private void BeginReceiving()
         {
             var state = Volatile.Read(ref _connectionState);
-            if (state == Closed) return;
+            if (state == Closed)
+            {
+                return;
+            }
+
             ReceiveMessagesAsync().Forget();
         }
 
@@ -108,6 +113,7 @@ namespace Gremlin.Net.Driver
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine($"ReceiveMessagesAsync exception, now {_callbackByRequestId.Count}");
                     await CloseConnectionBecauseOfFailureAsync(e).ConfigureAwait(false);
                     break;
                 }
@@ -131,13 +137,20 @@ namespace Gremlin.Net.Driver
                 if (receivedMsg.RequestId != null &&
                     _callbackByRequestId.TryRemove(receivedMsg.RequestId.Value, out var responseHandler))
                 {
+                    Console.WriteLine($"Removed callback for {receivedMsg.RequestId.Value} error, now {_callbackByRequestId.Count}");
                     responseHandler?.HandleFailure(e);
+                }
+                else
+                {
+                    Console.WriteLine($"Not removed callback, now {_callbackByRequestId.Count}");
                 }
             }
         }
 
-        private static void ThrowMessageDeserializedNull() =>
+        private static void ThrowMessageDeserializedNull()
+        {
             throw new InvalidOperationException("Received data deserialized into null object message. Cannot operate on it.");
+        }
 
         private void HandleReceivedMessage(ResponseMessage<List<object>> receivedMsg)
         {
@@ -150,23 +163,31 @@ namespace Gremlin.Net.Driver
                 return;
             }
 
-            if (receivedMsg.RequestId == null) return;
+            if (receivedMsg.RequestId == null)
+            {
+                return;
+            }
 
             if (status.Code != ResponseStatusCode.NoContent)
+            {
                 _callbackByRequestId[receivedMsg.RequestId.Value].HandleReceived(receivedMsg);
+            }
 
             if (status.Code == ResponseStatusCode.Success || status.Code == ResponseStatusCode.NoContent)
             {
                 _callbackByRequestId[receivedMsg.RequestId.Value].Finalize(status.Attributes);
                 _callbackByRequestId.TryRemove(receivedMsg.RequestId.Value, out _);
+                Console.WriteLine($"Removed callback for {receivedMsg.RequestId.Value}, now {_callbackByRequestId.Count}");
             }
         }
 
         private void Authenticate()
         {
             if (string.IsNullOrEmpty(_username) || string.IsNullOrEmpty(_password))
+            {
                 throw new InvalidOperationException(
                     $"The Gremlin Server requires authentication, but no credentials are specified - username: {_username}, password: {_password}.");
+            }
 
             var message = RequestMessage.Build(Tokens.OpsAuthentication).Processor(Tokens.ProcessorTraversal)
                 .AddArgument(Tokens.ArgsSasl, SaslArgument()).Create();
@@ -185,7 +206,10 @@ namespace Gremlin.Net.Driver
         private void BeginSendingMessages()
         {
             if (Interlocked.CompareExchange(ref _writeInProgress, 1, 0) != 0)
+            {
                 return;
+            }
+
             SendMessagesFromQueueAsync().Forget();
         }
 
@@ -199,6 +223,7 @@ namespace Gremlin.Net.Driver
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine($"SendMessagesFromQueueAsync exception, now {_callbackByRequestId.Count}");
                     await CloseConnectionBecauseOfFailureAsync(e).ConfigureAwait(false);
                     break;
                 }
@@ -234,6 +259,7 @@ namespace Gremlin.Net.Driver
                 cb.HandleFailure(exception);
             }
             _callbackByRequestId.Clear();
+            Console.WriteLine($"Removed all callbacks on ConnectionFailure, now {_callbackByRequestId.Count}");
         }
 
         private async Task SendMessageAsync(RequestMessage message)
@@ -263,7 +289,7 @@ namespace Gremlin.Net.Driver
 
             var msgBuilder = RequestMessage.Build(message.Operation)
               .OverrideRequestId(message.RequestId).Processor(Tokens.ProcessorSession);
-            foreach(var kv in message.Arguments)
+            foreach (var kv in message.Arguments)
             {
                 msgBuilder.AddArgument(kv.Key, kv.Value);
             }
@@ -279,7 +305,7 @@ namespace Gremlin.Net.Driver
             {
                 await CloseSession().ConfigureAwait(false);
             }
-            
+
             await _webSocketConnection.CloseAsync().ConfigureAwait(false);
         }
 
@@ -306,7 +332,10 @@ namespace Gremlin.Net.Driver
             if (!_disposed)
             {
                 if (disposing)
+                {
                     _webSocketConnection?.Dispose();
+                }
+
                 _disposed = true;
             }
         }
