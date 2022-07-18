@@ -137,8 +137,6 @@ namespace Gremlin.Net.UnitTest.Driver
             Uri uri = new Uri("wss://localhost:8182");
             WebSocketReceiveResult closeResult = new WebSocketReceiveResult(0, WebSocketMessageType.Close, true, WebSocketCloseStatus.EndpointUnavailable, "Server shutdown");
 
-            var clientState = WebSocketState.Open;
-
             var receiveSempahore = new SemaphoreSlim(0, 1);
             var mockedClientWebSocket = new Mock<IClientWebSocket>();
             mockedClientWebSocket
@@ -146,10 +144,9 @@ namespace Gremlin.Net.UnitTest.Driver
                 .Returns(async () =>
                 {
                     await receiveSempahore.WaitAsync();
-                    clientState = WebSocketState.CloseReceived;
                     return closeResult;
                 });
-            mockedClientWebSocket.Setup(m => m.State).Returns(() => clientState);
+            mockedClientWebSocket.SetupSequence(m => m.State).Returns(WebSocketState.Open).Returns(WebSocketState.CloseReceived);
             mockedClientWebSocket
                 .SetupGet(m => m.Options).Returns(new ClientWebSocket().Options);
 
