@@ -154,8 +154,10 @@ namespace Gremlin.Net.UnitTest.Driver
             await connection.ConnectAsync(CancellationToken.None);
 
             // Create two in-flight requests that will block on waiting for a response.
-            RequestMessage requestMsg1 = RequestMessage.Build("gremlin").Create();
-            RequestMessage requestMsg2 = RequestMessage.Build("gremlin").Create();
+            RequestMessage requestMsg1 = RequestMessage.Build("gremlin")
+                .OverrideRequestId(new Guid("1ddddddd-dddd-dddd-dddd-dddddddddddd")).Create();
+            RequestMessage requestMsg2 = RequestMessage.Build("gremlin")
+                .OverrideRequestId(new Guid("2ddddddd-dddd-dddd-dddd-dddddddddddd")).Create();
             Task request1 = connection.SubmitAsync<dynamic>(requestMsg1);
             Task request2 = connection.SubmitAsync<dynamic>(requestMsg2);
 
