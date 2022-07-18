@@ -23,8 +23,8 @@ services:
     container_name: gremlin-server-test-js
     image: tinkerpop:gremlin-server-test-${GREMLIN_SERVER}
     build:
-      context: ../
-      dockerfile: ../../../../../docker/gremlin-test-server/Dockerfile
+      context: ../../../../../
+      dockerfile: docker/gremlin-test-server/Dockerfile
       args:
         - GREMLIN_SERVER=${GREMLIN_SERVER}
     ports:
@@ -44,8 +44,10 @@ services:
       - .:/js_app
       - ../../../../../gremlin-test/features:/gremlin-test
       - ../../../../../docker/gremlin-test-server:/js_app/gremlin-test-server
+    environment:
+      - DOCKER_ENVIRONMENT=true
     working_dir: /js_app
     command: ["./gremlin-test-server/wait-for-server.sh", gremlin-server-test-js, "45940", "90", "bash", "-c",
-        "npm install && npm run test && npm run features"]
+        "npm install && npm run test && npm run features-docker"]
     depends_on:
       - gremlin-server-test-js
