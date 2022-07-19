@@ -166,7 +166,7 @@ namespace Gremlin.Net.UnitTest.Driver
 
             // Release the connection close message.
             receiveSempahore.Release();
-            await Task.Delay(100); 
+            await Task.Delay(100);  
 
             // Assert that both requests get notified with the closed exception.
             await AssertExpectedConnectionClosedException(closeResult.CloseStatus, closeResult.CloseStatusDescription, () => request1);
