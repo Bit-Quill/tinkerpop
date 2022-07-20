@@ -407,6 +407,7 @@ The following are the steps a Windows user must take in order to Build Tinkerpop
 * Download the link:https://github.com/cdarlint/winutils/blob/master/hadoop-2.7.7/bin/winutils.exe[winutils.exe] file for Hadoop version `2.7.7` from cdarlint/winutils
 * Place `winutils.exe` file wherever you would like to in the following folder structure:
 ** `hadoop-2.7.7/bin/winutils.exe`
+** Set `HADOOP_HOME` to point to `hadoop-2.7.7` folder
 . Run `mvn clean install` from root of tinkerpop
 . Follow IDE specific steps if applicable:
 * <<intellij>>
