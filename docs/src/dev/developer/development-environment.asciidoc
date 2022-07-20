@@ -51,6 +51,7 @@ NOTE: For those using Windows, efforts have been made to keep the build OS indep
 that TinkerPop's build system will only allow for a minimum build at best. +
  +
  Refer to <<building-on-windows>> section for more details.
+ 
 [[groovy-environment]]
 === Groovy Environment
 
@@ -401,7 +402,7 @@ mvn -Dmaven.javadoc.skip=true --projects tinkergraph-gremlin test
 [[building-on-windows]]
 == Building On Windows
 
-The following are the steps a Windows user must take in order to Build Tinkerpop on Windows:
+The following steps must be taken in order to build TinkerPop on Windows:
 
 . Install winutils for Hadoop
 * Download the link:https://github.com/cdarlint/winutils/blob/master/hadoop-2.7.7/bin/winutils.exe[winutils.exe] file for Hadoop version `2.7.7` from cdarlint/winutils
@@ -412,9 +413,9 @@ The following are the steps a Windows user must take in order to Build Tinkerpop
 . Follow IDE specific steps if applicable:
 * <<intellij>>
 
-You should now be able to work with Tinkerpop on Windows.
+You should now be able to work with TinkerPop on Windows.
 
-NOTE: The Windows build of Tinkerpop has currently only been tested to stably work on v3.5. Any other versions of Tinkerpop on Windows may still build, but to a partial extent.
+NOTE: Currently, the Windows build of TinkerPop is only stable on versions 3.5.x. Other versions of TinkerPop on Windows may still build, but to a partial extent.
 
 [[docker-integration]]
 == Docker Integration
