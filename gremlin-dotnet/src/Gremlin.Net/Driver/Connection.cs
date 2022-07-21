@@ -268,7 +268,7 @@ namespace Gremlin.Net.Driver
         private void NotifyAboutConnectionFailure(Exception exception)
         {
             Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} NotifyAboutConnectionFailure started");
-            lock (_callbackByRequestId) 
+            lock (_callbackByRequestId)
             {
                 foreach (var cb in _callbackByRequestId.Values)
                 {
