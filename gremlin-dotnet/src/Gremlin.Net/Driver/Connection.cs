@@ -265,11 +265,14 @@ namespace Gremlin.Net.Driver
 
         private void NotifyAboutConnectionFailure(Exception exception)
         {
-            foreach (var cb in _callbackByRequestId.Values)
+            lock (_callbackByRequestId)
             {
-                cb.HandleFailure(exception);
+                foreach (var cb in _callbackByRequestId.Values)
+                {
+                    cb.HandleFailure(exception);
+                }
+                _callbackByRequestId.Clear();
             }
-            _callbackByRequestId.Clear();
             Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Removed all callbacks on ConnectionFailure, now {_callbackByRequestId.Count}");
         }
 

@@ -179,6 +179,12 @@ namespace Gremlin.Net.UnitTest.Driver
             mockedClientWebSocket.Verify(m => m.ConnectAsync(uri, It.IsAny<CancellationToken>()), Times.Once);
             mockedClientWebSocket.Verify(m => m.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()), Times.Once);
             mockedClientWebSocket.Verify(m => m.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, It.IsAny<CancellationToken>()), Times.Once);
+
+            // 
+            //RequestMessage requestMsg3 = RequestMessage.Build("gremlin")
+            //    .OverrideRequestId(new Guid("3ddddddd-dddd-dddd-dddd-dddddddddddd")).Create();
+            //var response = await connection.SubmitAsync<dynamic>(requestMsg3);
+            //Assert.Equal(1, connection.NrRequestsInFlight);
         }
 
 
