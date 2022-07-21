@@ -170,7 +170,7 @@ namespace Gremlin.Net.UnitTest.Driver
             Assert.Equal(2, connection.NrRequestsInFlight);
 
             // Release the connection close message.
-            receiveSempahore.Release();
+            receiveSempahore.Release(); 
 
             // Assert that both requests get notified with the closed exception.
             await AssertExpectedConnectionClosedException(closeResult.CloseStatus, closeResult.CloseStatusDescription, () => request1);
