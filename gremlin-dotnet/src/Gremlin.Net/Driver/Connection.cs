@@ -83,8 +83,10 @@ namespace Gremlin.Net.Driver
             {
                 Console.WriteLine(
                         $"{Thread.CurrentThread.ManagedThreadId} NrRequestsInFlight getter, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
-
-                return _callbackByRequestId.Count;
+                lock (_callbackByRequestId)
+                {
+                    return _callbackByRequestId.Count;
+                }
             }
         }
 
