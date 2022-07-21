@@ -113,6 +113,7 @@ namespace Gremlin.Net.Driver
 
         private async Task ReceiveMessagesAsync()
         {
+            Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} ReceiveMessagesAsync started");
             while (true)
             {
                 try
@@ -128,6 +129,7 @@ namespace Gremlin.Net.Driver
                     break;
                 }
             }
+            Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} ReceiveMessagesAsync done");
         }
 
         private async Task HandleReceivedAsync(byte[] received)
@@ -265,6 +267,7 @@ namespace Gremlin.Net.Driver
 
         private void NotifyAboutConnectionFailure(Exception exception)
         {
+            Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} NotifyAboutConnectionFailure started");
             lock (_callbackByRequestId)
             {
                 foreach (var cb in _callbackByRequestId.Values)
