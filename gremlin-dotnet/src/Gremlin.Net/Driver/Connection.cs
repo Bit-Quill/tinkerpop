@@ -265,7 +265,7 @@ namespace Gremlin.Net.Driver
 
         private void NotifyAboutConnectionFailure(Exception exception)
         {
-            lock (_callbackByRequestId) 
+            lock (_callbackByRequestId)
             {
                 foreach (var cb in _callbackByRequestId.Values)
                 {
