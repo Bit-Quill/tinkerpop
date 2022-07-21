@@ -86,7 +86,7 @@ namespace Gremlin.Net.Driver
 
                 return _callbackByRequestId.Count;
             }
-        }
+        } 
 
         public bool IsOpen => _webSocketConnection.IsOpen && Volatile.Read(ref _connectionState) != Closed;
 
