@@ -172,7 +172,7 @@ namespace Gremlin.Net.UnitTest.Driver
             await AssertExpectedConnectionClosedException(closeResult.CloseStatus, closeResult.CloseStatusDescription, () => request1);
             await AssertExpectedConnectionClosedException(closeResult.CloseStatus, closeResult.CloseStatusDescription, () => request2);
 
-            Assert.False(connection.IsOpen); 
+            Assert.False(connection.IsOpen);
             Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Got NrRequestsInFlight=={connection.NrRequestsInFlight}");
 
             Assert.Equal(0, connection.NrRequestsInFlight);
