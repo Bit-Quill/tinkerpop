@@ -77,7 +77,16 @@ namespace Gremlin.Net.Driver
             BeginReceiving();
         }
 
-        public int NrRequestsInFlight => _callbackByRequestId.Count;
+        public int NrRequestsInFlight
+        {
+            get
+            {
+                Console.WriteLine(
+                        $"NrRequestsInFlight getter, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
+
+                return _callbackByRequestId.Count;
+            }
+        }
 
         public bool IsOpen => _webSocketConnection.IsOpen && Volatile.Read(ref _connectionState) != Closed;
 
