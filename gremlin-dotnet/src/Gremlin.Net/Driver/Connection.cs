@@ -223,7 +223,8 @@ namespace Gremlin.Net.Driver
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"SendMessagesFromQueueAsync exception, now {_callbackByRequestId.Count}");
+                    Console.WriteLine(
+                        $"SendMessagesFromQueueAsync exception, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
                     await CloseConnectionBecauseOfFailureAsync(e).ConfigureAwait(false);
                     break;
                 }

@@ -145,10 +145,6 @@ namespace Gremlin.Net.UnitTest.Driver
                 {
                     await receiveSempahore.WaitAsync();
                     mockedClientWebSocket.Setup(m => m.State).Returns(WebSocketState.CloseReceived);
-                    while (mockedClientWebSocket.Object.State != WebSocketState.CloseReceived)
-                    {
-                        await Task.Delay(5);
-                    }
                     return closeResult;
                 });
             mockedClientWebSocket.Setup(m => m.State).Returns(WebSocketState.Open);
