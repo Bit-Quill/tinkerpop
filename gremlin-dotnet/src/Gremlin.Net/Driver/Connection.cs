@@ -125,7 +125,7 @@ namespace Gremlin.Net.Driver
                     Console.WriteLine(
                         $"{Thread.CurrentThread.ManagedThreadId} ReceiveMessagesAsync exception, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
                     await CloseConnectionBecauseOfFailureAsync(e).ConfigureAwait(false);
-                    break; 
+                    break;
                 }
             }
         }
