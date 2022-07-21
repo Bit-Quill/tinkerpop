@@ -82,7 +82,7 @@ namespace Gremlin.Net.Driver
             get
             {
                 Console.WriteLine(
-                        $"NrRequestsInFlight getter, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
+                        $"{Thread.CurrentThread.ManagedThreadId} NrRequestsInFlight getter, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
 
                 return _callbackByRequestId.Count;
             }
@@ -94,7 +94,7 @@ namespace Gremlin.Net.Driver
         {
             var receiver = new ResponseHandlerForSingleRequestMessage<T>();
             _callbackByRequestId.GetOrAdd(requestMessage.RequestId, receiver);
-            Console.WriteLine($"Added callback for {requestMessage.RequestId}, now {_callbackByRequestId.Count}");
+            Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Added callback for {requestMessage.RequestId}, now {_callbackByRequestId.Count}");
             _writeQueue.Enqueue(requestMessage);
             BeginSendingMessages();
             return receiver.Result;
@@ -122,7 +122,8 @@ namespace Gremlin.Net.Driver
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"ReceiveMessagesAsync exception, now {_callbackByRequestId.Count}");
+                    Console.WriteLine(
+                        $"{Thread.CurrentThread.ManagedThreadId} ReceiveMessagesAsync exception, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
                     await CloseConnectionBecauseOfFailureAsync(e).ConfigureAwait(false);
                     break;
                 }
@@ -146,12 +147,12 @@ namespace Gremlin.Net.Driver
                 if (receivedMsg.RequestId != null &&
                     _callbackByRequestId.TryRemove(receivedMsg.RequestId.Value, out var responseHandler))
                 {
-                    Console.WriteLine($"Removed callback for {receivedMsg.RequestId.Value} error, now {_callbackByRequestId.Count}");
+                    Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Removed callback for {receivedMsg.RequestId.Value} error, now {_callbackByRequestId.Count}");
                     responseHandler?.HandleFailure(e);
                 }
                 else
                 {
-                    Console.WriteLine($"Not removed callback, now {_callbackByRequestId.Count}");
+                    Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Not removed callback, now {_callbackByRequestId.Count}");
                 }
             }
         }
@@ -186,7 +187,7 @@ namespace Gremlin.Net.Driver
             {
                 _callbackByRequestId[receivedMsg.RequestId.Value].Finalize(status.Attributes);
                 _callbackByRequestId.TryRemove(receivedMsg.RequestId.Value, out _);
-                Console.WriteLine($"Removed callback for {receivedMsg.RequestId.Value}, now {_callbackByRequestId.Count}");
+                Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Removed callback for {receivedMsg.RequestId.Value}, now {_callbackByRequestId.Count}");
             }
         }
 
@@ -233,7 +234,7 @@ namespace Gremlin.Net.Driver
                 catch (Exception e)
                 {
                     Console.WriteLine(
-                        $"SendMessagesFromQueueAsync exception, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
+                        $"{Thread.CurrentThread.ManagedThreadId} SendMessagesFromQueueAsync exception, now {_callbackByRequestId.Count}, {string.Join(",", _callbackByRequestId.Keys)}");
                     await CloseConnectionBecauseOfFailureAsync(e).ConfigureAwait(false);
                     break;
                 }
@@ -269,7 +270,7 @@ namespace Gremlin.Net.Driver
                 cb.HandleFailure(exception);
             }
             _callbackByRequestId.Clear();
-            Console.WriteLine($"Removed all callbacks on ConnectionFailure, now {_callbackByRequestId.Count}");
+            Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Removed all callbacks on ConnectionFailure, now {_callbackByRequestId.Count}");
         }
 
         private async Task SendMessageAsync(RequestMessage message)
