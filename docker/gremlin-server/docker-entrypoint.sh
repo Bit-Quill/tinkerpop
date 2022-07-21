@@ -80,7 +80,7 @@ java -cp /opt/gremlin-test/gremlin-test-${GREMLIN_SERVER_VERSION}-jar-with-depen
      org.apache.tinkerpop.gremlin.server.KdcFixture /opt/gremlin-server &
 
 export JAVA_OPTIONS="-Xms512m -Xmx4096m -Djava.security.krb5.conf=/opt/gremlin-server/target/kdc/krb5.conf"
-exec /opt/gremlin-server/bin/gremlin-server.sh conf/gremlin-server-integration-krb5.yaml
+/opt/gremlin-server/bin/gremlin-server.sh ${TINKERPOP_HOME}/conf/gremlin-server-integration-krb5.yaml
 
 
 #######################################################################
