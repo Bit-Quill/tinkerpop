@@ -63,6 +63,7 @@ cp *.yaml ${TINKERPOP_HOME}/conf/
 java -version
 
 dos2unix /opt/gremlin-server/bin/gremlin-server.sh
+dos2unix /opt/gremlin-server/bin/gremlin-server.conf
 
 # dynamically installs Neo4j libraries so that we can test variants with transactions,
 # but only only port 45940 is configured with the neo4j graph as the neo4j-empty.properties
