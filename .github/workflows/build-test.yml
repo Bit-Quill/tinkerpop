@@ -90,6 +90,9 @@ jobs:
           working-directory: .
           run: |
             mvn clean install -pl gremlin-server -DskipTests -DskipIntegrationTests=true -Dci -am
+        - name: Save Docker image
+          working-directory: ./gremlin-server
+          run: docker save tinkerpop/gremlin-server > gremlin-server.tar
         - uses: actions/cache@v2
           id: gremlin-server-test-docker-image
           with:
@@ -264,6 +267,9 @@ jobs:
             ./gremlin-server/*
             ~/.m2/repository/org/apache/tinkerpop/*
           key: ${{ github.sha }}
+      - name: Load Docker Image
+        working-directory: ./gremlin-server
+        run: docker load < gremlin-server.tar
       - name: Build with Maven
         working-directory: .
         run: |
