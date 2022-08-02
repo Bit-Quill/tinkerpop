@@ -22,7 +22,7 @@
  */
 'use strict';
 
-const {setWorldConstructor, Before, BeforeAll, AfterAll} = require('cucumber');
+const {setWorldConstructor, Before, BeforeAll, AfterAll, After} = require('cucumber');
 const helper = require('../helper');
 const traversal = require('../../lib/process/anonymous-traversal').traversal;
 const graphTraversalModule = require('../../lib/process/graph-traversal');
@@ -93,7 +93,12 @@ AfterAll(function () {
 Before(function (info) {
   this.scenario = info.pickle.name;
   this.cache = cache;
+  console.log("started: " + this.scenario+ " time: " + new Date().toISOString());
 });
+
+After(function (){
+  console.log("ended: " + this.scenario+ " time: " + new Date().toISOString());
+})
 
 function getVertices(connection) {
   const g = traversal().withRemote(connection);
