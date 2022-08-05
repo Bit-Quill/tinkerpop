@@ -48,7 +48,9 @@ services:
       - DOCKER_ENVIRONMENT=true
       - TEST_TRANSACTIONS=true
     working_dir: /gremlin-dotnet
-    command: ["./gremlin-test-server/wait-for-server.sh", gremlin-server-test-dotnet, "45940", "90", "bash", "-c",
-        "dotnet test ./Gremlin.Net.sln"]
+    command: >
+      bash -c "apt-get update && apt-get install dos2unix && dos2unix ./gremlin-test-server/wait-for-server.sh
+      && ./gremlin-test-server/wait-for-server.sh gremlin-server-test-dotnet 45940 300 
+      && dotnet test ./Gremlin.Net.sln"
     depends_on:
       - gremlin-server-test-dotnet
