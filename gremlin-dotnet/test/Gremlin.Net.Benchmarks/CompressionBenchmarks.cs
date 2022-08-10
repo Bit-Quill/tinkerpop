@@ -29,7 +29,7 @@ using Gremlin.Net.Structure.IO.GraphSON;
 using static Gremlin.Net.Process.Traversal.AnonymousTraversalSource;
 using static Gremlin.Net.Process.Traversal.__;
 
-namespace Gremlin.Net.Benchmarks;
+namespace Gremlin.Net.BenchmarkTests;
 
 public class CompressionBenchmarks
 {

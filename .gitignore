@@ -46,3 +46,4 @@ coverage.out
 .env
 coverage.lcov
 **/.nyc_output/
+coverage.opencover.xml
