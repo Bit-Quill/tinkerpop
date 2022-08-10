@@ -30,7 +30,7 @@ function usage {
           "\n\tThe default requires a SNAPSHOT server image to be built using:
           mvn clean install -pl :gremlin-server -DskipTests -DskipIntegrationTests=true -am && mvn install -Pdocker-images -pl :gremlin-server" \
           "\n\tRunning a prebuilt local SNAPSHOT build: ./run.sh 3.x.x-SNAPSHOT" \
-          "\n\tRunning a released version: ./run.sh 3.5.3" \
+          "\n\tRunning a released version: ./run.sh 3.5.4" \
           "\n"
 }
 
