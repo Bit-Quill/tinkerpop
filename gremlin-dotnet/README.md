@@ -19,6 +19,8 @@
 
 -->
 
+[![codecov](https://codecov.io/gh/apache/tinkerpop/branch/master/graph/badge.svg?token=TojD2nR5Qd)](https://codecov.io/gh/apache/tinkerpop)
+
 # Gremlin.Net
 
 [Apache TinkerPop™][tk] is a graph computing framework for both graph databases (OLTP) and graph analytic systems
