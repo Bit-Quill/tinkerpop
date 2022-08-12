@@ -51,6 +51,6 @@ services:
     command: >
       bash -c "apt-get update && apt-get install dos2unix && dos2unix ./gremlin-test-server/wait-for-server.sh
       && ./gremlin-test-server/wait-for-server.sh gremlin-server-test-dotnet 45940 300 
-      && dotnet test ./Gremlin.Net.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Exclude="[*Tests?]""
+      && dotnet test ./Gremlin.Net.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Exclude="[*Tests?]*""
     depends_on:
       - gremlin-server-test-dotnet
