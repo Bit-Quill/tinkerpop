@@ -45,7 +45,7 @@ jobs:
       - name: Upload to Codecov
         uses: codecov/codecov-action@v3
         with:
-          directory: ./
+          directory: ./gremlin-tools/gremlin-coverage/target/site
 #  gremlin-server-default:
 #    name: gremlin-server default
 #    timeout-minutes: 45
