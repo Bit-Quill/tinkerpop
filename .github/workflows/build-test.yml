@@ -46,7 +46,7 @@ jobs:
       - name: Upload to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./tinkergraph-gremlin/target/site/jacoco.xml
+          files: ./tinkergraph-gremlin/target/site/jacoco/jacoco.xml
 #  gremlin-server-default:
 #    name: gremlin-server default
 #    timeout-minutes: 45
