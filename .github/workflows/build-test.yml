@@ -41,11 +41,12 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
       - name: Build with Maven
-        run: mvn clean install -pl -:gremlin-javascript,-:gremlin-dotnet-source,-:gremlin-dotnet-tests,-:gremlin-go,-:gremlin-python -Dci --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dcoverage
+#        run: mvn clean install -pl -:gremlin-javascript,-:gremlin-dotnet-source,-:gremlin-dotnet-tests,-:gremlin-go,-:gremlin-python -Dci --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dcoverage
+        run: mvn clean install -pl :tinkergraph-gremlin -Dci --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dcoverage
       - name: Upload to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./gremlin-core/target/site/jacoco.xml,./gremlin-server/target/site/jacoco.xml,./gremlin-console/target/site/jacoco.xml,./gremlin-groovy/target/site/jacoco.xml,./gremlin-driver/target/site/jacoco.xml,./neo4j-gremlin/target/site/jacoco.xml,./tinkergraph-gremlin/target/site/jacoco.xml,
+          files: ./tinkergraph-gremlin/target/site/jacoco.xml
 #  gremlin-server-default:
 #    name: gremlin-server default
 #    timeout-minutes: 45
