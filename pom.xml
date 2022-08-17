@@ -1896,6 +1896,13 @@ limitations under the License.
                                 </configuration>
                             </execution>
                             <execution>
+                                <id>report</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                            <execution>
                                 <id>prepare-it-agent</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
