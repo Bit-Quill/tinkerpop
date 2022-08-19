@@ -14,9 +14,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ////
-image::https://codecov.io/gh/Bit-Quill/tinkerpop/branch/master/graph/badge.svg?token=emILhOc6Rm[link="https://codecov.io/gh/Bit-Quill/tinkerpop"]
 == TinkerPop3
-
+image::https://codecov.io/gh/Bit-Quill/tinkerpop/branch/master/graph/badge.svg?token=emILhOc6Rm[link="https://codecov.io/gh/Bit-Quill/tinkerpop"]
 image:https://raw.githubusercontent.com/apache/tinkerpop/master/docs/static/images/tinkerpop3-splash.png[TinkerPop3, link="https://tinkerpop.apache.org"]
 
 === Documentation
