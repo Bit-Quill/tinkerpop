@@ -27,7 +27,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Build with Maven
-        run: mvn clean install -pl -:gremlin-javascript -Dci --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+        run: mvn clean install -pl -:gremlin-javascript,-:gremlin-dotnet-source,-:gremlin-dotnet-tests,-:gremlin-go,-:gremlin-python -Dci --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dcoverage
   java-jdk8:
     name: mvn clean install - jdk8
     timeout-minutes: 45
@@ -41,7 +41,7 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
       - name: Build with Maven
-        run: mvn clean install -pl -:gremlin-javascript,-:gremlin-dotnet-source,-:gremlin-dotnet-tests,-:gremlin-go,-:gremlin-python -Dci --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dcoverage
+        run: mvn clean install -pl -:gremlin-javascript -Dci --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
       - name: Upload to Codecov
         uses: codecov/codecov-action@v3
         with:
