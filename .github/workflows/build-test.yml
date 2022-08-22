@@ -155,8 +155,12 @@ jobs:
           distribution: 'temurin'
       - name: Build with Maven
         run: |
-          mvn clean install -pl -:gremlin-python,-gremlin-dotnet,-:gremlin-dotnet-source,-:gremlin-dotnet-tests -q -DskipTests -Dci
+          mvn clean install -pl -:gremlin-python,-gremlin-dotnet,-:gremlin-dotnet-source,-:gremlin-dotnet-tests,-:gremlin-go -q -DskipTests -Dci
           mvn verify -pl :gremlin-javascript,:gremlint -DincludeNeo4j
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          working-directory: ./gremlin-javascript/src/main/javascript/gremlin-javascript
   python:
     name: python
     timeout-minutes: 20
