@@ -147,7 +147,8 @@ class GremlinServerWSProtocol(AbstractBaseProtocol):
             try:
                 print("do we have the correct kerberos_hostname:", flush=True)
                 print(self._kerberized_service)
-                print(os.environ['KRB5_CONFIG'])
+                print("getting local hostname:")
+                print(socket.gethostname())
                 _, kerberos_context = kerberos.authGSSClientInit(
                     self._kerberized_service, gssflags=kerberos.GSS_C_MUTUAL_FLAG)
                 print("context created")

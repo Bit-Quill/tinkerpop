@@ -64,6 +64,7 @@ services:
       && echo 'password' | kinit stephen -V
       && klist -a
       && echo $TEST_HOST
+      && cat /etc/hosts
       && pip install wheel radish-bdd PyHamcrest aenum isodate kerberos six
       && python3 ./setup.py build
       && python3 ./setup.py test
