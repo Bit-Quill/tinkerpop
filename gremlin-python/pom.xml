@@ -84,6 +84,22 @@ limitations under the License.
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>init-build-properties</id>
+                                <goals>
+                                    <goal>hostname</goal>
+                                </goals>
+                                <configuration>
+                                    <hostnameProperty>my.hostname</hostnameProperty>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
@@ -150,6 +166,7 @@ limitations under the License.
                                             <env key="ABS_PROJECT_HOME" value="${project.basedir}/../"/>
 <!--                                            <env key="KRB5_CONFIG" value="${project.basedir}/../docker/gremlin-test-server/krb5.conf"/>-->
 <!--                                            <env key="KRB_HOSTNAME" value="gremlin-server-test"/>-->
+                                            <env key="TEST_HOST" value="${my.hostname}" />
                                             <env key="BUILD_DIR" value="${project.build.directory}/python3"/>
                                             <arg line="up --build --abort-on-container-exit gremlin-server-test-python gremlin-python-integration-tests"/>
                                         </exec>
