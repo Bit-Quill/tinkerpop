@@ -251,7 +251,7 @@ have to be installed. When generating or publishing the TinkerPop website, the `
 built. Consequently, the scripts `bin/generate-home.sh` and `bin/publish-home.sh` require that Node.js and npm are
 installed. Version 6.x or newer of npm is required. This is covered in more detail in the <<site,Site>> section.
 
-`gremlin-javascript` uses Docker for all of its testing. Please make sure Docker is installed and running on your system. 
+`gremlin-javascript` uses Docker for running integration tests against the Gremlin server. Please make sure Docker is installed and running on your system. 
 You will need to install both link:https://docs.docker.com/engine/install/[Docker Engine] and link:https://docs.docker.com/compose/install/[Docker Compose], which are included in link:https://docs.docker.com/desktop/[Docker Desktop].
 
 IMPORTANT: Beware of unexpected or unwanted changes on `package-lock.json` files when committing and merging. 
