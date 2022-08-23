@@ -522,7 +522,7 @@ SNAPSHOT Gremlin server through `maven`, it is recommended to use the latest rel
 use actual version number, e.g. `GREMLIN_SERVER=3.5.x` or `GREMLIN_SERVER=3.6.x`).
 
 The docker compose environment variable `HOME` specifies the user home directory for mounting volumes during test image 
-set up. This varibale is set by default in Unix/Linux, but will need to be set for Windows, for example, run 
+set up. This varibale is set by default in Unix/Linux and macOS, but will need to be set for Windows, for example, run 
 `$env:HOME=$env:USERPROFILE` in PowerShell.
 
 There are different ways to launch the test suite and set the `GREMLIN_SERVER` environment variable depending on 
