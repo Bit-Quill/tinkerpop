@@ -49,6 +49,7 @@ services:
       - TEST_TRANSACTIONS=${TEST_TRANSACTIONS:-true}
       - DEBIAN_FRONTEND=noninteractive
       - KRB5_CONFIG=./gremlin-test-server/krb5.conf
+      - KRB5CCNAME=./test-tkt.cc
       - GREMLIN_SERVER_URL=ws://gremlin-server-test-python:{}/gremlin
       - GREMLIN_SERVER_BASIC_AUTH_URL=wss://gremlin-server-test-python:{}/gremlin
       - KRB_HOSTNAME=${KRB_HOSTNAME:-gremlin-server-test}
