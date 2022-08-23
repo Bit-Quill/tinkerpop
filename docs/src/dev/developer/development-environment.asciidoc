@@ -213,7 +213,7 @@ The build optionally requires link:https://dotnet.microsoft.com/download[.NET SD
 `gremlin-dotnet` module. If .NET SDK is not installed, TinkerPop will still build with Maven, but .NET projects
 will be skipped.
 
-`gremlin-dotnet` uses Docker for all of its testing. Please make sure Docker is installed and running on your system. 
+`gremlin-dotnet` uses Docker for running integration tests against the Gremlin server. Please make sure Docker is installed and running on your system. 
 You will need to install both link:https://docs.docker.com/engine/install/[Docker Engine] and link:https://docs.docker.com/compose/install/[Docker Compose], which are included in link:https://docs.docker.com/desktop/[Docker Desktop].
 
 `gremlin-dotnet` can be built and tested from the command line with:
