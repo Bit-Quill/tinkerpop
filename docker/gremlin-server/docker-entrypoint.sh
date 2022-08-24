@@ -74,10 +74,6 @@ if [ ! -z "${INCLUDE_NEO4J}" ]; then
   /opt/gremlin-server/bin/gremlin-server.sh install org.apache.tinkerpop neo4j-gremlin ${GREMLIN_SERVER_VERSION}
 fi
 
-echo "printing hosts:"
-
-cat /etc/hosts
-
 /opt/gremlin-server/bin/gremlin-server.sh ${TINKERPOP_HOME}/conf/gremlin-server-integration.yaml &
 
 /opt/gremlin-server/bin/gremlin-server.sh ${TINKERPOP_HOME}/conf/gremlin-server-integration-secure.yaml &
