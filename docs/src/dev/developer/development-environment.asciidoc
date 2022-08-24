@@ -213,7 +213,7 @@ The build optionally requires link:https://dotnet.microsoft.com/download[.NET SD
 `gremlin-dotnet` module. If .NET SDK is not installed, TinkerPop will still build with Maven, but .NET projects
 will be skipped.
 
-`gremlin-dotnet` uses Docker for running integration tests against the Gremlin server. Please make sure Docker is installed and running on your system. 
+`gremlin-dotnet` uses Docker for all of its testing. Please make sure Docker is installed and running on your system. 
 You will need to install both link:https://docs.docker.com/engine/install/[Docker Engine] and link:https://docs.docker.com/compose/install/[Docker Compose], which are included in link:https://docs.docker.com/desktop/[Docker Desktop].
 
 `gremlin-dotnet` can be built and tested from the command line with:
@@ -251,7 +251,7 @@ have to be installed. When generating or publishing the TinkerPop website, the `
 built. Consequently, the scripts `bin/generate-home.sh` and `bin/publish-home.sh` require that Node.js and npm are
 installed. Version 6.x or newer of npm is required. This is covered in more detail in the <<site,Site>> section.
 
-`gremlin-javascript` uses Docker for running integration tests against the Gremlin server. Please make sure Docker is installed and running on your system. 
+`gremlin-javascript` uses Docker for all of its testing. Please make sure Docker is installed and running on your system. 
 You will need to install both link:https://docs.docker.com/engine/install/[Docker Engine] and link:https://docs.docker.com/compose/install/[Docker Compose], which are included in link:https://docs.docker.com/desktop/[Docker Desktop].
 
 IMPORTANT: Beware of unexpected or unwanted changes on `package-lock.json` files when committing and merging. 
@@ -506,11 +506,13 @@ that has been published with that version number.
 [[docker-testing]]
 == Testing with Docker
 
-Some GLV allow you to run tests without Gremlin Server build. Currently supported gremlin-go, gremlin-javascript and
-gremlin-dotnet.
+Some GLV allow you to run tests without setting up Java and without building of other parts of the server. Currently
+supported gremlin-go, gremlin-javascript and gremlin-dotnet.
 
 Please make sure Docker is installed and running on your system. 
 You will need to install both link:https://docs.docker.com/engine/install/[Docker Engine] and link:https://docs.docker.com/compose/install/[Docker Compose], which are included in link:https://docs.docker.com/desktop/[Docker Desktop].
+
+The following environment variables used by Docker Compose will automatically be set when running with Maven.
 
 The docker compose environment variable `GREMLIN_SERVER` specifies the Gremlin server docker image to use, i.e. an
 image with the tag `tinkerpop/gremlin-server:$GREMLIN_SERVER`, and is a required environment variable. This also 
@@ -522,7 +524,7 @@ SNAPSHOT Gremlin server through `maven`, it is recommended to use the latest rel
 use actual version number, e.g. `GREMLIN_SERVER=3.5.x` or `GREMLIN_SERVER=3.6.x`).
 
 The docker compose environment variable `HOME` specifies the user home directory for mounting volumes during test image 
-set up. This varibale is set by default in Unix/Linux and macOS, but will need to be set for Windows, for example, run 
+set up. This variable is set by default in Unix/Linux, but will need to be set for Windows, for example, run 
 `$env:HOME=$env:USERPROFILE` in PowerShell.
 
 There are different ways to launch the test suite and set the `GREMLIN_SERVER` environment variable depending on 
