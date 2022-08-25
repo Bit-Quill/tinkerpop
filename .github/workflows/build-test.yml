@@ -206,7 +206,7 @@ jobs:
         run: |
           touch gremlin-dotnet/src/.glv
           touch gremlin-dotnet/test/.glv
-          mvn clean install -pl -:gremlin-javascript,-:gremlin-python,-:gremlint -q -DskipTests -Dci
+          mvn clean install -pl -:gremlin-javascript,-:gremlin-python,-:gremlint,-:gremlin-go -q -DskipTests -Dci
           mvn verify -pl :gremlin-dotnet,:gremlin-dotnet-tests -P gremlin-dotnet -DincludeNeo4j
       - name: Upload to Codecov
         uses: codecov/codecov-action@v3

@@ -88,31 +88,6 @@ limitations under the License.
                 <finalName>${project.artifactId}-${project.version}</finalName>
                 <plugins>
                     <plugin>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <version>1.2.1</version>
-                        <executions>
-                            <execution>
-                                <id>run-tests</id>
-                                <phase>integration-test</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>dotnet</executable>
-                                    <workingDirectory>./..</workingDirectory>
-                                    <arguments>
-                                        <argument>test</argument>
-                                        <argument>./Gremlin.Net.sln</argument>
-                                        <argument>/p:CollectCoverage=true</argument>
-                                        <argument>/p:CoverletOutputFormat=opencover</argument>
-                                        <argument>/p:Exclude="[*Tests?]*"</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>org.codehaus.gmavenplus</groupId>
                         <artifactId>gmavenplus-plugin</artifactId>
                         <dependencies>
@@ -226,6 +201,35 @@ limitations under the License.
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>1.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>run-tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${skipTests}</skip>
+                                    <environmentVariables>
+                                        <TEST_TRANSACTIONS>false</TEST_TRANSACTIONS>
+                                    </environmentVariables>
+                                    <executable>dotnet</executable>
+                                    <workingDirectory>./..</workingDirectory>
+                                    <arguments>
+                                        <argument>test</argument>
+                                        <argument>./Gremlin.Net.sln</argument>
+                                        <argument>/p:CollectCoverage=true</argument>
+                                        <argument>/p:CoverletOutputFormat=opencover</argument>
+                                        <argument>/p:Exclude="[*Tests?]*"</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -260,7 +264,7 @@ limitations under the License.
                                 </goals>
                                 <configuration>
                                     <executable>dotnet</executable>
-                                    <workingDirectory>../</workingDirectory>
+                                    <workingDirectory>./..</workingDirectory>
                                     <arguments>
                                         <argument>test</argument>
                                         <argument>./Gremlin.Net.sln</argument>
