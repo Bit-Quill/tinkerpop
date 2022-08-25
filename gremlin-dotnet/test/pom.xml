@@ -91,17 +91,26 @@ limitations under the License.
                         <artifactId>exec-maven-plugin</artifactId>
                         <groupId>org.codehaus.mojo</groupId>
                         <version>1.2.1</version>
-                        <configuration>
-                            <executable>dotnet</executable>
-                            <workingDirectory>./..</workingDirectory>
-                            <arguments>
-                                <argument>test</argument>
-                                <argument>./Gremlin.Net.sln</argument>
-                                <argument>/p:CollectCoverage=true</argument>
-                                <argument>/p:CoverletOutputFormat=opencover</argument>
-                                <argument>/p:Exclude="[*Tests?]*"</argument>
-                            </arguments>
-                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>run-tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>dotnet</executable>
+                                    <workingDirectory>./..</workingDirectory>
+                                    <arguments>
+                                        <argument>test</argument>
+                                        <argument>./Gremlin.Net.sln</argument>
+                                        <argument>/p:CollectCoverage=true</argument>
+                                        <argument>/p:CoverletOutputFormat=opencover</argument>
+                                        <argument>/p:Exclude="[*Tests?]*"</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.gmavenplus</groupId>
@@ -242,20 +251,29 @@ limitations under the License.
                         <artifactId>exec-maven-plugin</artifactId>
                         <groupId>org.codehaus.mojo</groupId>
                         <version>1.2.1</version>
-                        <configuration>
-                            <executable>dotnet</executable>
-                            <workingDirectory>../</workingDirectory>
-                            <arguments>
-                                <argument>test</argument>
-                                <argument>./Gremlin.Net.sln</argument>
-                                <argument>/p:CollectCoverage=true</argument>
-                                <argument>/p:CoverletOutputFormat=opencover</argument>
-                                <argument>/p:Exclude="[*Tests?]*"</argument>
-                            </arguments>
-                            <environmentVariables>
-                                <TEST_TRANSACTIONS>true</TEST_TRANSACTIONS>
-                            </environmentVariables>
-                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>run-tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>dotnet</executable>
+                                    <workingDirectory>../</workingDirectory>
+                                    <arguments>
+                                        <argument>test</argument>
+                                        <argument>./Gremlin.Net.sln</argument>
+                                        <argument>/p:CollectCoverage=true</argument>
+                                        <argument>/p:CoverletOutputFormat=opencover</argument>
+                                        <argument>/p:Exclude="[*Tests?]*"</argument>
+                                    </arguments>
+                                    <environmentVariables>
+                                        <TEST_TRANSACTIONS>true</TEST_TRANSACTIONS>
+                                    </environmentVariables>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.gmavenplus</groupId>
