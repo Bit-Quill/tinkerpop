@@ -44,3 +44,6 @@ docs/gremlint/
 gremlint/
 coverage.out
 .env
+coverage.lcov
+**/.nyc_output/
+
