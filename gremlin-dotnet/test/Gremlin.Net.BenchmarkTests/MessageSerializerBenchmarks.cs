@@ -34,7 +34,7 @@ using static Gremlin.Net.Process.Traversal.AnonymousTraversalSource;
 using static Gremlin.Net.Process.Traversal.__;
 using static Gremlin.Net.Process.Traversal.P;
 
-namespace Gremlin.Net.Benchmarks
+namespace Gremlin.Net.BenchmarkTests
 {
     [MemoryDiagnoser]
     public class MessageSerializerBenchmarks

@@ -26,7 +26,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Running;
 
-namespace Gremlin.Net.Benchmarks
+namespace Gremlin.Net.BenchmarkTests
 {
     public static class Program
     {

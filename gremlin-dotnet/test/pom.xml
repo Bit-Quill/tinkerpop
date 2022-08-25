@@ -88,25 +88,19 @@ limitations under the License.
                 <finalName>${project.artifactId}-${project.version}</finalName>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.eobjects.build</groupId>
-                        <artifactId>dotnet-maven-plugin</artifactId>
-                        <extensions>true</extensions>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>1.2.1</version>
                         <configuration>
-                            <skip>${skipTests}</skip>
-                            <!--
-                            transaction testing is disabled unless the -DincludeNeo4j flag enables the include-neo4j
-                            maven profile which is a standard profile we use to add neo4j to testing explicitly - for
-                            dotnet we set this TEST_TRANSACTIONS environment variable that can be accessed in tests to
-                            determine if we skip transaction oriented tests or not. without neo4j we can't test Tx()
-                            so this is disabled by default and enabled in the include-neo4j profile below
-                            -->
-                            <environment>
-                                <TEST_TRANSACTIONS>false</TEST_TRANSACTIONS>
-                            </environment>
+                            <executable>dotnet</executable>
+                            <workingDirectory>./..</workingDirectory>
+                            <arguments>
+                                <argument>test</argument>
+                                <argument>./Gremlin.Net.sln</argument>
+                                <argument>/p:CollectCoverage=true</argument>
+                                <argument>/p:CoverletOutputFormat=opencover</argument>
+                                <argument>/p:Exclude="[*Tests?]*"</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -245,12 +239,22 @@ limitations under the License.
                 <plugins>
                     <!-- with neo4j present we can enable transaction testing -->
                     <plugin>
-                        <groupId>org.eobjects.build</groupId>
-                        <artifactId>dotnet-maven-plugin</artifactId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>1.2.1</version>
                         <configuration>
-                            <environment>
+                            <executable>dotnet</executable>
+                            <workingDirectory>../</workingDirectory>
+                            <arguments>
+                                <argument>test</argument>
+                                <argument>./Gremlin.Net.sln</argument>
+                                <argument>/p:CollectCoverage=true</argument>
+                                <argument>/p:CoverletOutputFormat=opencover</argument>
+                                <argument>/p:Exclude="[*Tests?]*"</argument>
+                            </arguments>
+                            <environmentVariables>
                                 <TEST_TRANSACTIONS>true</TEST_TRANSACTIONS>
-                            </environment>
+                            </environmentVariables>
                         </configuration>
                     </plugin>
                     <plugin>
