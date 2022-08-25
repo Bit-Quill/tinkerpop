@@ -145,20 +145,10 @@ class GremlinServerWSProtocol(AbstractBaseProtocol):
         # First pass: get service granting ticket and return it to gremlin-server
         if not self._kerberos_context:
             try:
-                print("do we have the correct kerberos_hostname:", flush=True)
-                print(self._kerberized_service)
-                print("getting local hostname:")
-                print(socket.gethostname())
                 _, kerberos_context = kerberos.authGSSClientInit(
                     self._kerberized_service, gssflags=kerberos.GSS_C_MUTUAL_FLAG)
-                print("context created")
-                print(kerberos_context)
                 kerberos.authGSSClientStep(kerberos_context, '')
-                print("context authorizing")
-                print(kerberos_context)
                 auth = kerberos.authGSSClientResponse(kerberos_context)
-                print("context authorized")
-                print(auth)
                 self._kerberos_context = kerberos_context
             except kerberos.KrbError as e:
                 raise ConfigurationError(

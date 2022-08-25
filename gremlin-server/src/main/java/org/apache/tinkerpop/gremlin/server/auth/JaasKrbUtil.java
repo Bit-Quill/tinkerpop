@@ -93,7 +93,6 @@ public final class JaasKrbUtil {
         Configuration conf = useKeytab(principal, keytabFile);
         String confName = "KeytabConf";
         LoginContext loginContext = new LoginContext(confName, subject, null, conf);
-        System.out.println(conf);
         loginContext.login();
         return loginContext.getSubject();
     }
