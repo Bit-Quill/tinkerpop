@@ -506,8 +506,8 @@ that has been published with that version number.
 [[docker-testing]]
 == Testing with Docker
 
-Some GLV allow you to run tests without setting up Java and without building of other parts of the server. Currently
-supported gremlin-go, gremlin-javascript, gremlin-dotnet, gremlin-python and gremlin-console.
+Some GLV allow you to run tests without building of other parts of the server. Currently supported gremlin-go, 
+gremlin-javascript, gremlin-dotnet, gremlin-python and gremlin-console.
 
 Please make sure Docker is installed and running on your system. 
 You will need to install both link:https://docs.docker.com/engine/install/[Docker Engine] and link:https://docs.docker.com/compose/install/[Docker Compose], which are included in link:https://docs.docker.com/desktop/[Docker Desktop].
