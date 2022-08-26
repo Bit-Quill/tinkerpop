@@ -26,6 +26,11 @@ limitations under the License.
     <artifactId>gremlin-dotnet</artifactId>
     <name>Apache TinkerPop :: Gremlin.Net</name>
     <packaging>pom</packaging>
+    <properties>
+        <!-- provides a way to convert maven.test.skip value to skipTests for use in skipping dotnet tests -->
+        <maven.test.skip>false</maven.test.skip>
+        <skipTests>${maven.test.skip}</skipTests>
+    </properties>
 
     <modules>
         <module>src</module>
@@ -58,6 +63,9 @@ limitations under the License.
                 <groupId>org.eobjects.build</groupId>
                 <artifactId>dotnet-maven-plugin</artifactId>
                 <extensions>true</extensions>
+                <configuration>
+                    <skip>${skipTests}</skip>
+                </configuration>
             </plugin>
             <!--
             there is no point to deploying the jvm stuff - there is no java source really - just poms
@@ -70,15 +78,5 @@ limitations under the License.
                 </configuration>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.eobjects.build</groupId>
-                    <artifactId>dotnet-maven-plugin</artifactId>
-                    <extensions>true</extensions>
-                    <version>0.24</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>

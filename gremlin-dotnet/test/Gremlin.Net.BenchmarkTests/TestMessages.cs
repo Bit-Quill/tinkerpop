@@ -21,7 +21,7 @@
 
 #endregion
 
-namespace Gremlin.Net.Benchmarks
+namespace Gremlin.Net.BenchmarkTests
 {
     public class TestMessages
     {
