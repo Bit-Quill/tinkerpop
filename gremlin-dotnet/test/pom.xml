@@ -263,16 +263,6 @@ limitations under the License.
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <skip>${skipTests}</skip>
-                                    <executable>dotnet</executable>
-                                    <workingDirectory>./..</workingDirectory>
-                                    <arguments>
-                                        <argument>test</argument>
-                                        <argument>./Gremlin.Net.sln</argument>
-                                        <argument>/p:CollectCoverage=true</argument>
-                                        <argument>/p:CoverletOutputFormat=opencover</argument>
-                                        <argument>/p:Exclude="[*Tests?]*"</argument>
-                                    </arguments>
                                     <environmentVariables>
                                         <TEST_TRANSACTIONS>true</TEST_TRANSACTIONS>
                                     </environmentVariables>
