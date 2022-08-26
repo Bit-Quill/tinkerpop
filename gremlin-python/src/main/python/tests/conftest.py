@@ -37,9 +37,9 @@ from gremlin_python.driver.serializer import (
     GraphBinarySerializersV1)
 from gremlin_python.driver.aiohttp.transport import AiohttpTransport
 
-gremlin_server_url = (os.environ['GREMLIN_SERVER_URL']) if 'GREMLIN_SERVER_URL' in os.environ else 'ws://localhost:{}/gremlin'
-gremlin_basic_auth_url = (os.environ['GREMLIN_SERVER_BASIC_AUTH_URL']) if 'GREMLIN_SERVER_BASIC_AUTH_URL' in os.environ else 'wss://localhost:{}/gremlin'
-kerberos_hostname = (os.environ['KRB_HOSTNAME']) if 'KRB_HOSTNAME' in os.environ else socket.gethostname()
+gremlin_server_url = os.environ.get('GREMLIN_SERVER_URL', 'ws://localhost:{}/gremlin')
+gremlin_basic_auth_url = os.environ.get('GREMLIN_SERVER_BASIC_AUTH_URL', 'wss://localhost:{}/gremlin')
+kerberos_hostname = os.environ.get('KRB_HOSTNAME', socket.gethostname())
 anonymous_url = gremlin_server_url.format(45940)
 basic_url = gremlin_basic_auth_url.format(45941)
 kerberos_url = gremlin_server_url.format(45942)

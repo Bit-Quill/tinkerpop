@@ -28,7 +28,7 @@ from gremlin_python.process.anonymous_traversal import traversal
 
 __author__ = 'David M. Brown (davebshow@gmail.com)'
 
-gremlin_server_url = (os.environ['GREMLIN_SERVER_URL']) if 'GREMLIN_SERVER_URL' in os.environ else 'ws://localhost:{}/gremlin'
+gremlin_server_url = os.environ.get('GREMLIN_SERVER_URL', 'ws://localhost:{}/gremlin')
 test_no_auth_url = gremlin_server_url.format(45940)
 
 def test_conns_in_threads(remote_connection):
