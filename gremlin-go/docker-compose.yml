@@ -15,13 +15,13 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
-version: "3.7"
+version: "3.8"
 
 services:
 
   gremlin-server-test:
     container_name: gremlin-server-test
-    image: tinkerpop:gremlin-server-test-${GREMLIN_SERVER}
+    image: tinkerpop/gremlin-server-test:${GREMLIN_SERVER}
     build:
       context: ../
       dockerfile: docker/gremlin-test-server/Dockerfile
