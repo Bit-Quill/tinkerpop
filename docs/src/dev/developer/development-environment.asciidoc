@@ -40,9 +40,8 @@ To gain the ability to execute all aspects of the TinkerPop build system, other 
 established. Those prerequisites are defined in the following subsections.
 
 As of TinkerPop 3.5.5, environment configuration for Gremlin Language Variants can be optional, as Docker becomes a
-system requirement to build and test GLVs inside of Maven. Docker enables the building and testing of the GLVs without
-the need to install GLV-specific environments. Please make sure Docker is installed and running on your system. You will
-need to install both link:https://docs.docker.com/engine/install/[Docker Engine] and
+system requirement to build and test GLVs inside of Maven. Please make sure Docker is installed and running on your system.
+You will need to install both link:https://docs.docker.com/engine/install/[Docker Engine] and
 link:https://docs.docker.com/compose/install/[Docker Compose], which are included in
 link:https://docs.docker.com/desktop/[Docker Desktop].
 
@@ -520,10 +519,10 @@ To be a bit more clear, the version can not be a Docker tag like "latest" becaus
 that has been published with that version number.
 
 [[docker-testing]]
-== Testing GLVs with Docker
+== Testing Sub-Modules with Docker
 
-Currently gremlin-go, gremlin-javascript, gremlin-dotnet, gremlin-python and gremlin-console can be tested through
-Docker using Docker Compose.
+Currently the modules gremlin-go, gremlin-javascript, gremlin-dotnet, gremlin-python and gremlin-console can be tested
+through Docker.
 
 Please make sure Docker is installed and running on your system. You will need to install both
 link:https://docs.docker.com/engine/install/[Docker Engine] and link:https://docs.docker.com/compose/install/[Docker Compose],
