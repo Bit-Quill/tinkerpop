@@ -68,9 +68,9 @@ limitations under the License.
     </build>
 
     <profiles>
-        <!-- Test gremlin-dotnet javascript in Docker -->
+        <!-- Test gremlin-dotnet in Docker -->
         <profile>
-            <id>glv-dotnet</id>
+            <id>gremlin-dotnet</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <file>

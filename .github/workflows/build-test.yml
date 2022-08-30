@@ -197,12 +197,12 @@ jobs:
             ./gremlin-server/*
             ~/.m2/repository/org/apache/tinkerpop/*
           key: ${{ github.sha }}
-      - name: Download Server Base Image
-        if: matrix.os == 'windows-latest'
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ github.sha }}
-          path: ./gremlin-server
+#      - name: Download Server Base Image
+#        if: matrix.os == 'windows-latest'
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: ${{ github.sha }}
+#          path: ./gremlin-server
       - name: Load Docker Image
         working-directory: ./gremlin-server
         run: docker load --input gremlin-server.tar
