@@ -71,10 +71,7 @@ limitations under the License.
         <profile>
             <id>glv-js</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
-                <file>
-                    <exists>.glv</exists>
-                </file>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <build>
                 <finalName>${project.artifactId}-${project.version}</finalName>
