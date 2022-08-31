@@ -210,7 +210,7 @@ jobs:
         run: |
           touch gremlin-javascript/.glv
           mvn clean install -pl -:gremlin-python,-gremlin-dotnet,-:gremlin-dotnet-source,-:gremlin-dotnet-tests -q -DskipTests -Dci
-          mvn verify -pl :gremlin-javascript,:gremlint -DincludeNeo4j
+          mvn verify -pl :gremlin-javascript,:gremlint
   python:
     name: python
     timeout-minutes: 20
@@ -269,7 +269,7 @@ jobs:
           touch gremlin-dotnet/src/.glv
           touch gremlin-dotnet/test/.glv
           mvn clean install -pl -:gremlin-javascript,-:gremlin-python,-:gremlint -q -DskipTests -Dci
-          mvn verify -pl :gremlin-dotnet,:gremlin-dotnet-tests -P gremlin-dotnet -DincludeNeo4j
+          mvn verify -pl :gremlin-dotnet,:gremlin-dotnet-tests -P gremlin-dotnet
   neo4j-gremlin:
     name: neo4j-gremlin
     timeout-minutes: 20
