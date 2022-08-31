@@ -41,7 +41,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 30
-      start_period: 1m
+      start_period: 30s
 
   gremlin-dotnet-integration-tests:
     container_name: gremlin-dotnet-integration-tests
