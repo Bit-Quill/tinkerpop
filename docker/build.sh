@@ -82,6 +82,15 @@ while [ ! -z "$1" ]; do
   esac
 done
 
+# The default is for every module to be included.
+if [[ -z ${INCLUDE_GO} && -z ${INCLUDE_PYTHON} && -z ${INCLUDE_DOTNET} && -z ${INCLUDE_JAVASCRIPT} && -z ${INCLUDE_CONSOLE} ]]; then
+  INCLUDE_GO=true
+  INCLUDE_PYTHON=true
+  INCLUDE_DOTNET=true
+  INCLUDE_JAVASCRIPT=true
+  INCLUDE_CONSOLE=true
+fi
+
 pushd ${PROJECT_HOME} > /dev/null
 export ABS_PROJECT_HOME=$(pwd) # absolute path required by some Docker variables.
 echo "ABS_PROJECT_HOME ${ABS_PROJECT_HOME}"
