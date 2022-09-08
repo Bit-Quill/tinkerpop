@@ -288,8 +288,8 @@ traversalMethod_V
 	;
 
 traversalMethod_E
-    : 'E' LPAREN genericLiteralList RPAREN
-    ;
+	: 'E' LPAREN genericLiteralList RPAREN
+	;
 
 traversalMethod_addE
 	: 'addE' LPAREN stringBasedLiteral RPAREN #traversalMethod_addE_String
