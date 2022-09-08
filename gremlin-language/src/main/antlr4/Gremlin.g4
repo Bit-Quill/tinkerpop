@@ -176,6 +176,7 @@ terminatedTraversal
 
 traversalMethod
 	: traversalMethod_V
+	| traversalMethod_E
 	| traversalMethod_addE
 	| traversalMethod_addV
 	| traversalMethod_mergeE
@@ -285,6 +286,10 @@ traversalMethod
 traversalMethod_V
 	: 'V' LPAREN genericLiteralList RPAREN
 	;
+
+traversalMethod_E
+    : 'E' LPAREN genericLiteralList RPAREN
+    ;
 
 traversalMethod_addE
 	: 'addE' LPAREN stringBasedLiteral RPAREN #traversalMethod_addE_String
