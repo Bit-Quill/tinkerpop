@@ -1124,4 +1124,9 @@ public class TraversalMethodVisitorTest {
         compare(g.V().with("blah", "bleh"),
                 eval("g.V().with('blah', 'bleh')"));
     }
+
+    @Test
+    public void testTraversalMethod_midTraversal_E() throws Exception {
+        compare(g.inject(1).E(), eval("g.inject(1).E()"));
+    }
 }
