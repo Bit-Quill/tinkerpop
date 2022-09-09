@@ -274,6 +274,10 @@ class GraphTraversal(Traversal):
         self.bytecode.add_step("V", *args)
         return self
 
+    def E(self, *args):
+        self.bytecode.add_step("E", *args)
+        return self
+
     def addE(self, *args):
         warnings.warn(
             "gremlin_python.process.GraphTraversal.addE will be replaced by "

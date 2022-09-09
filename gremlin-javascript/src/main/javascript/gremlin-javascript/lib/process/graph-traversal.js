@@ -365,6 +365,16 @@ class GraphTraversal extends Traversal {
   }
 
   /**
+   * Graph traversal E method.
+   * @param {...Object} args
+   * @returns {GraphTraversal}
+   */
+  E(...args) {
+    this.bytecode.addStep('E', args);
+    return this;
+  }
+
+  /**
    * Graph traversal addE method.
    * @param {...Object} args
    * @returns {GraphTraversal}
