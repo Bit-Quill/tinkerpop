@@ -1453,7 +1453,8 @@ function callOnEmptyTraversal(fnName, args) {
  * @type {Object}
  */
 const statics = {
-  V: (...args) => callOnEmptyTraversal('V', args),
+  E: (...args) => callOnEmptyTraversal('E', args),
+  V: (...args) => callOnEmptyTraversal('V', args),  
   addE: (...args) => callOnEmptyTraversal('addE', args),
   addV: (...args) => callOnEmptyTraversal('addV', args),
   aggregate: (...args) => callOnEmptyTraversal('aggregate', args),

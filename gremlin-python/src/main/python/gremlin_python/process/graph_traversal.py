@@ -931,6 +931,10 @@ class __(object, metaclass=MagicType):
         return __.inject(*args)
 
     @classmethod
+    def E(cls, *args):
+        return cls.graph_traversal(None, None, Bytecode()).E(*args)
+
+    @classmethod
     def V(cls, *args):
         return cls.graph_traversal(None, None, Bytecode()).V(*args)
 
@@ -1584,6 +1588,10 @@ class Transaction:
         self._session_based_connection.close()
         self.__is_open = False
         return session
+
+
+def E(*args):
+    return __.E(*args)
 
 
 def V(*args):
