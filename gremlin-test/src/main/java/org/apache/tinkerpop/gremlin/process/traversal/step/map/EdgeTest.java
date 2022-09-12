@@ -25,6 +25,7 @@ import org.apache.tinkerpop.gremlin.process.AbstractGremlinProcessTest;
 import org.apache.tinkerpop.gremlin.process.GremlinProcessRunner;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -48,6 +49,8 @@ public abstract class EdgeTest extends AbstractGremlinProcessTest {
 
     public abstract Traversal<Edge, Edge> get_g_EX11X_E(final Object e11Id);
 
+    public abstract Traversal<Vertex, Edge> get_g_V_coalesceXEX_hasLabelXtestsX_addEXtestsX_from_V_hasXnameX_XjoshXX_toXV_hasXnameX_XvadasXXX();
+
     @Test
     @LoadGraphWith(MODERN)
     public void g_EX11X_E() {
@@ -64,11 +67,31 @@ public abstract class EdgeTest extends AbstractGremlinProcessTest {
         assertEquals(6, counter);
     }
 
+    @Test
+    @LoadGraphWith(MODERN)
+    public void g_V_coalesceXEX_hasLabelXtestsX_addEXtestsX_from_V_hasXnameX_XjoshXX_toXV_hasXnameX_XvadasXXX() {
+        final Traversal<Vertex, Edge> traversal = get_g_V_coalesceXEX_hasLabelXtestsX_addEXtestsX_from_V_hasXnameX_XjoshXX_toXV_hasXnameX_XvadasXXX();
+        printTraversalForm(traversal);
+        int counter = 0;
+        final Set<Edge> edges = new HashSet<>();
+        while (traversal.hasNext()) {
+            counter++;
+            edges.add(traversal.next());
+        }
+        assertEquals(1, edges.size());
+        assertEquals(1, counter);
+    }
+
     public static class Traversals extends EdgeTest {
 
         @Override
         public Traversal<Edge, Edge> get_g_EX11X_E(final Object e11Id) {
             return g.E(e11Id).E();
+        }
+
+        @Override
+        public Traversal<Vertex, Edge> get_g_V_coalesceXEX_hasLabelXtestsX_addEXtestsX_from_V_hasXnameX_XjoshXX_toXV_hasXnameX_XvadasXXX() {
+            return g.V().coalesce(__.E().hasLabel("tests"), __.addE("tests").from(__.V().has("name","josh")).to(__.V().has("name","vadas")));
         }
     }
 }

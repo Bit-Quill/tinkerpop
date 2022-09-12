@@ -34,3 +34,19 @@ Feature: Step - E()
       | e[peter-created->lop] |
       | e[josh-created->lop] |
       | e[josh-created->ripple] |
+
+ Scenario: g_V_coalesceXEX_hasLabelXtestsX_addEXtestsX_from_V_hasXnameX_XjoshXX_toXV_hasXnameX_XvadasXXX
+    Given the empty graph
+    And the graph initializer of
+      """
+      g.addV("person").property("name", "josh").
+        addV("person").property("name", "vadas")
+      """
+    And the traversal of
+      """
+      g.V().coalesce(E().hasLabel("tests"), addE("tests").from(V().has("name","josh")).to(V().has("name","vadas")));
+      """
+    When iterated to list
+    Then the result should be unordered
+      | result |
+      | e[josh-tests->vadas] |

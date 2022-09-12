@@ -1129,4 +1129,9 @@ public class TraversalMethodVisitorTest {
     public void testTraversalMethod_midTraversal_E() throws Exception {
         compare(g.inject(1).E(), eval("g.inject(1).E()"));
     }
+
+    @Test
+    public void testTraversalMethod_midTraversal_E_spawning() throws Exception {
+        compare(g.V().coalesce(E(),addE("person")), eval("g.V().coalesce(__.E(),__.addE('person'))"));
+    }
 }
