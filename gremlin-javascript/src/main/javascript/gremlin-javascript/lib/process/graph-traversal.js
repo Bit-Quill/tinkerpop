@@ -1454,7 +1454,7 @@ function callOnEmptyTraversal(fnName, args) {
  */
 const statics = {
   E: (...args) => callOnEmptyTraversal('E', args),
-  V: (...args) => callOnEmptyTraversal('V', args),  
+  V: (...args) => callOnEmptyTraversal('V', args),
   addE: (...args) => callOnEmptyTraversal('addE', args),
   addV: (...args) => callOnEmptyTraversal('addV', args),
   aggregate: (...args) => callOnEmptyTraversal('aggregate', args),
