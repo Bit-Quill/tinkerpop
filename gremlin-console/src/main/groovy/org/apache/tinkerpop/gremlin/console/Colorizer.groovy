@@ -37,7 +37,12 @@ public class Colorizer {
 
     public static String render(String color, Object text) {
         if (Ansi.isEnabled() && Preferences.colors) {
-            Ansi.ansi().render(String.format("@|%s %s|@", color, text)).toString()
+            try{
+                Ansi.ansi().render(String.format("@|%s %s|@", color, text)).toString()
+            }
+            catch(MissingMethodException e){
+                return text;
+            }
         } else {
             return text
         }
