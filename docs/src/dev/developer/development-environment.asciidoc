@@ -473,6 +473,19 @@ RUN apk add --no-cache --update \
     openjdk11-jdk
 ----
 
+* Add Jansi Dependency to gremlin-console
+** In gremlin-console/pom.xml, add an additional dependency for Jansi v1.17.1 as this is required
+for formatted console output.
+
+.gremlin-console/pom.xml
+----
+<dependency>
+    <groupId>org.fusesource.jansi</groupId>
+    <artifactId>jansi</artifactId>
+    <version>1.17.1</version>
+</dependency>
+----
+
 [[docker-integration]]
 == Docker Integration
 

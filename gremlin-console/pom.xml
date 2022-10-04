@@ -27,11 +27,6 @@ limitations under the License.
     <name>Apache TinkerPop :: Gremlin Console</name>
     <dependencies>
         <dependency>
-            <groupId>org.fusesource.jansi</groupId>
-            <artifactId>jansi</artifactId>
-            <version>2.1.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>gremlin-groovy</artifactId>
             <version>${project.version}</version>
@@ -64,6 +59,11 @@ limitations under the License.
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>1.17.1</version>
         </dependency>
         <!-- TESTING -->
         <dependency>
