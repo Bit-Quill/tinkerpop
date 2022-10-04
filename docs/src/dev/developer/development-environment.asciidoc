@@ -441,6 +441,38 @@ The following steps must be taken in order to build TinkerPop on Windows:
 
 You should now be able to work with TinkerPop on Windows.
 
+[[building-on-arm-macs]]
+== Building On Arm Macs
+
+The following notes should be considered when building and running tinkerpop on Apple Silicon computers:
+
+* Configure Docker Desktop
+** Go into the settings in Docker Desktop, go to Experimental Features, and ensure that both the
+New Virtualization Framework and VirtioFS are enabled. This has a substantial impact on performance.
+
+* Modify Dockerfiles for gremlin-server and gremlin-console
+** gremlin-server/Dockerfile and gremlin-console/Dockerfile both use adoptopenjdk/openjdk11:alpine-slim as
+base images. This image only has support for x86_64. In order to get a compatible working image for arm,
+change the FROM and RUN apk lines as follows:
+
+.gremlin-server/Dockerfile
+----
+FROM alpine
+
+RUN apk add --no-cache --update \
+    bash \
+    perl \
+    openjdk11-jdk
+----
+.gremlin-console/Dockerfile
+----
+FROM alpine
+
+RUN apk add --no-cache --update \
+    bash \
+    openjdk11-jdk
+----
+
 [[docker-integration]]
 == Docker Integration
 
