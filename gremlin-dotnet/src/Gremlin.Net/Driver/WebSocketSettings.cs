@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.ComponentModel;
 using System.Net.WebSockets;
 
 namespace Gremlin.Net.Driver
@@ -40,6 +41,8 @@ namespace Gremlin.Net.Driver
         ///     object used to configure WebSocket connections.
         /// </summary>
         public Action<ClientWebSocketOptions> WebSocketConfigurationCallback { get; set; }
+
+        public bool EnableUserAgentOnConnect { get; set; }
 
 #if NET6_0_OR_GREATER
         /// <summary>

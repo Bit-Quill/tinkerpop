@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
@@ -32,6 +33,8 @@ namespace Gremlin.Net.Process
     /// </summary>
     internal static class Utils
     {
+        public static readonly string UserAgent = GenerateUserAgent();
+
         /// <summary>
         /// Waits the completion of the provided Task.
         /// When an AggregateException is thrown, the inner exception is thrown.
@@ -62,6 +65,24 @@ namespace Gremlin.Net.Process
             {
                 t.Exception?.Handle(_ => true);
             }, TaskContinuationOptions.ExecuteSynchronously);
+        }
+
+        /// <summary>
+        ///  Returns a user agent for connection request headers.
+        ///
+        /// Format:
+        /// "[Application Name] [GLV Name].[Version] [Language Runtime Version] [OS].[Version] [CPU Architecture]"
+        /// </summary>
+        private static string GenerateUserAgent()
+        {
+            var applicationName = Assembly.GetExecutingAssembly().GetName().Name.Replace(' ', '_');
+            var driverVersion = AssemblyName.GetAssemblyName("Gremlin.Net.dll")?.Version.ToString().Replace(' ', '_');
+            var languageVersion = Environment.Version.ToString().Replace(' ', '_');
+            var osName = Environment.OSVersion.Platform.ToString().Replace(' ', '_');
+            var osVersion = Environment.OSVersion.Version.ToString().Replace(' ', '_');
+            var cpuArchitecture = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture.ToString().Replace(' ', '_');
+            
+            return $"{applicationName} gremlin-dotnet.{driverVersion} {languageVersion} {osName}.{osVersion} {cpuArchitecture}";
         }
     }
 }
