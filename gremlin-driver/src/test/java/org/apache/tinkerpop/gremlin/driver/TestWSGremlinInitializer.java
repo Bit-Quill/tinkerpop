@@ -18,6 +18,8 @@
  */
 package org.apache.tinkerpop.gremlin.driver;
 
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.tinkerpop.gremlin.driver.message.RequestMessage;
@@ -69,6 +71,8 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
             UUID.fromString("3c4cf18a-c7f2-4dad-b9bf-5c701eb33000");
     public static final UUID RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID =
             UUID.fromString("0d333b1d-6e91-4807-b915-50b9ad721d20");
+    public static final UUID USER_AGENT_REQUEST_ID =
+            UUID.fromString("0d333b1d-6e91-4807-b915-50b9ad721d55");
 
     /**
      * Gremlin serializer used for serializing/deserializing the request/response. This should be same as client.
@@ -84,6 +88,7 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
      * Handler introduced in the server pipeline to configure expected response for test cases.
      */
     private static class ClientTestConfigurableHandler extends MessageToMessageDecoder<BinaryWebSocketFrame> {
+        private String userAgent = "";
         @Override
         protected void decode(final ChannelHandlerContext ctx, final BinaryWebSocketFrame frame, final List<Object> objects)
                 throws Exception {
@@ -127,6 +132,9 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
                 Thread.sleep(1000);
                 ctx.channel().writeAndFlush(new CloseWebSocketFrame());
             }
+            else if (msg.getRequestId().equals(USER_AGENT_REQUEST_ID)) {
+                ctx.channel().writeAndFlush(new TextWebSocketFrame(returnUserAgentResponse(USER_AGENT_REQUEST_ID, userAgent)));
+            }
         }
 
         private String returnSingleVertexResponse(final UUID requestID) throws SerializationException {
@@ -135,6 +143,26 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
             final Vertex t = g.V().limit(1).next();
 
             return SERIALIZER.serializeResponseAsString(ResponseMessage.build(requestID).result(t).create());
+        }
+
+        private String returnUserAgentResponse(final UUID requestID, String userAgent) {
+            return String.format("{\"requestId\":\"%s\",\"status\":{\"message\":\"\",\"code\":200,\"attributes\":{}},\"result\":{\"data\":{\"@type\":\"String\",\"@value\":\"%s\"},\"meta\":{}}}", requestID, userAgent);
+        }
+
+        @Override
+        public void userEventTriggered(ChannelHandlerContext ctx, java.lang.Object evt){
+            if(evt instanceof WebSocketServerProtocolHandler.HandshakeComplete){
+                WebSocketServerProtocolHandler.HandshakeComplete handshake = (WebSocketServerProtocolHandler.HandshakeComplete) evt;
+                HttpHeaders requestHeaders = handshake.requestHeaders();
+                if(requestHeaders.contains("user_agent")){
+                    userAgent = requestHeaders.get("user_agent");
+                    logger.info("UserAgent is "+requestHeaders.get("user_agent"));
+                }
+                else{
+                    logger.info("No UserAgent provided");
+                    ctx.fireUserEventTriggered(evt);
+                }
+            }
         }
     }
 }

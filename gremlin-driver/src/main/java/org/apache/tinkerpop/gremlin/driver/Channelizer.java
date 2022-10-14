@@ -22,15 +22,17 @@ import org.apache.tinkerpop.gremlin.driver.exception.ConnectionException;
 import org.apache.tinkerpop.gremlin.driver.handler.WebSocketClientHandler;
 import org.apache.tinkerpop.gremlin.driver.handler.WebSocketGremlinRequestEncoder;
 import org.apache.tinkerpop.gremlin.driver.handler.WebSocketGremlinResponseDecoder;
+import org.apache.tinkerpop.gremlin.driver.util.UserAgent;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.EmptyHttpHeaders;
-import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
 import io.netty.handler.ssl.SslContext;
@@ -180,8 +182,9 @@ public interface Channelizer extends ChannelHandler {
             final int maxContentLength = cluster.connectionPoolSettings().maxContentLength;
             handler = new WebSocketClientHandler(
                     new WebSocketClientHandler.InterceptedWebSocketClientHandshaker13(
-                            connection.getUri(), WebSocketVersion.V13, null,true,
-                            EmptyHttpHeaders.INSTANCE, maxContentLength, true, false, -1,
+                            connection.getUri(), WebSocketVersion.V13, null, true,
+                            new DefaultHttpHeaders().set(EmptyHttpHeaders.INSTANCE).set("user_agent", UserAgent.getUserAgent()),
+                            maxContentLength, true, false, -1,
                             cluster.getHandshakeInterceptor()), cluster.getConnectionSetupTimeout());
 
             final int keepAliveInterval = toIntExact(TimeUnit.SECONDS.convert(
