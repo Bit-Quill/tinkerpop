@@ -205,6 +205,7 @@ public final class Cluster {
                 .maxConnectionPoolSize(settings.connectionPool.maxSize)
                 .minConnectionPoolSize(settings.connectionPool.minSize)
                 .connectionSetupTimeoutMillis(settings.connectionPool.connectionSetupTimeoutMillis)
+                .sslHandshakeTimeoutMillis(settings.connectionPool.sslHandshakeTimeoutMillis)
                 .validationRequest(settings.connectionPool.validationRequest);
 
         if (settings.username != null && settings.password != null)
@@ -440,6 +441,14 @@ public final class Cluster {
     }
 
     /**
+     * Gets time duration of time in milliseconds provided for the SSL handshake to complete. Beyond this duration an
+     * exception would be thrown if the handshake is not complete by then.
+     */
+    public long getSslHandshakeTimeout() {
+        return manager.connectionPoolSettings.sslHandshakeTimeoutMillis;
+    }
+
+    /**
      * Specifies the load balancing strategy to use on the client side.
      */
     public Class<? extends LoadBalancingStrategy> getLoadBalancingStrategy() {
@@ -597,6 +606,7 @@ public final class Cluster {
         private HandshakeInterceptor interceptor = HandshakeInterceptor.NO_OP;
         private AuthProperties authProps = new AuthProperties();
         private long connectionSetupTimeoutMillis = Connection.CONNECTION_SETUP_TIMEOUT_MILLIS;
+        private long sslHandshakeTimeoutMillis = Connection.SSL_HANDSHAKE_TIMEOUT_MILLIS;
 
         private Builder() {
             // empty to prevent direct instantiation
@@ -986,10 +996,23 @@ public final class Cluster {
          * handshake and SSL handshake. Beyond this duration an exception would be thrown.
          *
          * Note that this value should be greater that SSL handshake timeout defined in
-         * {@link io.netty.handler.ssl.SslHandler} since WebSocket handshake include SSL handshake.
+         * {@link io.netty.handler.ssl.SslHandler} since WebSocket handshake include SSL handshake. This value should be
+         * less than {@link Builder#maxWaitForConnection}.
          */
         public Builder connectionSetupTimeoutMillis(final long connectionSetupTimeoutMillis) {
             this.connectionSetupTimeoutMillis = connectionSetupTimeoutMillis;
+            return this;
+        }
+
+        /**
+         * Sets the duration of time in milliseconds provided for the SSL handshake to complete. Beyond this duration an
+         * exception would be thrown.
+         *
+         * Note that this value should be less than connection setup timeout defined by
+         * {@link Builder#connectionSetupTimeoutMillis} since it includes the SSL handshake.
+         */
+        public Builder sslHandshakeTimeoutMillis(final long sslHandshakeTimeoutMillis) {
+            this.sslHandshakeTimeoutMillis = sslHandshakeTimeoutMillis;
             return this;
         }
 
@@ -1084,6 +1107,7 @@ public final class Cluster {
             connectionPoolSettings.channelizer = builder.channelizer;
             connectionPoolSettings.validationRequest = builder.validationRequest;
             connectionPoolSettings.connectionSetupTimeoutMillis = builder.connectionSetupTimeoutMillis;
+            connectionPoolSettings.sslHandshakeTimeoutMillis = builder.sslHandshakeTimeoutMillis;
 
             sslContextOptional = Optional.ofNullable(builder.sslContext);
 
@@ -1140,6 +1164,9 @@ public final class Cluster {
             if (builder.maxWaitForConnection < 1)
                 throw new IllegalArgumentException("maxWaitForConnection must be greater than zero");
 
+            if (builder.connectionSetupTimeoutMillis > builder.maxWaitForConnection)
+                throw new IllegalArgumentException("maxWaitForConnection cannot be less than connectionSetupTimeoutMillis");
+
             if (builder.maxWaitForClose < 1)
                 throw new IllegalArgumentException("maxWaitForClose must be greater than zero");
 
@@ -1160,6 +1187,12 @@ public final class Cluster {
 
             if (builder.connectionSetupTimeoutMillis < 1)
                 throw new IllegalArgumentException("connectionSetupTimeoutMillis must be greater than zero");
+
+            if (builder.sslHandshakeTimeoutMillis < 0)
+                throw new IllegalArgumentException("sslHandshakeTimeoutMillis must be greater than or equal to zero");
+
+            if (builder.sslHandshakeTimeoutMillis > builder.connectionSetupTimeoutMillis)
+                throw new IllegalArgumentException("connectionSetupTimeoutMillis cannot be less than sslHandshakeTimeoutMillis");
 
             try {
                 Class.forName(builder.channelizer);

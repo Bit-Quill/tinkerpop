@@ -34,6 +34,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import org.slf4j.Logger;
@@ -123,7 +124,9 @@ public interface Channelizer extends ChannelHandler {
             }
 
             if (sslCtx.isPresent()) {
-                pipeline.addLast(sslCtx.get().newHandler(socketChannel.alloc(), connection.getUri().getHost(), connection.getUri().getPort()));
+                SslHandler sslHandler = sslCtx.get().newHandler(socketChannel.alloc(), connection.getUri().getHost(), connection.getUri().getPort());
+                sslHandler.setHandshakeTimeoutMillis(cluster.getSslHandshakeTimeout());
+                pipeline.addLast(sslHandler);
             }
 
             configure(pipeline);

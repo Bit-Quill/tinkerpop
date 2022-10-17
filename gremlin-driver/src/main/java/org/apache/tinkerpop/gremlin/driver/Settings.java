@@ -243,6 +243,9 @@ final class Settings {
             if (connectionPoolConf.containsKey("connectionSetupTimeoutMillis"))
                 cpSettings.connectionSetupTimeoutMillis = connectionPoolConf.getLong("connectionSetupTimeoutMillis");
 
+            if (connectionPoolConf.containsKey("sslHandshakeTimeoutMillis"))
+                cpSettings.sslHandshakeTimeoutMillis = connectionPoolConf.getLong("sslHandshakeTimeoutMillis");
+
             settings.connectionPool = cpSettings;
         }
 
@@ -401,9 +404,20 @@ final class Settings {
          * complete by then.
          *
          * Note that this value should be greater that SSL handshake timeout defined in
-         * {@link io.netty.handler.ssl.SslHandler} since WebSocket handshake include SSL handshake.
+         * {@link io.netty.handler.ssl.SslHandler} since WebSocket handshake include SSL handshake. This value should be
+         * less than {@link ConnectionPoolSettings#maxWaitForConnection}.
          */
         public long connectionSetupTimeoutMillis = Connection.CONNECTION_SETUP_TIMEOUT_MILLIS;
+
+        /**
+         *
+         * Duration of time in milliseconds provided for the SSL handshake to complete. Beyond this duration an
+         * exception would be thrown if the handshake is not complete by then.
+         *
+         * Note that this value should be less than connection setup timeout defined by
+         * {@link ConnectionPoolSettings#connectionSetupTimeoutMillis}.
+         */
+        public long sslHandshakeTimeoutMillis = Connection.SSL_HANDSHAKE_TIMEOUT_MILLIS;
     }
 
     public static class SerializerSettings {

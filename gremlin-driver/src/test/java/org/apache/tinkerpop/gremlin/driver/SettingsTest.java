@@ -69,6 +69,7 @@ public class SettingsTest {
         conf.setProperty("connectionPool.channelizer", "channelizer0");
         conf.setProperty("connectionPool.validationRequest", "g.inject()");
         conf.setProperty("connectionPool.connectionSetupTimeoutMillis", 15000);
+        conf.setProperty("connectionPool.sslHandshakeTimeoutMillis", 10000);
 
         final Settings settings = Settings.from(conf);
 
@@ -102,6 +103,7 @@ public class SettingsTest {
         assertEquals(800, settings.connectionPool.maxContentLength);
         assertEquals(900, settings.connectionPool.reconnectInterval);
         assertEquals(15000, settings.connectionPool.connectionSetupTimeoutMillis);
+        assertEquals(10000, settings.connectionPool.sslHandshakeTimeoutMillis);
         assertEquals(1100, settings.connectionPool.resultIterationBatchSize);
         assertEquals("channelizer0", settings.connectionPool.channelizer);
         assertEquals("g.inject()", settings.connectionPool.validationRequest);
