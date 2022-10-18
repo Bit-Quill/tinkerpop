@@ -26,15 +26,16 @@ public class UserAgent {
     public static String getUserAgent() {
         String applicationName = null;
         try {
-            applicationName = (String)(new javax.naming.InitialContext().lookup("java:app/AppName"));
+            applicationName = ((String)(new javax.naming.InitialContext().lookup("java:app/AppName"))).replace(' ', '_');
         } catch (NamingException e) {
             applicationName = "NotAvailable";
         };
+
         final String glvVersion = Gremlin.version().replace(' ', '_');
-        final String javaVersion = System.getProperty("java.version").replace(' ', '_');
-        final String osName = System.getProperty("os.name").replace(' ', '_');
-        final String osVersion = System.getProperty("os.version").replace(' ', '_');
-        final String cpuArch = System.getProperty("os.arch").replace(' ', '_');
+        final String javaVersion = System.getProperty("java.version", "NotAvailable").replace(' ', '_');
+        final String osName = System.getProperty("os.name", "NotAvailable").replace(' ', '_');
+        final String osVersion = System.getProperty("os.version", "NotAvailable").replace(' ', '_');
+        final String cpuArch = System.getProperty("os.arch", "NotAvailable").replace(' ', '_');
 
         return String.format("%s Gremlin-Driver/%s %s %s/%s %s",
                                 applicationName, glvVersion, javaVersion,
