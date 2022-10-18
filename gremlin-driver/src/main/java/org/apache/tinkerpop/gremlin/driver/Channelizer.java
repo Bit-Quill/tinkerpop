@@ -28,7 +28,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.EmptyHttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
@@ -180,11 +180,14 @@ public interface Channelizer extends ChannelHandler {
                 throw new IllegalStateException("To use wss scheme ensure that enableSsl is set to true in configuration");
 
             final int maxContentLength = cluster.connectionPoolSettings().maxContentLength;
+            HttpHeaders httpHeaders = new DefaultHttpHeaders();
+            if(connection.getCluster().isUserAgentEnabled()) {
+                httpHeaders.set("user_agent", UserAgent.getUserAgent());
+            }
             handler = new WebSocketClientHandler(
                     new WebSocketClientHandler.InterceptedWebSocketClientHandshaker13(
                             connection.getUri(), WebSocketVersion.V13, null, true,
-                            new DefaultHttpHeaders().set(EmptyHttpHeaders.INSTANCE).set("user_agent", UserAgent.getUserAgent()),
-                            maxContentLength, true, false, -1,
+                            httpHeaders, maxContentLength, true, false, -1,
                             cluster.getHandshakeInterceptor()), cluster.getConnectionSetupTimeout());
 
             final int keepAliveInterval = toIntExact(TimeUnit.SECONDS.convert(

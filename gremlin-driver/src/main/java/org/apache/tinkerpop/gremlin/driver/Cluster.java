@@ -205,6 +205,7 @@ public final class Cluster {
                 .maxConnectionPoolSize(settings.connectionPool.maxSize)
                 .minConnectionPoolSize(settings.connectionPool.minSize)
                 .connectionSetupTimeoutMillis(settings.connectionPool.connectionSetupTimeoutMillis)
+                .enableUserAgent(settings.enableUserAgent)
                 .validationRequest(settings.connectionPool.validationRequest);
 
         if (settings.username != null && settings.password != null)
@@ -561,6 +562,10 @@ public final class Cluster {
         return builder.build();
     }
 
+    public boolean isUserAgentEnabled() {
+        return manager.isUserAgentEnabled();
+    }
+
     public final static class Builder {
         private List<InetAddress> addresses = new ArrayList<>();
         private int port = 8182;
@@ -597,6 +602,7 @@ public final class Cluster {
         private HandshakeInterceptor interceptor = HandshakeInterceptor.NO_OP;
         private AuthProperties authProps = new AuthProperties();
         private long connectionSetupTimeoutMillis = Connection.CONNECTION_SETUP_TIMEOUT_MILLIS;
+        private boolean enableUserAgent = true;
 
         private Builder() {
             // empty to prevent direct instantiation
@@ -993,6 +999,11 @@ public final class Cluster {
             return this;
         }
 
+        public Builder enableUserAgent(boolean enableUserAgent) {
+            this.enableUserAgent = enableUserAgent;
+            return this;
+        }
+
         List<InetSocketAddress> getContactPoints() {
             return addresses.stream().map(addy -> new InetSocketAddress(addy, port)).collect(Collectors.toList());
         }
@@ -1002,6 +1013,7 @@ public final class Cluster {
             if (null == serializer) serializer = Serializers.GRAPHBINARY_V1D0.simpleInstance();
             return new Cluster(this);
         }
+
     }
 
     static class Factory {
@@ -1045,6 +1057,7 @@ public final class Cluster {
         private final int workerPoolSize;
         private final int port;
         private final String path;
+        private final boolean userAgentEnabled;
 
         private final AtomicReference<CompletableFuture<Void>> closeFuture = new AtomicReference<>();
 
@@ -1057,6 +1070,7 @@ public final class Cluster {
             this.authProps = builder.authProps;
             this.contactPoints = builder.getContactPoints();
             this.interceptor = builder.interceptor;
+            this.userAgentEnabled = builder.enableUserAgent;
 
             connectionPoolSettings = new Settings.ConnectionPoolSettings();
             connectionPoolSettings.maxInProcessPerConnection = builder.maxInProcessPerConnection;
@@ -1228,6 +1242,10 @@ public final class Cluster {
         @Override
         public String toString() {
             return String.join(", ", contactPoints.stream().map(InetSocketAddress::toString).collect(Collectors.<String>toList()));
+        }
+
+        public boolean isUserAgentEnabled() {
+            return userAgentEnabled;
         }
     }
 }

@@ -104,6 +104,22 @@ public class WebSocketClientBehaviorIntegrateTest {
         assertEquals(UserAgent.getUserAgent(), returnedUserAgent);
     }
 
+    @Test
+    public void shouldNotIncludeUserAgentInHandshakeRequestIfDisabled() throws InterruptedException {
+        final Cluster cluster = Cluster.build("localhost").port(SimpleSocketServer.PORT)
+                .minConnectionPoolSize(1)
+                .maxConnectionPoolSize(1)
+                .serializer(Serializers.GRAPHSON_V2D0)
+                .enableUserAgent(false)
+                .create();
+        final Client.ClusteredClient client = cluster.connect();
+
+        // trigger the testing server to return captured user agent
+        String returnedUserAgent = client.submit("1", RequestOptions.build()
+                .overrideRequestId(TestWSGremlinInitializer.USER_AGENT_REQUEST_ID).create()).one().getString();
+        assertEquals("", returnedUserAgent);
+    }
+
     /**
      * Constructs a deadlock situation when initializing a {@link Client} object in sessionless form that leads to
      * hanging behavior in low resource environments (TINKERPOP-2504) and for certain configurations of the
