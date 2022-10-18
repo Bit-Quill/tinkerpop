@@ -23,6 +23,8 @@ import org.apache.tinkerpop.gremlin.util.Gremlin;
 import javax.naming.NamingException;
 
 public class UserAgent {
+
+    public static final String USER_AGENT_HEADER = "User-Agent";
     public static String getUserAgent() {
         String applicationName = null;
         try {

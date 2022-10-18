@@ -20,6 +20,7 @@ package org.apache.tinkerpop.gremlin.driver;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import org.apache.tinkerpop.gremlin.driver.util.UserAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.tinkerpop.gremlin.driver.message.RequestMessage;
@@ -157,8 +158,8 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
             if(evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
                 WebSocketServerProtocolHandler.HandshakeComplete handshake = (WebSocketServerProtocolHandler.HandshakeComplete) evt;
                 HttpHeaders requestHeaders = handshake.requestHeaders();
-                if(requestHeaders.contains("user_agent")) {
-                    userAgent = requestHeaders.get("user_agent");
+                if(requestHeaders.contains(UserAgent.USER_AGENT_HEADER)) {
+                    userAgent = requestHeaders.get(UserAgent.USER_AGENT_HEADER);
                     logger.info("UserAgent is " + userAgent);
                 }
                 else {

@@ -182,7 +182,7 @@ public interface Channelizer extends ChannelHandler {
             final int maxContentLength = cluster.connectionPoolSettings().maxContentLength;
             HttpHeaders httpHeaders = new DefaultHttpHeaders();
             if(connection.getCluster().isUserAgentEnabled()) {
-                httpHeaders.set("user_agent", UserAgent.getUserAgent());
+                httpHeaders.set(UserAgent.USER_AGENT_HEADER, UserAgent.getUserAgent());
             }
             handler = new WebSocketClientHandler(
                     new WebSocketClientHandler.InterceptedWebSocketClientHandshaker13(
