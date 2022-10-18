@@ -35,8 +35,7 @@ public class UserAgent {
         String osName = System.getProperty("os.name").replace(' ', '_');
         String osVersion = System.getProperty("os.version").replace(' ', '_');
         String cpuArch = System.getProperty("os.arch").replace(' ', '_');
-        //[Application Name] [GLV Name]/[Version] [Language Runtime Version]
-        //[OS]/[Version] [CPU Architecture] [User-Supplied Extension]
+
         return String.format("%s Gremlin-Driver/%s %s %s/%s %s",
                                 applicationName, glvVersion, javaVersion,
                                 osName, osVersion, cpuArch);

@@ -72,7 +72,7 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
     public static final UUID RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID =
             UUID.fromString("0d333b1d-6e91-4807-b915-50b9ad721d20");
     public static final UUID USER_AGENT_REQUEST_ID =
-            UUID.fromString("0d333b1d-6e91-4807-b915-50b9ad721d55");
+            UUID.fromString("20ad7bfb-4abf-d7f4-f9d3-9f1d55bee4ad");
 
     /**
      * Gremlin serializer used for serializing/deserializing the request/response. This should be same as client.
@@ -133,7 +133,7 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
                 ctx.channel().writeAndFlush(new CloseWebSocketFrame());
             }
             else if (msg.getRequestId().equals(USER_AGENT_REQUEST_ID)) {
-                ctx.channel().writeAndFlush(new TextWebSocketFrame(returnUserAgentResponse(USER_AGENT_REQUEST_ID, userAgent)));
+                ctx.channel().writeAndFlush(new TextWebSocketFrame(returnSimpleStringResponse(USER_AGENT_REQUEST_ID, userAgent)));
             }
         }
 
@@ -145,10 +145,13 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
             return SERIALIZER.serializeResponseAsString(ResponseMessage.build(requestID).result(t).create());
         }
 
-        private String returnUserAgentResponse(final UUID requestID, String userAgent) {
-            return String.format("{\"requestId\":\"%s\",\"status\":{\"message\":\"\",\"code\":200,\"attributes\":{}},\"result\":{\"data\":{\"@type\":\"String\",\"@value\":\"%s\"},\"meta\":{}}}", requestID, userAgent);
+        private String returnSimpleStringResponse(final UUID requestID, String message) throws SerializationException {
+            return SERIALIZER.serializeResponseAsString(ResponseMessage.build(requestID).result(message).create());
         }
 
+        /**
+         * Captures and stores user-agent if included in header
+         */
         @Override
         public void userEventTriggered(ChannelHandlerContext ctx, java.lang.Object evt){
             if(evt instanceof WebSocketServerProtocolHandler.HandshakeComplete){

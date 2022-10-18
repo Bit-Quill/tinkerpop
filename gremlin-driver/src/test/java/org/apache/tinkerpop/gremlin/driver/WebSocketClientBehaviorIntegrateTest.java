@@ -91,7 +91,6 @@ public class WebSocketClientBehaviorIntegrateTest {
 
     @Test
     public void shouldIncludeUserAgentInHandshakeRequest() throws InterruptedException {
-        String userAgent = UserAgent.getUserAgent();
         final Cluster cluster = Cluster.build("localhost").port(SimpleSocketServer.PORT)
                 .minConnectionPoolSize(1)
                 .maxConnectionPoolSize(1)
@@ -99,12 +98,10 @@ public class WebSocketClientBehaviorIntegrateTest {
                 .create();
         final Client.ClusteredClient client = cluster.connect();
 
-        // Initialize the client preemptively
-        client.init().getCluster().getChannelizer();
-        // trigger the testing server to return previously captured user agent
-        Object returnedUserAgent = client.submit("1", RequestOptions.build()
+        // trigger the testing server to return captured user agent
+        String returnedUserAgent = client.submit("1", RequestOptions.build()
                         .overrideRequestId(TestWSGremlinInitializer.USER_AGENT_REQUEST_ID).create()).one().getString();
-        assertEquals(userAgent, returnedUserAgent);
+        assertEquals(UserAgent.getUserAgent(), returnedUserAgent);
     }
 
     /**
