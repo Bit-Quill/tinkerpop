@@ -153,13 +153,13 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
          * Captures and stores user_agent if included in header
          */
         @Override
-        public void userEventTriggered(ChannelHandlerContext ctx, java.lang.Object evt) {
+        public void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) {
             if(evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
                 WebSocketServerProtocolHandler.HandshakeComplete handshake = (WebSocketServerProtocolHandler.HandshakeComplete) evt;
                 HttpHeaders requestHeaders = handshake.requestHeaders();
                 if(requestHeaders.contains("user_agent")) {
                     userAgent = requestHeaders.get("user_agent");
-                    logger.info("UserAgent is "+requestHeaders.get("user_agent"));
+                    logger.info("UserAgent is " + userAgent);
                 }
                 else {
                     logger.info("No UserAgent provided");

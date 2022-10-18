@@ -30,11 +30,11 @@ public class UserAgent {
         } catch (NamingException e) {
             applicationName = "NotAvailable";
         };
-        String glvVersion = Gremlin.version().replace(' ', '_');
-        String javaVersion = System.getProperty("java.version").replace(' ', '_');
-        String osName = System.getProperty("os.name").replace(' ', '_');
-        String osVersion = System.getProperty("os.version").replace(' ', '_');
-        String cpuArch = System.getProperty("os.arch").replace(' ', '_');
+        final String glvVersion = Gremlin.version().replace(' ', '_');
+        final String javaVersion = System.getProperty("java.version").replace(' ', '_');
+        final String osName = System.getProperty("os.name").replace(' ', '_');
+        final String osVersion = System.getProperty("os.version").replace(' ', '_');
+        final String cpuArch = System.getProperty("os.arch").replace(' ', '_');
 
         return String.format("%s Gremlin-Driver/%s %s %s/%s %s",
                                 applicationName, glvVersion, javaVersion,
