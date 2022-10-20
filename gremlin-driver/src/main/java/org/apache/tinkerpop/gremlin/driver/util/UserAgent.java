@@ -19,14 +19,23 @@
 package org.apache.tinkerpop.gremlin.driver.util;
 
 import org.apache.tinkerpop.gremlin.util.Gremlin;
-
 import javax.naming.NamingException;
 
 public class UserAgent {
 
-    public static final String USER_AGENT_HEADER = "User-Agent";
-    public static String getUserAgent() {
-        String applicationName = null;
+    /**
+     * Request header name for user agent
+     */
+    public static final String USER_AGENT_HEADER_NAME = "User-Agent";
+    /**
+     * User Agent body to be sent in web socket handshake
+     * Has the form of:
+     * [Application Name] [GLV Name]/[Version] [Language Runtime Version] [OS]/[Version] [CPU Architecture]
+     */
+    public static final String WS_HANDSHAKE_USER_AGENT;
+
+    static {
+        String applicationName = "";
         try {
             applicationName = ((String)(new javax.naming.InitialContext().lookup("java:app/AppName"))).replace(' ', '_');
         } catch (NamingException e) {
@@ -39,8 +48,8 @@ public class UserAgent {
         final String osVersion = System.getProperty("os.version", "NotAvailable").replace(' ', '_');
         final String cpuArch = System.getProperty("os.arch", "NotAvailable").replace(' ', '_');
 
-        return String.format("%s Gremlin-Driver/%s %s %s/%s %s",
-                                applicationName, glvVersion, javaVersion,
-                                osName, osVersion, cpuArch);
+        WS_HANDSHAKE_USER_AGENT =  String.format("%s Gremlin-Driver/%s %s %s/%s %s",
+                                            applicationName, glvVersion, javaVersion,
+                                            osName, osVersion, cpuArch);
     }
 }

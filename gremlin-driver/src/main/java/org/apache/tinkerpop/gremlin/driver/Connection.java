@@ -374,7 +374,6 @@ final class Connection {
         return String.format(connectionLabel + ", {channel=%s}", getChannelId());
     }
 
-
     /**
      * Self-cancelling tasks that periodically checks for the pending queue to clear before shutting down the
      * {@code Connection}. Once it does that, it self cancels the scheduled job in the executor.

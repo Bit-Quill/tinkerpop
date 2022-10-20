@@ -72,6 +72,10 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
             UUID.fromString("3c4cf18a-c7f2-4dad-b9bf-5c701eb33000");
     public static final UUID RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID =
             UUID.fromString("0d333b1d-6e91-4807-b915-50b9ad721d20");
+    /**
+     * If a request with this ID comes to the server, the server responds with the user agent (if any) that was captured
+     * during the web socket handshake.
+     */
     public static final UUID USER_AGENT_REQUEST_ID =
             UUID.fromString("20ad7bfb-4abf-d7f4-f9d3-9f1d55bee4ad");
 
@@ -146,24 +150,26 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
             return SERIALIZER.serializeResponseAsString(ResponseMessage.build(requestID).result(t).create());
         }
 
+        /**
+         * Packages a string message into a ResponseMessage, serializes it, and returns the serialized string
+         * @throws SerializationException
+         */
         private String returnSimpleStringResponse(final UUID requestID, String message) throws SerializationException {
             return SERIALIZER.serializeResponseAsString(ResponseMessage.build(requestID).result(message).create());
         }
 
         /**
-         * Captures and stores user_agent if included in header
+         * Captures and stores User-Agent if included in header
          */
         @Override
         public void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) {
             if(evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
                 WebSocketServerProtocolHandler.HandshakeComplete handshake = (WebSocketServerProtocolHandler.HandshakeComplete) evt;
                 HttpHeaders requestHeaders = handshake.requestHeaders();
-                if(requestHeaders.contains(UserAgent.USER_AGENT_HEADER)) {
-                    userAgent = requestHeaders.get(UserAgent.USER_AGENT_HEADER);
-                    logger.info("UserAgent is " + userAgent);
+                if(requestHeaders.contains(UserAgent.USER_AGENT_HEADER_NAME)) {
+                    userAgent = requestHeaders.get(UserAgent.USER_AGENT_HEADER_NAME);
                 }
                 else {
-                    logger.info("No UserAgent provided");
                     ctx.fireUserEventTriggered(evt);
                 }
             }

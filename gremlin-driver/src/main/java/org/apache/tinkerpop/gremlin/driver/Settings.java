@@ -101,7 +101,7 @@ final class Settings {
     /**
      * Toggles if user agent should be sent in web socket handshakes.
      */
-    public boolean enableUserAgent = true;
+    public boolean enableWsHandshakeUserAgent = true;
 
     /**
      * Read configuration from a file into a new {@link Settings} object.
@@ -148,8 +148,8 @@ final class Settings {
         if (conf.containsKey("protocol"))
             settings.protocol = conf.getString("protocol");
 
-        if (conf.containsKey("enableUserAgent"))
-            settings.enableUserAgent = conf.getBoolean("enableUserAgent");
+        if (conf.containsKey("enableWsHandshakeUserAgent"))
+            settings.enableWsHandshakeUserAgent = conf.getBoolean("enableWsHandshakeUserAgent");
 
         if (conf.containsKey("hosts"))
             settings.hosts = conf.getList("hosts").stream().map(Object::toString).collect(Collectors.toList());

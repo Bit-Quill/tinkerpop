@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import java.io.File;
@@ -205,7 +204,7 @@ public final class Cluster {
                 .maxConnectionPoolSize(settings.connectionPool.maxSize)
                 .minConnectionPoolSize(settings.connectionPool.minSize)
                 .connectionSetupTimeoutMillis(settings.connectionPool.connectionSetupTimeoutMillis)
-                .enableUserAgent(settings.enableUserAgent)
+                .enableWsHandshakeUserAgent(settings.enableWsHandshakeUserAgent)
                 .validationRequest(settings.connectionPool.validationRequest);
 
         if (settings.username != null && settings.password != null)
@@ -562,8 +561,12 @@ public final class Cluster {
         return builder.build();
     }
 
-    public boolean isUserAgentEnabled() {
-        return manager.isUserAgentEnabled();
+    /**
+     * Checks if cluster is configured to send a User Agent header
+     * in the web socket handshake
+     */
+    public boolean isWsHandshakeUserAgentEnabled() {
+        return manager.isWsHandshakeUserAgentEnabled();
     }
 
     public final static class Builder {
@@ -602,7 +605,7 @@ public final class Cluster {
         private HandshakeInterceptor interceptor = HandshakeInterceptor.NO_OP;
         private AuthProperties authProps = new AuthProperties();
         private long connectionSetupTimeoutMillis = Connection.CONNECTION_SETUP_TIMEOUT_MILLIS;
-        private boolean enableUserAgent = true;
+        private boolean wsHandshakeUserAgentEnabled = true;
 
         private Builder() {
             // empty to prevent direct instantiation
@@ -999,8 +1002,13 @@ public final class Cluster {
             return this;
         }
 
-        public Builder enableUserAgent(boolean enableUserAgent) {
-            this.enableUserAgent = enableUserAgent;
+        /**
+         * Configures whether cluster will send a user agent during
+         * web socket handshakes
+         * @param enableWsHandshakeUserAgent true enables the useragent. false disables the useragent.
+         */
+        public Builder enableWsHandshakeUserAgent(boolean enableWsHandshakeUserAgent) {
+            this.wsHandshakeUserAgentEnabled = enableWsHandshakeUserAgent;
             return this;
         }
 
@@ -1013,7 +1021,6 @@ public final class Cluster {
             if (null == serializer) serializer = Serializers.GRAPHBINARY_V1D0.simpleInstance();
             return new Cluster(this);
         }
-
     }
 
     static class Factory {
@@ -1057,7 +1064,7 @@ public final class Cluster {
         private final int workerPoolSize;
         private final int port;
         private final String path;
-        private final boolean userAgentEnabled;
+        private final boolean wsHandshakeUserAgentEnabled;
 
         private final AtomicReference<CompletableFuture<Void>> closeFuture = new AtomicReference<>();
 
@@ -1070,7 +1077,7 @@ public final class Cluster {
             this.authProps = builder.authProps;
             this.contactPoints = builder.getContactPoints();
             this.interceptor = builder.interceptor;
-            this.userAgentEnabled = builder.enableUserAgent;
+            this.wsHandshakeUserAgentEnabled = builder.wsHandshakeUserAgentEnabled;
 
             connectionPoolSettings = new Settings.ConnectionPoolSettings();
             connectionPoolSettings.maxInProcessPerConnection = builder.maxInProcessPerConnection;
@@ -1244,8 +1251,12 @@ public final class Cluster {
             return String.join(", ", contactPoints.stream().map(InetSocketAddress::toString).collect(Collectors.<String>toList()));
         }
 
-        public boolean isUserAgentEnabled() {
-            return userAgentEnabled;
+        /**
+         * Checks if cluster is configured to send a User Agent header
+         * in the web socket handshake
+         */
+        public boolean isWsHandshakeUserAgentEnabled() {
+            return wsHandshakeUserAgentEnabled;
         }
     }
 }
