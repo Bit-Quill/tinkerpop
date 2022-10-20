@@ -18,6 +18,7 @@
  */
 package org.apache.tinkerpop.gremlin.driver;
 
+import org.apache.tinkerpop.gremlin.driver.util.UserAgent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -86,6 +87,44 @@ public class WebSocketClientBehaviorIntegrateTest {
         }
 
         rootLogger.removeAppender(recordingAppender);
+    }
+
+    /**
+     * Tests that client is correctly sending user agent during web socket handshake by having the server return
+     * the captured user agent.
+     */
+    @Test
+    public void shouldIncludeUserAgentInHandshakeRequest() {
+        final Cluster cluster = Cluster.build("localhost").port(SimpleSocketServer.PORT)
+                .minConnectionPoolSize(1)
+                .maxConnectionPoolSize(1)
+                .serializer(Serializers.GRAPHSON_V2D0)
+                .create();
+        final Client.ClusteredClient client = cluster.connect();
+
+        // trigger the testing server to return captured user agent
+        String returnedUserAgent = client.submit("1", RequestOptions.build()
+                        .overrideRequestId(TestWSGremlinInitializer.USER_AGENT_REQUEST_ID).create()).one().getString();
+        assertEquals(UserAgent.WS_HANDSHAKE_USER_AGENT, returnedUserAgent);
+    }
+
+    /**
+     * Tests that no user agent is sent to server when that behaviour is disabled.
+     */
+    @Test
+    public void shouldNotIncludeUserAgentInHandshakeRequestIfDisabled() {
+        final Cluster cluster = Cluster.build("localhost").port(SimpleSocketServer.PORT)
+                .minConnectionPoolSize(1)
+                .maxConnectionPoolSize(1)
+                .serializer(Serializers.GRAPHSON_V2D0)
+                .enableWsHandshakeUserAgent(false)
+                .create();
+        final Client.ClusteredClient client = cluster.connect();
+
+        // trigger the testing server to return captured user agent
+        String returnedUserAgent = client.submit("1", RequestOptions.build()
+                .overrideRequestId(TestWSGremlinInitializer.USER_AGENT_REQUEST_ID).create()).one().getString();
+        assertEquals("", returnedUserAgent);
     }
 
     /**

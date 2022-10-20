@@ -46,6 +46,7 @@ public class SettingsTest {
         conf.setProperty("hosts", Arrays.asList("255.0.0.1", "255.0.0.2", "255.0.0.3"));
         conf.setProperty("serializer.className", "my.serializers.MySerializer");
         conf.setProperty("serializer.config.any", "thing");
+        conf.setProperty("enableWsHandshakeUserAgent", false);
         conf.setProperty("connectionPool.enableSsl", true);
         conf.setProperty("connectionPool.keyStore", "server.jks");
         conf.setProperty("connectionPool.keyStorePassword", "password2");
@@ -82,6 +83,7 @@ public class SettingsTest {
         assertEquals(Arrays.asList("255.0.0.1", "255.0.0.2", "255.0.0.3"), settings.hosts);
         assertEquals("my.serializers.MySerializer", settings.serializer.className);
         assertEquals("thing", settings.serializer.config.get("any"));
+        assertEquals(false, settings.enableWsHandshakeUserAgent);
         assertThat(settings.connectionPool.enableSsl, is(true));
         assertEquals("server.jks", settings.connectionPool.keyStore);
         assertEquals("password2", settings.connectionPool.keyStorePassword);
