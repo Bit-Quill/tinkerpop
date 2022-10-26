@@ -23,7 +23,6 @@ import groovy.lang.GroovyRuntimeException;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.MessageSerializer;
 import org.apache.tinkerpop.gremlin.driver.Tokens;
 import org.apache.tinkerpop.gremlin.driver.message.RequestMessage;
@@ -129,7 +128,7 @@ public abstract class AbstractSession implements Session, AutoCloseable {
 
         /**
          * The session was interrupted by the channel closing, which can be something initiated by closing the
-         * {@link Client} or might be triggered by the server. This may not be considered an error situation and
+         * Client or might be triggered by the server. This may not be considered an error situation and
          * depending on context, might be similar to a {@link #EXIT_PROCESSING} termination.
          */
         CHANNEL_CLOSED,
