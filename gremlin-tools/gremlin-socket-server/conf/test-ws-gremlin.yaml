@@ -1,0 +1,35 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+PORT: 45943
+
+# If a request with this ID comes to the server, the server responds back with a single
+# vertex picked from Modern graph.
+SINGLE_VERTEX_REQUEST_ID: 6457272A-4018-4538-B9AE-08DD5DDC0AA1
+
+# If a request with this ID comes to the server, the server responds back with a single
+# vertex picked from Modern graph. After some delay, server sends a Close WebSocket
+# frame on the same connection.
+SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID: 3cb39c94-9454-4398-8430-03485d08bdae
+
+FAILED_AFTER_DELAY_REQUEST_ID: edf79c8b-1d32-4102-a5d2-a5feeca40864
+
+CLOSE_CONNECTION_REQUEST_ID: 0150143b-00f9-48a7-a268-28142d902e18
+
+CLOSE_CONNECTION_REQUEST_ID_2: 3c4cf18a-c7f2-4dad-b9bf-5c701eb33000
+
+RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID: 0d333b1d-6e91-4807-b915-50b9ad721d20

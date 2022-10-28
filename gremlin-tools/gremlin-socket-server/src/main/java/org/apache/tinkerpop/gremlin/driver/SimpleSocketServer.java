@@ -32,9 +32,13 @@ import io.netty.handler.logging.LoggingHandler;
  * Simple Netty Server
  */
 public class SimpleSocketServer {
-    public static final int PORT = 45940;
+    private final SocketServerSettings settings;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+
+    public SimpleSocketServer(SocketServerSettings settings) {
+        this.settings = settings;
+    }
 
     public Channel start(final ChannelInitializer<SocketChannel> channelInitializer) throws InterruptedException {
         bossGroup = new NioEventLoopGroup(1);
@@ -44,7 +48,7 @@ public class SimpleSocketServer {
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(channelInitializer);
-        return b.bind(PORT).sync().channel();
+        return b.bind(settings.PORT).sync().channel();
     }
 
     public void stop() {

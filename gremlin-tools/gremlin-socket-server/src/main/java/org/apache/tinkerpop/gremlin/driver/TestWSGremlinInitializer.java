@@ -47,33 +47,17 @@ import java.util.UUID;
  */
 public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
     private static final Logger logger = LoggerFactory.getLogger(TestWSGremlinInitializer.class);
-    /**
-     * If a request with this ID comes to the server, the server responds back with a single vertex picked from Modern
-     * graph.
-     */
-    public static final UUID SINGLE_VERTEX_REQUEST_ID =
-            UUID.fromString("6457272A-4018-4538-B9AE-08DD5DDC0AA1");
 
-    /**
-     * If a request with this ID comes to the server, the server responds back with a single vertex picked from Modern
-     * graph. After some delay, server sends a Close WebSocket frame on the same connection.
-     */
-    public static final UUID SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID =
-            UUID.fromString("3cb39c94-9454-4398-8430-03485d08bdae");
-
-    public static final UUID FAILED_AFTER_DELAY_REQUEST_ID =
-            UUID.fromString("edf79c8b-1d32-4102-a5d2-a5feeca40864");
-    public static final UUID CLOSE_CONNECTION_REQUEST_ID =
-            UUID.fromString("0150143b-00f9-48a7-a268-28142d902e18");
-    public static final UUID CLOSE_CONNECTION_REQUEST_ID_2 =
-            UUID.fromString("3c4cf18a-c7f2-4dad-b9bf-5c701eb33000");
-    public static final UUID RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID =
-            UUID.fromString("0d333b1d-6e91-4807-b915-50b9ad721d20");
+    private final SocketServerSettings settings;
 
     /**
      * Gremlin serializer used for serializing/deserializing the request/response. This should be same as client.
      */
     private static final GraphSONMessageSerializerV2d0 SERIALIZER = new GraphSONMessageSerializerV2d0();
+
+    public TestWSGremlinInitializer(SocketServerSettings settings) {
+        this.settings = settings;
+    }
 
     @Override
     public void postInit(ChannelPipeline pipeline) {
@@ -83,7 +67,7 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
     /**
      * Handler introduced in the server pipeline to configure expected response for test cases.
      */
-    private static class ClientTestConfigurableHandler extends MessageToMessageDecoder<BinaryWebSocketFrame> {
+    private class ClientTestConfigurableHandler extends MessageToMessageDecoder<BinaryWebSocketFrame> {
         @Override
         protected void decode(final ChannelHandlerContext ctx, final BinaryWebSocketFrame frame, final List<Object> objects)
                 throws Exception {
@@ -102,28 +86,28 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
             }
             final RequestMessage msg = SERIALIZER.deserializeRequest(messageBytes.discardReadBytes());
 
-            if (msg.getRequestId().equals(SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID)) {
+            if (msg.getRequestId().equals(settings.SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID)) {
                 logger.info("sending vertex result frame");
                 ctx.channel().writeAndFlush(new TextWebSocketFrame(returnSingleVertexResponse(
-                        SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID)));
+                        settings.SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID)));
                 logger.info("waiting for 2 sec");
                 Thread.sleep(2000);
                 logger.info("sending close frame");
                 ctx.channel().writeAndFlush(new CloseWebSocketFrame());
-            } else if (msg.getRequestId().equals(SINGLE_VERTEX_REQUEST_ID)) {
+            } else if (msg.getRequestId().equals(settings.SINGLE_VERTEX_REQUEST_ID)) {
                 logger.info("sending vertex result frame");
-                ctx.channel().writeAndFlush(new TextWebSocketFrame(returnSingleVertexResponse(SINGLE_VERTEX_REQUEST_ID)));
-            } else if (msg.getRequestId().equals(FAILED_AFTER_DELAY_REQUEST_ID)) {
+                ctx.channel().writeAndFlush(new TextWebSocketFrame(returnSingleVertexResponse(settings.SINGLE_VERTEX_REQUEST_ID)));
+            } else if (msg.getRequestId().equals(settings.FAILED_AFTER_DELAY_REQUEST_ID)) {
                 logger.info("waiting for 2 sec");
                 Thread.sleep(1000);
                 final ResponseMessage responseMessage = ResponseMessage.build(msg)
                         .code(ResponseStatusCode.SERVER_ERROR)
                         .statusAttributeException(new RuntimeException()).create();
                 ctx.channel().writeAndFlush(new TextWebSocketFrame(SERIALIZER.serializeResponseAsString(responseMessage)));
-            } else if (msg.getRequestId().equals(CLOSE_CONNECTION_REQUEST_ID)) {
+            } else if (msg.getRequestId().equals(settings.CLOSE_CONNECTION_REQUEST_ID)) {
                 Thread.sleep(1000);
                 ctx.channel().writeAndFlush(new CloseWebSocketFrame());
-            } else if (msg.getRequestId().equals(RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID)) {
+            } else if (msg.getRequestId().equals(settings.RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID)) {
                 Thread.sleep(1000);
                 ctx.channel().writeAndFlush(new CloseWebSocketFrame());
             }
