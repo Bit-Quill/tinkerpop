@@ -50,9 +50,12 @@ services:
       - .:/js_app
       - ../../../../../gremlin-test/src/main/resources/org/apache/tinkerpop/gremlin/test/features:/gremlin-test
       - ../../../../../docker/gremlin-test-server:/js_app/gremlin-test-server
+      - ../../../../../gremlin-tools/gremlin-socket-server/conf:/js_app/gremlin-socket-server/conf/
     environment:
       - DOCKER_ENVIRONMENT=true
       - TEST_TRANSACTIONS=true
+      - GREMLIN_SOCKET_SERVER_URL=ws://gremlin-socket-server-js:{}/gremlin
+      - GREMLIN_SOCKET_SERVER_CONFIG_PATH=/python_app/gremlin-socket-server/conf/test-ws-gremlin.yaml
     working_dir: /js_app
     command: >
       bash -c "npm config set cache /tmp --global
@@ -60,3 +63,8 @@ services:
     depends_on:
       gremlin-server-test-js:
         condition: service_healthy
+  gremlin-socket-server:
+    container_name: gremlin-socket-server-js
+    image: tinkerpop/gremlin-socket-server:${GREMLIN_SERVER}
+    ports:
+      - "45943:45943"
