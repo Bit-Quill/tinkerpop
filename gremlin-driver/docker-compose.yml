@@ -22,12 +22,5 @@ services:
   gremlin-socket-server:
     container_name: gremlin-socket-server
     image: tinkerpop/gremlin-socket-server:${GREMLIN_VERSION}
-    build:
-      context: ../gremlin-tools/gremlin-socket-server/
-      dockerfile: Dockerfile
-      args:
-        - SOCKET_SERVER_VERSION=${GREMLIN_VERSION}
-        - SOCKET_SERVER_DIR=/target
     ports:
       - "45943:45943"
-

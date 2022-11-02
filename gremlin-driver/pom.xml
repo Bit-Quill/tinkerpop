@@ -25,11 +25,6 @@ limitations under the License.
     </parent>
     <artifactId>gremlin-driver</artifactId>
     <name>Apache TinkerPop :: Gremlin Driver</name>
-    <properties>
-        <!-- provides a way to convert maven.test.skip value to skipTests for use in skipping dotnet tests -->
-        <maven.test.skip>false</maven.test.skip>
-        <skipTests>${maven.test.skip}</skipTests>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.tinkerpop</groupId>
