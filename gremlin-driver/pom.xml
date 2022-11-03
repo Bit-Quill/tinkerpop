@@ -264,68 +264,6 @@ limitations under the License.
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>exec-maven-plugin</artifactId>
-                <groupId>org.codehaus.mojo</groupId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <id>run-tests</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipTests}</skip>
-                            <environmentVariables>
-                                <GREMLIN_VERSION>${project.version}</GREMLIN_VERSION>
-                                <ABS_PROJECT_HOME>${project.basedir}</ABS_PROJECT_HOME>
-                                <!-- setting this env variable is needed to be cross-platform compatible -->
-                                <HOME>${user.home}</HOME>
-                            </environmentVariables>
-                            <executable>docker-compose</executable>
-                            <arguments>
-                                <argument>up</argument>
-                                <argument>--build</argument>
-                                <argument>--detach</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>shutdown-container</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipTests}</skip>
-                            <!-- don't need to set env variables for container tear down -->
-                            <executable>docker-compose</executable>
-                            <arguments>
-                                <argument>down</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>remove-dangling-images</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipTests}</skip>
-                            <executable>docker</executable>
-                            <arguments>
-                                <argument>image</argument>
-                                <argument>prune</argument>
-                                <argument>--filter</argument>
-                                <argument>label=maintainer=dev@tinkerpop.apache.org</argument>
-                                <argument>-f</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>

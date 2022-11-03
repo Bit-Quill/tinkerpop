@@ -53,6 +53,7 @@ public class WebSocketClientBehaviorIntegrateTest {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketClientBehaviorIntegrateTest.class);
     private Log4jRecordingAppender recordingAppender = null;
     private Level previousLogLevel;
+    private SimpleSocketServer server;
 
     public WebSocketClientBehaviorIntegrateTest() throws IOException {
         settings = new SocketServerSettings(FileSystems.getDefault().getPath("..","gremlin-tools", "gremlin-socket-server", "conf", "test-ws-gremlin.yaml"));
@@ -72,10 +73,15 @@ public class WebSocketClientBehaviorIntegrateTest {
         }
 
         rootLogger.addAppender(recordingAppender);
+
+        server = new SimpleSocketServer(settings);
+        server.start(new TestWSGremlinInitializer(settings));
     }
 
     @After
     public void shutdown() {
+        server.stop();
+
         // reset logger
         final org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
 
