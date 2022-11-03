@@ -23,6 +23,9 @@ import io.netty.channel.Channel;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 
+/**
+ * A simple main class to create and run a SimpleSocketServer
+ */
 public class SocketServerRunner {
 
     public static void main(String[] args) throws InterruptedException, IOException {

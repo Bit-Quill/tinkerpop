@@ -29,6 +29,10 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
+/**
+ * Encapsulates all constants that are needed by SimpleSocketServer. UUID constants are used to coordinate
+ * custom response behavior between a test client and the server.
+ */
 public class SocketServerSettings {
     public final int PORT;
 
@@ -50,6 +54,9 @@ public class SocketServerSettings {
 
     private static final BiFunction<String, Object, Object> UUID_REMAP_FUNCTION = (String key, Object val) -> UUID.fromString((String) val);
 
+    /**
+     * SocketServerSettings are constructed from a yaml config file
+     */
     public SocketServerSettings(Path confFilePath) throws IOException {
         this(Files.newInputStream(confFilePath));
     }
