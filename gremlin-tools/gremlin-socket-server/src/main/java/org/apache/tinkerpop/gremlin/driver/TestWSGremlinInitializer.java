@@ -55,7 +55,7 @@ public class TestWSGremlinInitializer extends TestWebSocketServerInitializer {
      */
     private static final GraphSONMessageSerializerV2d0 SERIALIZER = new GraphSONMessageSerializerV2d0();
 
-    public TestWSGremlinInitializer(SocketServerSettings settings) {
+    public TestWSGremlinInitializer(final SocketServerSettings settings) {
         this.settings = settings;
     }
 

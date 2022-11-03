@@ -36,7 +36,7 @@ public class SimpleSocketServer {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    public SimpleSocketServer(SocketServerSettings settings) {
+    public SimpleSocketServer(final SocketServerSettings settings) {
         this.settings = settings;
     }
 

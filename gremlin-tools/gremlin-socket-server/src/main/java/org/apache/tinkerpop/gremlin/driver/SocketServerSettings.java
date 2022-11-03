@@ -52,26 +52,27 @@ public class SocketServerSettings {
     public final UUID CLOSE_CONNECTION_REQUEST_ID_2;
     public final UUID RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID;
 
-    private static final BiFunction<String, Object, Object> UUID_REMAP_FUNCTION = (String key, Object val) -> UUID.fromString((String) val);
+    private static UUID uuidFromString(final String s) {
+        return s == null ? null : UUID.fromString(s);
+    }
 
     /**
      * SocketServerSettings are constructed from a yaml config file
      */
-    public SocketServerSettings(Path confFilePath) throws IOException {
+    public SocketServerSettings(final Path confFilePath) throws IOException {
         this(Files.newInputStream(confFilePath));
     }
 
-    public SocketServerSettings(InputStream confInputStream) {
+    public SocketServerSettings(final InputStream confInputStream) {
         Objects.requireNonNull(confInputStream);
         Yaml yaml = new Yaml();
         Map<String, Object> settings = yaml.load(confInputStream);
-
         this.PORT = (int) settings.get("PORT");
-        this.SINGLE_VERTEX_REQUEST_ID = (UUID) settings.computeIfPresent("SINGLE_VERTEX_REQUEST_ID", UUID_REMAP_FUNCTION);
-        this.SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID = (UUID) settings.computeIfPresent("SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID", UUID_REMAP_FUNCTION);
-        this.FAILED_AFTER_DELAY_REQUEST_ID = (UUID) settings.computeIfPresent("FAILED_AFTER_DELAY_REQUEST_ID", UUID_REMAP_FUNCTION);
-        this.CLOSE_CONNECTION_REQUEST_ID = (UUID) settings.computeIfPresent("CLOSE_CONNECTION_REQUEST_ID", UUID_REMAP_FUNCTION);
-        this.CLOSE_CONNECTION_REQUEST_ID_2 = (UUID) settings.computeIfPresent("CLOSE_CONNECTION_REQUEST_ID_2", UUID_REMAP_FUNCTION);
-        this.RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID = (UUID) settings.computeIfPresent("RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID", UUID_REMAP_FUNCTION);
+        this.SINGLE_VERTEX_REQUEST_ID = uuidFromString((String) settings.get("SINGLE_VERTEX_REQUEST_ID"));
+        this.SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID = uuidFromString((String) settings.get("SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID"));
+        this.FAILED_AFTER_DELAY_REQUEST_ID = uuidFromString((String) settings.get("FAILED_AFTER_DELAY_REQUEST_ID"));
+        this.CLOSE_CONNECTION_REQUEST_ID = uuidFromString((String) settings.get("CLOSE_CONNECTION_REQUEST_ID"));
+        this.CLOSE_CONNECTION_REQUEST_ID_2 = uuidFromString((String) settings.get("CLOSE_CONNECTION_REQUEST_ID_2"));
+        this.RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID = uuidFromString((String) settings.get("RESPONSE_CONTAINS_SERVER_ERROR_REQUEST_ID"));
     }
 }
