@@ -36,6 +36,9 @@ image::https://raw.githubusercontent.com/apache/tinkerpop/master/docs/static/ima
 * Async operations in .NET can now be cancelled. This however does not cancel work that is already happening on the server.
 * Bumped to `snakeyaml` 1.32 to fix security vulnerability.
 * Added logging in .NET.
+* Moves java serializer, message and token classes from gremlin-driver to a new gremlin-util module.
+* Moves SimpleSocketServer and its initializers to a new gremlin-tools/gremlin-socket-server module.
+* Configures gremlin-socket-server to build a docker image which can be used for testing GLV's. (Can be skipped with -DskipImageBuild)
 
 ==== Bugs
 
