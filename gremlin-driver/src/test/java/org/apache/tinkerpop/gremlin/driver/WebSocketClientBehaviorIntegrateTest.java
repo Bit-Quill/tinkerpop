@@ -19,7 +19,9 @@
 package org.apache.tinkerpop.gremlin.driver;
 
 import nl.altindag.log.LogCaptor;
-import org.apache.tinkerpop.gremlin.process.traversal.strategy.verification.AbstractWarningVerificationStrategy;
+import org.apache.tinkerpop.gremlin.socket.server.SimpleSocketServer;
+import org.apache.tinkerpop.gremlin.socket.server.SocketServerSettings;
+import org.apache.tinkerpop.gremlin.socket.server.TestWSGremlinInitializer;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,7 +31,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.tinkerpop.gremlin.driver.ser.Serializers;
+import org.apache.tinkerpop.gremlin.util.ser.Serializers;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.io.IOException;
