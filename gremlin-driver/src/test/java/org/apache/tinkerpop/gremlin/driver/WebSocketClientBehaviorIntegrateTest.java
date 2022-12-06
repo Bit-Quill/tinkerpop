@@ -105,6 +105,7 @@ public class WebSocketClientBehaviorIntegrateTest {
         String returnedUserAgent = client.submit("1", RequestOptions.build()
                         .overrideRequestId(TestWSGremlinInitializer.USER_AGENT_REQUEST_ID).create()).one().getString();
         assertEquals(UserAgent.USER_AGENT, returnedUserAgent);
+        assertEquals(true, false);
     }
 
     /**
