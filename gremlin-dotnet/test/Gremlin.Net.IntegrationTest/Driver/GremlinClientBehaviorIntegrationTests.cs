@@ -84,5 +84,37 @@ namespace Gremlin.Net.IntegrationTest.Driver
             Assert.NotNull(response2);
             Assert.Equal(1, gremlinClient.NrConnections);
         }
+
+        [Fact]
+        public async Task ShouldIncludeUserAgentInHandshakeRequest()
+        {
+            var sessionId = Guid.NewGuid().ToString();
+            var poolSettings = new ConnectionPoolSettings {PoolSize = 1};
+
+            var gremlinServer = new GremlinServer(TestHost, Settings.Port);
+            var gremlinClient = new GremlinClient(gremlinServer, messageSerializer: Serializer,
+                connectionPoolSettings: poolSettings, sessionId: sessionId);
+
+            //verify that the server received the correct user agent during connection setup.
+            var userAgentResponse = await gremlinClient.SubmitWithSingleResultAsync<String>(RequestMessage.Build("1")
+                .OverrideRequestId(Settings.UserAgentRequestId).Create());
+            Assert.Equal(Gremlin.Net.Process.Utils.UserAgent, userAgentResponse);
+        }
+        
+        [Fact]
+        public async Task ShouldNotIncludeUserAgentInHandshakeRequestIfDisabled()
+        {
+            var sessionId = Guid.NewGuid().ToString();
+            var poolSettings = new ConnectionPoolSettings {PoolSize = 1, EnableUserAgentOnConnect = false};
+            
+            var gremlinServer = new GremlinServer(TestHost, Settings.Port);
+            var gremlinClient = new GremlinClient(gremlinServer, messageSerializer: Serializer,
+                connectionPoolSettings: poolSettings, sessionId: sessionId);
+
+            //verify that the server did not receive any user agent.
+            var userAgentResponse = await gremlinClient.SubmitWithSingleResultAsync<String>(RequestMessage.Build("1")
+                .OverrideRequestId(Settings.UserAgentRequestId).Create());
+            Assert.Equal("", userAgentResponse);
+        }
     }
 }

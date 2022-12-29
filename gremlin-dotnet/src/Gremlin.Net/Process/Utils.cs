@@ -32,8 +32,11 @@ namespace Gremlin.Net.Process
     /// <summary>
     /// Contains useful methods that can be reused across the project. 
     /// </summary>
-    internal static class Utils
+    public static class Utils
     {
+        /// <summary>
+        /// The user agent which is sent with connection requests if enabled.
+        /// </summary>
         public static string UserAgent => _userAgent ??= GenerateUserAgent();
         private static string? _userAgent;
         
