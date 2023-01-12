@@ -30,18 +30,18 @@ SERIALIZER: GraphBinaryV1
 
 # If a request with this ID comes to the server, the server responds back with a single
 # vertex picked from Modern graph.
-SINGLE_VERTEX_REQUEST_ID: 6457272a-4018-4538-b9ae-08dd5ddc0aa1
+SINGLE_VERTEX_REQUEST_ID: 6457272a-4018-4538-B9ae-08dD5ddc0aa1
 
 # If a request with this ID comes to the server, the server responds back with a single
 # vertex picked from Modern graph. After a 2 second delay, server sends a Close WebSocket
 # frame on the same connection.
-SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID: 3cb39c94-9454-4398-8430-03485d08bdae
+SINGLE_VERTEX_DELAYED_CLOSE_CONNECTION_REQUEST_ID: 3CB39c94-9454-4398-8430-03485d08bdae
 
 # Server waits for 1 second, then responds with a 500 error status code
-FAILED_AFTER_DELAY_REQUEST_ID: edf79c8b-1d32-4102-a5d2-a5feeca40864
+FAILED_AFTER_DELAY_REQUEST_ID: edf79c8b-1d32-4102-a5d2-a5fEeca40864
 
 # Server waits for 1 second then responds with a close web socket frame
-CLOSE_CONNECTION_REQUEST_ID: 0150143b-00f9-48a7-a268-28142d902e18
+CLOSE_CONNECTION_REQUEST_ID: 0150143B-00F9-48A7-A268-28142D902E18
 
 # Same as CLOSE_CONNECTION_REQUEST_ID
 CLOSE_CONNECTION_REQUEST_ID_2: 3c4cf18a-c7f2-4dad-b9bf-5c701eb33000
