@@ -29,6 +29,7 @@ limitations under the License.
         <!-- provides a way to convert maven.test.skip value to skipTests for use in skipping dotnet tests -->
         <maven.test.skip>false</maven.test.skip>
         <skipTests>${maven.test.skip}</skipTests>
+        <skipTestServerMatrix>true</skipTestServerMatrix>
     </properties>
 
     <build>
@@ -118,10 +119,51 @@ limitations under the License.
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${skipTestServerMatrix}</skip>
+                                    <!-- don't need to set env variables for container tear down -->
+                                    <executable>docker-compose</executable>
+                                    <arguments>
+                                        <argument>down</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>run-tests-against-server-version-matrix</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${skipTests}</skip>
+                                    <environmentVariables>
+                                        <ABS_PROJECT_HOME>${project.basedir}/../</ABS_PROJECT_HOME>
+                                        <!-- setting this env variable is needed to be cross-platform compatible -->
+                                        <HOME>${user.home}</HOME>
+                                    </environmentVariables>
+                                    <executable>docker-compose</executable>
+                                    <arguments>
+                                        <argument>-f</argument>
+                                        <argument>../docker-compose-server-version-matrix.yml</argument>
+                                        <argument>up</argument>
+                                        <argument>--build</argument>
+                                        <argument>--exit-code-from</argument>
+                                        <argument>gremlin-dotnet-integration-tests-3.5.4</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>shutdown-container-server-version-matrix</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
                                     <skip>${skipTests}</skip>
                                     <!-- don't need to set env variables for container tear down -->
                                     <executable>docker-compose</executable>
                                     <arguments>
+                                        <argument>-f</argument>
+                                        <argument>../docker-compose-server-version-matrix.yml</argument>
                                         <argument>down</argument>
                                     </arguments>
                                 </configuration>

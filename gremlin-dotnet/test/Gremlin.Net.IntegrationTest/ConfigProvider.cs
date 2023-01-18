@@ -46,6 +46,11 @@ namespace Gremlin.Net.IntegrationTest
             if (Convert.ToBoolean(Environment.GetEnvironmentVariable("DOCKER_ENVIRONMENT")))
             {
                 config["TestServerIpAddress"] = config["TestServerIpAddressDocker"];
+                if (Environment.GetEnvironmentVariable("GREMLIN_TEST_SERVER_VERSION") != null)
+                {
+                    config["TestServerIpAddress"] +=
+                        "-" + Environment.GetEnvironmentVariable("GREMLIN_TEST_SERVER_VERSION");
+                }
             }
 
             return config;
