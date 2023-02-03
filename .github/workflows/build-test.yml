@@ -130,6 +130,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           mvn clean install -pl -:gremlin-javascript,-:gremlin-python,-gremlin-dotnet,-:gremlin-dotnet-source,-:gremlin-dotnet-tests,-:gremlint -q -DskipTests -DskipImageBuild -Dci
+          cat D:\a\tinkerpop\tinkerpop\target\rat.txt
       - name: Build with Maven Ubuntu
         if: runner.os == 'Linux'
         run: |
@@ -154,6 +155,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           mvn clean install -pl -:gremlin-javascript,-:gremlin-python,-gremlin-dotnet,-:gremlin-dotnet-source,-:gremlin-dotnet-tests,-:gremlint -q -DskipTests -DskipImageBuild -Dci
+          cat D:\a\tinkerpop\tinkerpop\target\rat.txt
       - name: Build with Maven Ubuntu
         if: runner.os == 'Linux'
         run: |
