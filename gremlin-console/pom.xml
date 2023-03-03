@@ -136,6 +136,11 @@ limitations under the License.
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-cli-picocli</artifactId>
+            <version>${groovy.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <directory>${basedir}/target</directory>
