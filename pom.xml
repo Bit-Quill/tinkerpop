@@ -224,7 +224,7 @@ limitations under the License.
                             <rules>
                                 <DependencyConvergence/>
                                 <requireJavaVersion>
-                                    <version>[1.8,12)</version>
+                                    <version>[1.8,17]</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>[3.5.3,)</version>
@@ -827,7 +827,7 @@ limitations under the License.
         <profile>
             <id>jdk11</id>
             <activation>
-                <jdk>11</jdk>
+                <jdk>[11,17]</jdk>
             </activation>
             <properties>
                 <suresafeArgs>--illegal-access=permit</suresafeArgs>
