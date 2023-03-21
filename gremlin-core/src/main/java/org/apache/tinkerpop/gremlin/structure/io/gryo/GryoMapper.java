@@ -27,7 +27,6 @@ import org.apache.tinkerpop.gremlin.structure.io.gryo.kryoshim.shaded.ShadedSeri
 import org.apache.tinkerpop.shaded.kryo.ClassResolver;
 import org.apache.tinkerpop.shaded.kryo.Kryo;
 import org.apache.tinkerpop.shaded.kryo.Serializer;
-import org.apache.tinkerpop.shaded.kryo.util.DefaultStreamFactory;
 import org.apache.tinkerpop.shaded.kryo.util.MapReferenceResolver;
 import org.javatuples.Pair;
 
@@ -93,7 +92,7 @@ public final class GryoMapper implements Mapper<Kryo> {
 
     @Override
     public Kryo createMapper() {
-        final Kryo kryo = new Kryo(classResolver.get(), new MapReferenceResolver(), new DefaultStreamFactory());
+        final Kryo kryo = new Kryo(classResolver.get(), new MapReferenceResolver());
         kryo.addDefaultSerializer(Map.Entry.class, new UtilSerializers.EntrySerializer());
         kryo.setRegistrationRequired(registrationRequired);
         kryo.setReferences(referenceTracking);

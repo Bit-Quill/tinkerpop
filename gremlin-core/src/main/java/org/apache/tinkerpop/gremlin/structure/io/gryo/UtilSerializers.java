@@ -62,7 +62,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> List read(final KryoShim<I, ?> kryo, final I input, final Class<List> clazz) {
+        public <I extends InputShim> List read(final KryoShim<I, ?> kryo, final I input, final Class<? extends List> clazz) {
             return kryo.readObject(input, ArrayList.class);
         }
     }
@@ -78,7 +78,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> ByteBuffer read(final KryoShim<I, ?> kryo, final I input, final Class<ByteBuffer> clazz) {
+        public <I extends InputShim> ByteBuffer read(final KryoShim<I, ?> kryo, final I input, final Class<? extends ByteBuffer> clazz) {
             final int len = input.readInt();
             final byte[] b = input.readBytes(len);
             final ByteBuffer bb = ByteBuffer.allocate(len);
@@ -94,7 +94,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> Class read(final KryoShim<I, ?> kryo, final I input, final Class<Class> clazz) {
+        public <I extends InputShim> Class read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Class> clazz) {
             final String name = input.readString();
             try {
                 return Class.forName(name);
@@ -114,7 +114,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> Class[] read(final KryoShim<I, ?> kryo, final I input, final Class<Class[]> clazz) {
+        public <I extends InputShim> Class[] read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Class[]> clazz) {
             final int size = input.readInt();
             final Class[] clazzes = new Class[size];
             for (int i = 0; i < size; i++) {
@@ -143,7 +143,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> InetAddress read(final KryoShim<I, ?> kryo, final I input, final Class<InetAddress> clazz) {
+        public <I extends InputShim> InetAddress read(final KryoShim<I, ?> kryo, final I input, final Class<? extends InetAddress> clazz) {
             try {
                 return InetAddress.getByName(input.readString());
             } catch (Exception ex) {
@@ -158,7 +158,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> HashSetSupplier read(final KryoShim<I, ?> kryo, final I input, final Class<HashSetSupplier> clazz) {
+        public <I extends InputShim> HashSetSupplier read(final KryoShim<I, ?> kryo, final I input, final Class<? extends HashSetSupplier> clazz) {
             return HashSetSupplier.instance();
         }
     }
@@ -175,7 +175,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> UUID read(final KryoShim<I, ?> kryo, final I input, final Class<UUID> uuidClass) {
+        public <I extends InputShim> UUID read(final KryoShim<I, ?> kryo, final I input, final Class<? extends UUID> uuidClass) {
             return new UUID(input.readLong(), input.readLong());
         }
 
@@ -196,7 +196,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> URI read(final KryoShim<I, ?> kryo, final I input, final Class<URI> uriClass) {
+        public <I extends InputShim> URI read(final KryoShim<I, ?> kryo, final I input, final Class<? extends URI> uriClass) {
             return URI.create(input.readString());
         }
 
@@ -214,7 +214,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> Pair read(final KryoShim<I, ?> kryo, final I input, final Class<Pair> pairClass) {
+        public <I extends InputShim> Pair read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Pair> pairClass) {
             return Pair.with(kryo.readClassAndObject(input), kryo.readClassAndObject(input));
         }
     }
@@ -228,7 +228,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> Triplet read(final KryoShim<I, ?> kryo, final I input, final Class<Triplet> tripletClass) {
+        public <I extends InputShim> Triplet read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Triplet> tripletClass) {
             return Triplet.with(kryo.readClassAndObject(input), kryo.readClassAndObject(input), kryo.readClassAndObject(input));
         }
     }
@@ -241,7 +241,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public Map.Entry read(final Kryo kryo, final Input input, final Class<Map.Entry> entryClass) {
+        public Map.Entry read(final Kryo kryo, final Input input, final Class<? extends Map.Entry> entryClass) {
             return new AbstractMap.SimpleEntry(kryo.readClassAndObject(input), kryo.readClassAndObject(input));
         }
     }
@@ -258,7 +258,7 @@ final class UtilSerializers {
         }
 
         @Override
-        public <I extends InputShim> Map read(final KryoShim<I, ?> kryo, final I input, final Class<Map> clazz) {
+        public <I extends InputShim> Map read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Map> clazz) {
             return Collections.synchronizedMap(kryo.readObject(input, LinkedHashMap.class));
         }
     }

@@ -69,7 +69,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> Edge read(final KryoShim<I, ?> kryo, final I input, final Class<Edge> edgeClass) {
+        public <I extends InputShim> Edge read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Edge> edgeClass) {
             final Object o = kryo.readClassAndObject(input);
             return (Edge) o;
         }
@@ -85,7 +85,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> Vertex read(final KryoShim<I, ?> kryo, final I input, final Class<Vertex> vertexClass) {
+        public <I extends InputShim> Vertex read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Vertex> vertexClass) {
             return (Vertex) kryo.readClassAndObject(input);
         }
     }
@@ -100,7 +100,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> Property read(final KryoShim<I, ?> kryo, final I input, final Class<Property> propertyClass) {
+        public <I extends InputShim> Property read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Property> propertyClass) {
             return (Property) kryo.readClassAndObject(input);
         }
     }
@@ -115,7 +115,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> VertexProperty read(final KryoShim<I, ?> kryo, final I input, final Class<VertexProperty> vertexPropertyClass) {
+        public <I extends InputShim> VertexProperty read(final KryoShim<I, ?> kryo, final I input, final Class<? extends VertexProperty> vertexPropertyClass) {
             return (VertexProperty) kryo.readClassAndObject(input);
         }
     }
@@ -130,7 +130,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> Path read(final KryoShim<I, ?> kryo, final I input, final Class<Path> pathClass) {
+        public <I extends InputShim> Path read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Path> pathClass) {
             return (Path) kryo.readClassAndObject(input);
         }
     }
@@ -143,7 +143,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> Bytecode read(final KryoShim<I, ?> kryo, final I input, final Class<Bytecode> clazz) {
+        public <I extends InputShim> Bytecode read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Bytecode> clazz) {
             final Bytecode bytecode = new Bytecode();
             final int sourceInstructionCount = input.readInt();
             for (int ix = 0; ix < sourceInstructionCount; ix++) {
@@ -193,7 +193,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> P read(final KryoShim<I, ?> kryo, final I input, final Class<P> clazz) {
+        public <I extends InputShim> P read(final KryoShim<I, ?> kryo, final I input, final Class<? extends P> clazz) {
             final String predicate = input.readString();
             final boolean isCollection = input.readByte() == (byte) 0;
             final Object value;
@@ -246,7 +246,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> TextP read(final KryoShim<I, ?> kryo, final I input, final Class<TextP> clazz) {
+        public <I extends InputShim> TextP read(final KryoShim<I, ?> kryo, final I input, final Class<? extends TextP> clazz) {
             final String predicate = input.readString();
             final String value = kryo.readObject(input, String.class);
 
@@ -267,7 +267,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> Lambda read(final KryoShim<I, ?> kryo, final I input, final Class<Lambda> clazz) {
+        public <I extends InputShim> Lambda read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Lambda> clazz) {
             final String script = input.readString();
             final String language = input.readString();
             final int arguments = input.readInt();
@@ -291,7 +291,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> Bytecode.Binding read(final KryoShim<I, ?> kryo, final I input, final Class<Bytecode.Binding> clazz) {
+        public <I extends InputShim> Bytecode.Binding read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Bytecode.Binding> clazz) {
             final String var = input.readString();
             final Object val = kryo.readClassAndObject(input);
             return new Bytecode.Binding(var, val);
@@ -306,7 +306,7 @@ public final class GryoSerializersV1d0 {
         }
 
         @Override
-        public <I extends InputShim> DefaultRemoteTraverser read(final KryoShim<I, ?> kryo, final I input, final Class<DefaultRemoteTraverser> remoteTraverserClass) {
+        public <I extends InputShim> DefaultRemoteTraverser read(final KryoShim<I, ?> kryo, final I input, final Class<? extends DefaultRemoteTraverser> remoteTraverserClass) {
             final Object o = kryo.readClassAndObject(input);
             return new DefaultRemoteTraverser<>(o, input.readLong());
         }

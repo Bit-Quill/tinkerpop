@@ -82,7 +82,7 @@ public class IoXIoRegistry {
         }
 
         @Override
-        public IoX read(final Kryo kryo, final Input input, final Class<IoX> ioxClass) {
+        public IoX read(final Kryo kryo, final Input input, final Class<? extends IoX> ioxClass) {
             throw new UnsupportedOperationException("IoX writes to DetachedVertex and can't be read back in as IoX");
         }
 

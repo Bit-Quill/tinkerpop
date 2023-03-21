@@ -450,7 +450,7 @@ public class GryoMapperTest {
         }
 
         @Override
-        public Duration read(final Kryo kryo, final Input input, final Class<Duration> durationClass)
+        public Duration read(final Kryo kryo, final Input input, final Class<? extends Duration> durationClass)
         {
             throw new UnsupportedOperationException("I don't do anything");
         }

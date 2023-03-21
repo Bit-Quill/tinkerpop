@@ -45,7 +45,7 @@ public class ShadedSerializerAdapter<T> extends Serializer<T> {
     }
 
     @Override
-    public T read(final Kryo kryo, final Input input, final Class<T> aClass) {
+    public T read(final Kryo kryo, final Input input, final Class<? extends T> aClass) {
         // Same caching opportunity as in write(...)
         final ShadedKryoAdapter shadedKryoAdapter = new ShadedKryoAdapter(kryo);
         final ShadedInputAdapter shadedInputAdapter = new ShadedInputAdapter(input);

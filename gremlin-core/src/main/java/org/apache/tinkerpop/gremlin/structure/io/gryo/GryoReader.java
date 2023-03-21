@@ -322,7 +322,7 @@ public final class GryoReader implements GraphReader {
 
         @Override
         public boolean hasNext() {
-            return !input.eof();
+            return !input.end();
         }
 
         @Override

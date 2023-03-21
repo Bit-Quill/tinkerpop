@@ -76,7 +76,7 @@ public class IoYIoRegistry {
         }
 
         @Override
-        public IoY read(final Kryo kryo, final Input input, final Class<IoY> ioyClass) {
+        public IoY read(final Kryo kryo, final Input input, final Class<? extends IoY> ioyClass) {
             throw new UnsupportedOperationException("IoX writes to Map and can't be read back in as IoX");
         }
     }

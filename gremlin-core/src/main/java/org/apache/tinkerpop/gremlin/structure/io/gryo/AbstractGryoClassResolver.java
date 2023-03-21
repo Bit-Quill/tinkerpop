@@ -72,6 +72,38 @@ public abstract class AbstractGryoClassResolver implements ClassResolver {
     }
 
     @Override
+    public Registration unregister(int classID) {
+        Registration reg = idToRegistration.get(classID);
+
+        if (classID == memoizedClassId) {
+            memoizedClassId = -1;
+            memoizedClassIdValue = null;
+        }
+
+        if (reg != null) {
+            Class type = reg.getType();
+            classToRegistration.remove(type);
+
+            if (memoizedClass.equals(type)) {
+                memoizedClass = null;
+                memoizedClassValue = null;
+            }
+
+            if (reg.getType().isPrimitive()) {
+                Class wrappedType = getWrapperClass(type);
+                classToRegistration.remove(wrappedType);
+
+                if (memoizedClass.equals(wrappedType)) {
+                    memoizedClass = null;
+                    memoizedClassValue = null;
+                }
+            }
+        }
+
+        return reg;
+    }
+
+    @Override
     public Registration registerImplicit(final Class type) {
         return register(new Registration(type, kryo.getDefaultSerializer(type), NAME));
     }

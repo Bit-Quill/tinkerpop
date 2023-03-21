@@ -29,7 +29,7 @@ public interface SerializerShim<T> {
 
     public <O extends OutputShim> void write(final KryoShim<?, O> kryo, final O output, final T object);
 
-    public <I extends InputShim> T read(final KryoShim<I, ?> kryo, final I input, final Class<T> clazz);
+    public <I extends InputShim> T read(final KryoShim<I, ?> kryo, final I input, final Class<? extends T> clazz);
 
     public default boolean isImmutable() {
         return false;

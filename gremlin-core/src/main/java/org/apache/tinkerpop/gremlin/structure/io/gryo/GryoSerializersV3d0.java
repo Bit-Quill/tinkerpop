@@ -105,7 +105,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> Edge read(final KryoShim<I, ?> kryo, final I input, final Class<Edge> edgeClass) {
+        public <I extends InputShim> Edge read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Edge> edgeClass) {
             final DetachedEdge.Builder builder = DetachedEdge.build();
             builder.setId(kryo.readClassAndObject(input));
             builder.setLabel(input.readString());
@@ -156,7 +156,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> Vertex read(final KryoShim<I, ?> kryo, final I input, final Class<Vertex> vertexClass) {
+        public <I extends InputShim> Vertex read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Vertex> vertexClass) {
             final DetachedVertex.Builder builder = DetachedVertex.build();
             builder.setId(kryo.readClassAndObject(input));
             builder.setLabel(input.readString());
@@ -191,7 +191,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> Property read(final KryoShim<I, ?> kryo, final I input, final Class<Property> propertyClass) {
+        public <I extends InputShim> Property read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Property> propertyClass) {
             return new DetachedProperty<>(input.readString(), kryo.readClassAndObject(input),
                     DetachedVertex.build().setId(kryo.readClassAndObject(input)).setLabel(input.readString()).create());
         }
@@ -217,7 +217,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> VertexProperty read(final KryoShim<I, ?> kryo, final I input, final Class<VertexProperty> vertexPropertyClass) {
+        public <I extends InputShim> VertexProperty read(final KryoShim<I, ?> kryo, final I input, final Class<? extends VertexProperty> vertexPropertyClass) {
            final DetachedVertexProperty.Builder vpBuilder = DetachedVertexProperty.build();
             vpBuilder.setId(kryo.readClassAndObject(input));
             vpBuilder.setLabel(input.readString());
@@ -246,7 +246,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> Path read(final KryoShim<I, ?> kryo, final I input, final Class<Path> pathClass) {
+        public <I extends InputShim> Path read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Path> pathClass) {
             return (Path) kryo.readClassAndObject(input);
         }
     }
@@ -259,7 +259,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> Bytecode read(final KryoShim<I, ?> kryo, final I input, final Class<Bytecode> clazz) {
+        public <I extends InputShim> Bytecode read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Bytecode> clazz) {
             final Bytecode bytecode = new Bytecode();
             final int sourceInstructionCount = input.readInt();
             for (int ix = 0; ix < sourceInstructionCount; ix++) {
@@ -309,7 +309,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> P read(final KryoShim<I, ?> kryo, final I input, final Class<P> clazz) {
+        public <I extends InputShim> P read(final KryoShim<I, ?> kryo, final I input, final Class<? extends P> clazz) {
             final String predicate = input.readString();
             final boolean isCollection = input.readByte() == (byte) 0;
             final Object value;
@@ -362,7 +362,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> TextP read(final KryoShim<I, ?> kryo, final I input, final Class<TextP> clazz) {
+        public <I extends InputShim> TextP read(final KryoShim<I, ?> kryo, final I input, final Class<? extends TextP> clazz) {
             final String predicate = input.readString();
             final String value = kryo.readObject(input, String.class);
 
@@ -383,7 +383,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> Lambda read(final KryoShim<I, ?> kryo, final I input, final Class<Lambda> clazz) {
+        public <I extends InputShim> Lambda read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Lambda> clazz) {
             final String script = input.readString();
             final String language = input.readString();
             final int arguments = input.readInt();
@@ -407,7 +407,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> Bytecode.Binding read(final KryoShim<I, ?> kryo, final I input, final Class<Bytecode.Binding> clazz) {
+        public <I extends InputShim> Bytecode.Binding read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Bytecode.Binding> clazz) {
             final String var = input.readString();
             final Object val = kryo.readClassAndObject(input);
             return new Bytecode.Binding(var, val);
@@ -422,7 +422,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> DefaultRemoteTraverser read(final KryoShim<I, ?> kryo, final I input, final Class<DefaultRemoteTraverser> remoteTraverserClass) {
+        public <I extends InputShim> DefaultRemoteTraverser read(final KryoShim<I, ?> kryo, final I input, final Class<? extends DefaultRemoteTraverser> remoteTraverserClass) {
             final Object o = kryo.readClassAndObject(input);
             return new DefaultRemoteTraverser<>(o, input.readLong());
         }
@@ -438,7 +438,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> TraversalMetrics read(final KryoShim<I, ?> kryo, final I input, final Class<TraversalMetrics> clazz) {
+        public <I extends InputShim> TraversalMetrics read(final KryoShim<I, ?> kryo, final I input, final Class<? extends TraversalMetrics> clazz) {
             final double duration = input.readDouble();
             final int size = input.readInt();
 
@@ -472,7 +472,7 @@ public final class GryoSerializersV3d0 {
         }
 
         @Override
-        public <I extends InputShim> Metrics read(final KryoShim<I, ?> kryo, final I input, final Class<Metrics> clazz) {
+        public <I extends InputShim> Metrics read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Metrics> clazz) {
             final MutableMetrics m = new MutableMetrics(input.readString(), input.readString());
 
             m.setDuration(Math.round(input.readDouble() * 1000000), TimeUnit.NANOSECONDS);

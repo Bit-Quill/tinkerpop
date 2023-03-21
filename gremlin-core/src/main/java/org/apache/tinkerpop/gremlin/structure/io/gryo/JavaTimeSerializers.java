@@ -55,7 +55,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> Duration read(final KryoShim<I, ?> kryo, final I input, final Class<Duration> durationClass) {
+        public <I extends InputShim> Duration read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Duration> durationClass) {
             return Duration.ofNanos(input.readLong());
         }
     }
@@ -71,7 +71,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> Instant read(final KryoShim<I, ?> kryo, final I input, final Class<Instant> aClass) {
+        public <I extends InputShim> Instant read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Instant> aClass) {
             return Instant.ofEpochSecond(input.readLong(), input.readInt());
         }
     }
@@ -86,7 +86,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> LocalDate read(final KryoShim<I, ?> kryo, final I input, final Class<LocalDate> clazz) {
+        public <I extends InputShim> LocalDate read(final KryoShim<I, ?> kryo, final I input, final Class<? extends LocalDate> clazz) {
             return LocalDate.ofEpochDay(input.readLong());
         }
     }
@@ -107,7 +107,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> LocalDateTime read(final KryoShim<I, ?> kryo, final I input, final Class<LocalDateTime> clazz) {
+        public <I extends InputShim> LocalDateTime read(final KryoShim<I, ?> kryo, final I input, final Class<? extends LocalDateTime> clazz) {
             return LocalDateTime.of(input.readInt(), input.readInt(), input.readInt(), input.readInt(), input.readInt(), input.readInt(), input.readInt());
         }
     }
@@ -122,7 +122,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> LocalTime read(final KryoShim<I, ?> kryo, final I input, final Class<LocalTime> clazz) {
+        public <I extends InputShim> LocalTime read(final KryoShim<I, ?> kryo, final I input, final Class<? extends LocalTime> clazz) {
             return LocalTime.ofNanoOfDay(input.readLong());
         }
     }
@@ -138,7 +138,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> MonthDay read(final KryoShim<I, ?> kryo, final I input, final Class<MonthDay> clazz) {
+        public <I extends InputShim> MonthDay read(final KryoShim<I, ?> kryo, final I input, final Class<? extends MonthDay> clazz) {
             return MonthDay.of(input.readInt(), input.readInt());
         }
     }
@@ -154,7 +154,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> OffsetDateTime read(final KryoShim<I, ?> kryo, final I input, final Class<OffsetDateTime> clazz) {
+        public <I extends InputShim> OffsetDateTime read(final KryoShim<I, ?> kryo, final I input, final Class<? extends OffsetDateTime> clazz) {
             return OffsetDateTime.of(kryo.readObject(input, LocalDateTime.class), kryo.readObject(input, ZoneOffset.class));
         }
     }
@@ -170,7 +170,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> OffsetTime read(final KryoShim<I, ?> kryo, final I input, final Class<OffsetTime> clazz) {
+        public <I extends InputShim> OffsetTime read(final KryoShim<I, ?> kryo, final I input, final Class<? extends OffsetTime> clazz) {
             return OffsetTime.of(kryo.readObject(input, LocalTime.class), kryo.readObject(input, ZoneOffset.class));
         }
     }
@@ -187,7 +187,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> Period read(final KryoShim<I, ?> kryo, final I input, final Class<Period> clazz) {
+        public <I extends InputShim> Period read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Period> clazz) {
             return Period.of(input.readInt(), input.readInt(), input.readInt());
         }
     }
@@ -202,7 +202,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> Year read(final KryoShim<I, ?> kryo, final I input, final Class<Year> clazz) {
+        public <I extends InputShim> Year read(final KryoShim<I, ?> kryo, final I input, final Class<? extends Year> clazz) {
             return Year.of(input.readInt());
         }
     }
@@ -218,7 +218,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> YearMonth read(final KryoShim<I, ?> kryo, final I input, final Class<YearMonth> clazz) {
+        public <I extends InputShim> YearMonth read(final KryoShim<I, ?> kryo, final I input, final Class<? extends YearMonth> clazz) {
             return YearMonth.of(input.readInt(), input.readInt());
         }
     }
@@ -240,7 +240,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> ZonedDateTime read(final KryoShim<I, ?> kryo, final I input, final Class<ZonedDateTime> clazz) {
+        public <I extends InputShim> ZonedDateTime read(final KryoShim<I, ?> kryo, final I input, final Class<? extends ZonedDateTime> clazz) {
             return ZonedDateTime.of(input.readInt(), input.readInt(), input.readInt(),
                     input.readInt(), input.readInt(), input.readInt(), input.readInt(),
                     ZoneId.of(input.readString()));
@@ -257,7 +257,7 @@ final class JavaTimeSerializers {
         }
 
         @Override
-        public <I extends InputShim> ZoneOffset read(final KryoShim<I, ?> kryo, final I input, final Class<ZoneOffset> clazz) {
+        public <I extends InputShim> ZoneOffset read(final KryoShim<I, ?> kryo, final I input, final Class<? extends ZoneOffset> clazz) {
             return ZoneOffset.of(input.readString());
         }
     }
