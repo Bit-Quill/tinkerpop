@@ -41,7 +41,7 @@ public class UnshadedSerializerAdapter<T> extends Serializer<T> {
     }
 
     @Override
-    public T read(final Kryo kryo, final Input input, final Class<? extends T> aClass) {
+    public T read(final Kryo kryo, final Input input, final Class<T> aClass) {
         UnshadedKryoAdapter shadedKryoAdapter = new UnshadedKryoAdapter(kryo);
         UnshadedInputAdapter shadedInputAdapter = new UnshadedInputAdapter(input);
         return serializer.read(shadedKryoAdapter, shadedInputAdapter, aClass);
