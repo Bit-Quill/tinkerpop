@@ -81,7 +81,7 @@ public final class ToyTriangle {
         }
 
         @Override
-        public <I extends InputShim> ToyTriangle read(final KryoShim<I, ?> kryo, final I input, final Class<ToyTriangle> toyTriangleClass) {
+        public <I extends InputShim> ToyTriangle read(final KryoShim<I, ?> kryo, final I input, final Class<? extends ToyTriangle> toyTriangleClass) {
             return new ToyTriangle(input.readInt(), input.readInt(), input.readInt());
         }
     }

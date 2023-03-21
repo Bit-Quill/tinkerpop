@@ -74,7 +74,7 @@ public final class ToyPoint {
         }
 
         @Override
-        public <I extends InputShim> ToyPoint read(final KryoShim<I, ?> kryo, final I input, final Class<ToyPoint> toyPointClass) {
+        public <I extends InputShim> ToyPoint read(final KryoShim<I, ?> kryo, final I input, final Class<? extends ToyPoint> toyPointClass) {
             return new ToyPoint(input.readInt(), input.readInt());
         }
     }

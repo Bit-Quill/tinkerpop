@@ -101,7 +101,7 @@ public final class TinkerIoRegistryV1d0 extends AbstractIoRegistry {
         }
 
         @Override
-        public TinkerGraph read(final Kryo kryo, final Input input, final Class<TinkerGraph> tinkerGraphClass) {
+        public TinkerGraph read(final Kryo kryo, final Input input, final Class<? extends TinkerGraph> tinkerGraphClass) {
             final Configuration conf = new BaseConfiguration();
             conf.setProperty("gremlin.tinkergraph.defaultVertexPropertyCardinality", "list");
             final TinkerGraph graph = TinkerGraph.open(conf);

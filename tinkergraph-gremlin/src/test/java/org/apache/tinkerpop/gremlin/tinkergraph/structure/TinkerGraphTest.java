@@ -961,7 +961,7 @@ public class TinkerGraphTest {
         }
 
         @Override
-        public Color read(final Kryo kryo, final Input input, final Class<Color> colorClass) {
+        public Color read(final Kryo kryo, final Input input, final Class<? extends Color> colorClass) {
             throw new UnsupportedOperationException("IoX writes to DetachedVertex and can't be read back in as IoX");
         }
 
