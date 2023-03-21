@@ -48,7 +48,7 @@ public class ResponseMessageGryoSerializer implements SerializerShim<ResponseMes
     }
 
     @Override
-    public <I extends InputShim> ResponseMessage read(final KryoShim<I, ?> kryo, final I input, final Class<ResponseMessage> clazz) {
+    public <I extends InputShim> ResponseMessage read(final KryoShim<I, ?> kryo, final I input, final Class<? extends ResponseMessage> clazz) {
         final UUID requestId = kryo.readObjectOrNull(input, UUID.class);
         final int status = input.readShort();
         final String statusMsg = input.readString();

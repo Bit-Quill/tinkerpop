@@ -41,7 +41,7 @@ public class RequestMessageGryoSerializer implements SerializerShim<RequestMessa
     }
 
     @Override
-    public <I extends InputShim> RequestMessage read(final KryoShim<I, ?> kryo, final I input, final Class<RequestMessage> aClass) {
+    public <I extends InputShim> RequestMessage read(final KryoShim<I, ?> kryo, final I input, final Class<? extends RequestMessage> aClass) {
         final UUID id = kryo.readObject(input, UUID.class);
         final String processor = input.readString();
         final String op = input.readString();

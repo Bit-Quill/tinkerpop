@@ -40,7 +40,7 @@ public final class WrappedArraySerializer<T> extends Serializer<WrappedArray<T>>
     }
 
     @Override
-    public WrappedArray<T> read(final Kryo kryo, final Input input, final Class<WrappedArray<T>> aClass) {
+    public WrappedArray<T> read(final Kryo kryo, final Input input, final Class<? extends WrappedArray<T>> aClass) {
         final int size = input.readVarInt(true);
         final Object[] array = new Object[size];
         for (int i = 0; i < size; i++) {

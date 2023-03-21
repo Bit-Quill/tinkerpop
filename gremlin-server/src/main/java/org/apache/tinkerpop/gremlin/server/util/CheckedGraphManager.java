@@ -25,7 +25,7 @@ import org.apache.tinkerpop.gremlin.server.GraphManager;
 import org.apache.tinkerpop.gremlin.server.Settings;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactory;
-import org.apache.tinkerpop.shaded.minlog.Log;
+import org.apache.tinkerpop.shaded.kryo.minlog.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -40,7 +40,7 @@ public final class ObjectWritableSerializer<T> implements SerializerShim<ObjectW
     }
 
     @Override
-    public <I extends InputShim> ObjectWritable<T> read(final KryoShim<I, ?> kryo, final I input, final Class<ObjectWritable<T>> clazz) {
+    public <I extends InputShim> ObjectWritable<T> read(final KryoShim<I, ?> kryo, final I input, final Class<? extends ObjectWritable<T>> clazz) {
         return new ObjectWritable(kryo.readClassAndObject(input));
     }
 }

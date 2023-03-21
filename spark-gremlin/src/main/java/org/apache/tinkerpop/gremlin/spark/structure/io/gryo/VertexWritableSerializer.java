@@ -41,7 +41,7 @@ public final class VertexWritableSerializer implements SerializerShim<VertexWrit
     }
 
     @Override
-    public <I extends InputShim> VertexWritable read(final KryoShim<I, ?> kryo, final I input, final Class<VertexWritable> clazz) {
+    public <I extends InputShim> VertexWritable read(final KryoShim<I, ?> kryo, final I input, final Class<? extends VertexWritable> clazz) {
         return new VertexWritable(kryo.readObject(input, StarGraph.class).getStarVertex());
     }
 }

@@ -38,7 +38,7 @@ public final class Tuple3Serializer<A, B, C> extends Serializer<Tuple3<A, B, C>>
     }
 
     @Override
-    public Tuple3<A, B, C> read(final Kryo kryo, final Input input, final Class<Tuple3<A, B, C>> clazz) {
+    public Tuple3<A, B, C> read(final Kryo kryo, final Input input, final Class<? extends Tuple3<A, B, C>> clazz) {
         return new Tuple3(kryo.readClassAndObject(input), kryo.readClassAndObject(input), kryo.readClassAndObject(input));
     }
 }

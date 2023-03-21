@@ -49,7 +49,7 @@ public final class CompactBufferSerializer<T> extends Serializer<CompactBuffer<T
     }
 
     @Override
-    public CompactBuffer<T> read(Kryo kryo, Input input, Class<CompactBuffer<T>> aClass) {
+    public CompactBuffer<T> read(Kryo kryo, Input input, Class<? extends CompactBuffer<T>> aClass) {
         final ClassTag<T> classTag = kryo.readClassAndObject(input);
         final CompactBuffer<T> compactBuffer = new CompactBuffer<>(classTag);
         compactBuffer.element0 = kryo.readClassAndObject(input);
