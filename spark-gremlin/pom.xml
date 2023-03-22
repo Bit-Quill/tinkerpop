@@ -213,21 +213,21 @@ limitations under the License.
             <artifactId>scala-library</artifactId>
             <version>2.12.10</version>
         </dependency>
-        <!-- use jackson 2.12.7 to fit better with spark where Scala module 2.12.3 requires Jackson Databind version >= 2.12.0 and < 2.13.0 -->
+        <!-- use jackson 2.13.5 to fit better with spark 2.3.3 where Scala module 2.13.4 requires Jackson Databind version >= 2.13.0 and < 2.14.0 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.12.7</version>
+            <version>2.13.5</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.12.7</version>
+            <version>2.13.5</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.12.7</version>
+            <version>2.13.5</version>
         </dependency>
         <!-- TEST -->
         <dependency>
