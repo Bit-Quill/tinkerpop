@@ -317,6 +317,11 @@ limitations under the License.
                     </execution>
                 </executions>
             </plugin>
+            <!--
+                It's important to set build.dir for any tests run through Surefire which write temporary files to
+                the build directory. Without explicitly setting build.dir, Surefire runs will incorrectly identify
+                a build directory in .m2 which results in some tests failing.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

@@ -522,6 +522,10 @@ limitations under the License.
                      tightly to the former. included the log4j configuration file here so that we didn't have to
                      copy/paste this entire config into both hadoop-gremlin and spark-gremlin. it is of no cost to
                      maintain these settings here globally even if they aren't used as such.
+
+                     It's important to set build.dir for any tests run through Surefire which write temporary files to
+                     the build directory. Without explicitly setting build.dir, Surefire runs will incorrectly identify
+                     a build directory in .m2 which results in some tests failing.
                 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
