@@ -24,6 +24,7 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.service.Service;
 import org.apache.tinkerpop.gremlin.structure.util.CloseableIterator;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.AbstractTinkerGraph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
 
@@ -52,7 +53,7 @@ public class TinkerDegreeCentralityFactory extends TinkerServiceRegistry.TinkerS
         );
     }
 
-    public TinkerDegreeCentralityFactory(final TinkerGraph graph) {
+    public TinkerDegreeCentralityFactory(final AbstractTinkerGraph graph) {
         super(graph, NAME);
     }
 
