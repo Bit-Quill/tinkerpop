@@ -806,7 +806,7 @@ traversalMethod_call
 traversalMethod_concat
 	: 'concat' LPAREN RPAREN #traversalMethod_concat_Empty //is this needed given stringLiteralList?
 	| 'concat' LPAREN nestedTraversal RPAREN #traversalMethod_concat_Traversal
-	| 'concat' LPAREN stringLiteralList RPAREN #traversalMethod_concat_String
+	| 'concat' LPAREN stringLiteralVarargs RPAREN #traversalMethod_concat_String
 	;
 
 /*********************************************
