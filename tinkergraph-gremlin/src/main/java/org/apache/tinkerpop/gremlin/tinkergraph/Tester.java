@@ -43,6 +43,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.desc;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.neq;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.*;
 import static org.apache.tinkerpop.gremlin.structure.io.IoCore.graphml;
 import static org.apache.tinkerpop.gremlin.tinkergraph.structure.AbstractTinkerGraph.DefaultIdManager.LONG;
@@ -119,18 +120,18 @@ public class Tester {
         for (; numTimes != 0; numTimes--) {
 
             GraphTraversalSource g = createTxAirRoutesTraversalSource();
-
+            List<Object> vIds = g.V().id().toList();
             Long start = System.nanoTime();
 
             // TODO: this takes too long to run. Maybe reduce to 300 vertices.
-            for (Vertex v : g.V().toList()) {
-                List<Vertex> oneAway = g.V(v.id()).out().toList();
-                List<Vertex> twoAway = g.V(v.id()).out().out().dedup().toList();
-                twoAway.removeIf(val -> oneAway.contains(val));
-                for (Vertex vToAdd : twoAway) {
-                    g.addE("route").from(v).to(vToAdd).iterate();
-                    g.tx().commit();
-                }
+            for (int i = 0; i < 1000; i++) {
+                g.V(vIds.get(i)).as("start")
+                        .in().out().as("end")
+                        .where("end", neq("start"))
+                        .where(out().is(neq("start")))
+                        .addE("route").to("start")
+                        .iterate();
+                g.tx().commit();
             }
 
             Long end = System.nanoTime();
@@ -693,6 +694,6 @@ public class Tester {
     public static long traversalRunTime(GraphTraversal traversal) {
         long startTime = System.nanoTime();
         traversal.iterate();
-        return System.nanoTime() - startTime;
+        return (System.nanoTime() - startTime)/1000000;
     }
 }
