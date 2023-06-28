@@ -1710,6 +1710,30 @@ public class TraversalMethodVisitor extends TraversalRootVisitor<GraphTraversal>
                 antlr.tvisitor.visitNestedTraversal(ctx.nestedTraversal()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GraphTraversal visitTraversalMethod_concat_Empty(GremlinParser.TraversalMethod_concat_EmptyContext ctx) {
+        return graphTraversal.concat();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GraphTraversal visitTraversalMethod_concat_Traversal(GremlinParser.TraversalMethod_concat_TraversalContext ctx) {
+        return graphTraversal.concat(antlr.tvisitor.visitNestedTraversal(ctx.nestedTraversal()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GraphTraversal visitTraversalMethod_concat_String(GremlinParser.TraversalMethod_concat_StringContext ctx) {
+        return graphTraversal.concat(GenericLiteralVisitor.getStringLiteralList(ctx.stringLiteralList()));
+    }
+
     public GraphTraversal[] getNestedTraversalList(final GremlinParser.NestedTraversalListContext ctx) {
         return ctx.nestedTraversalExpr().nestedTraversal()
                 .stream()
