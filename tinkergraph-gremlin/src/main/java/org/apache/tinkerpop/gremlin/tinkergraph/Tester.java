@@ -111,6 +111,8 @@ public class Tester {
             txGraph = TinkerTransactionGraph.open(getTinkerGraphConf());
         } else if (GRAPH_TYPE == GRAPH_NEO4J) {
             txGraph = Neo4jGraph.open("/tmp/neo4j");
+            txGraph.traversal().V().drop().iterate();
+            txGraph.traversal().E().drop().iterate();
         } else {
             throw new RuntimeException("GRAPH_TYPE " + GRAPH_TYPE + " unsupported.");
         }
@@ -175,10 +177,10 @@ public class Tester {
                     for (Edge e : g.V(v.id()).outE().toList()) {
                         if (random.nextInt(3) == 0) {
                             g.E(e.id()).drop().iterate();
-                            Commit(g);
                         }
                     }
                 }
+                Commit(g);
             }
 
             Long end = System.nanoTime();
@@ -395,7 +397,7 @@ public class Tester {
 
             Long start = System.nanoTime();
             for (Object id : edgeIds) {
-                g.V(id).drop().iterate();
+                g.E(id).drop().iterate();
                 Commit(g);
             }
 
