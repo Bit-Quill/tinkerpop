@@ -30,7 +30,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.process.traversal.strategy.decoration.SeedStrategy;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalInterruptedException;
 import org.apache.tinkerpop.gremlin.structure.*;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.AbstractTinkerGraph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerTransactionGraph;
@@ -50,7 +49,7 @@ import static org.apache.tinkerpop.gremlin.tinkergraph.structure.AbstractTinkerG
 
 public class Tester {
     public static final int GRAPH_TINKER = 0;
-    public static final int GRAPH_TXN = 1;
+    public static final int GRAPH_TXN_TINKER = 1;
     public static final int GRAPH_NEO4J = 2;
 
     public static int GRAPH_TYPE;
@@ -107,7 +106,7 @@ public class Tester {
         Graph txGraph;
         if (GRAPH_TYPE == GRAPH_TINKER) {
             txGraph = TinkerGraph.open(getTinkerGraphConf()); // TODO: air routes needs a specific vertex manager.
-        } else if (GRAPH_TYPE == GRAPH_TXN) {
+        } else if (GRAPH_TYPE == GRAPH_TXN_TINKER) {
             txGraph = TinkerTransactionGraph.open(getTinkerGraphConf());
         } else if (GRAPH_TYPE == GRAPH_NEO4J) {
             txGraph = Neo4jGraph.open("/tmp/neo4j");
@@ -129,7 +128,7 @@ public class Tester {
     }
 
     public static void cleanup(GraphTraversalSource g) {
-        if (GRAPH_TYPE == GRAPH_TXN || GRAPH_TYPE == GRAPH_NEO4J) {
+        if (GRAPH_TYPE == GRAPH_TXN_TINKER || GRAPH_TYPE == GRAPH_NEO4J) {
             try {
                 g.getGraph().close();
             } catch (Exception e) {
@@ -426,6 +425,35 @@ public class Tester {
 
                 g.V(toVertexId).addE((String) edgeElement.get("label")).from(V(fromVertexId)).property((Map<Object, Object>) edgeElement.get("props")).iterate();
                 g.E(edgeElement.get("id")).drop().iterate();
+                Commit(g);
+            }
+
+            Long end = System.nanoTime();
+
+            cleanup(g);
+
+            System.out.println("It took " + (end-start)/1000000 + " ms to randomly move all edges");
+        }
+    }
+
+    public static void runLatencyRandomEdgeMoveTestV2(int numTimes) {
+        for (; numTimes != 0; numTimes--) {
+            GraphTraversalSource g = createAirRoutesTraversalSource();
+            List<Object> vertexIds = g.V().id().toList();
+            Long numEdges = g.E().count().next();
+            Random random = new Random(5);
+
+            final int numVertices = vertexIds.size();
+            Long start = System.nanoTime();
+            for (int i = 0; i < numEdges; i++) {
+                int fromVertexId = random.nextInt(numVertices);
+                int toVertexId = random.nextInt(numVertices);
+
+                g.V(fromVertexId).as("v1")
+                        .outE().limit(1).as("e1")
+                        .V(toVertexId).addE("relatesTo").from("v1").as("e2")
+                        .sideEffect(select("e1").properties().unfold().as("p1").select("e2").property(select("p1").key(), select("p1").value()))
+                        .select("e1").drop().iterate();
                 Commit(g);
             }
 
