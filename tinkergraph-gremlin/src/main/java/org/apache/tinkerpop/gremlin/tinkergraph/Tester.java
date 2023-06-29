@@ -49,17 +49,21 @@ import static org.apache.tinkerpop.gremlin.structure.io.IoCore.graphml;
 import static org.apache.tinkerpop.gremlin.tinkergraph.structure.AbstractTinkerGraph.DefaultIdManager.LONG;
 
 public class Tester {
+    public static final int GRAPH_TINKER = 0;
+    public static final int GRAPH_TXN = 1;
+    public static final int GRAPH_NEO4J = 2;
+
+    public static int GRAPH_TYPE;
 
     public static void main(String[] args) {
-        if (args.length < 1) throw new IllegalArgumentException("Test expected more parameters");
+        if (args.length < 2) throw new IllegalArgumentException("Test expected more parameters");
 
         int numTimesToRepeatQuery = Integer.parseInt(args[0]);
+        GRAPH_TYPE = Integer.parseInt(args[1]);
 
-        GraphTraversalSource tinkerTraversal = createAirRoutesTraversalSource();
-        GraphTraversalSource txTraversal = createTxAirRoutesTraversalSource();
+        System.out.println("Running test v1 for " + numTimesToRepeatQuery + " times and type " + GRAPH_TYPE);
 
-        //runLatencyReadQuery(tinkerTraversal, numTimesToRepeatQuery);
-        runLatencyReadQuery(txTraversal, numTimesToRepeatQuery);
+        runLatencyReadQuery(numTimesToRepeatQuery);
         //runThroughPutReadQuery(tinkerTraversal, numTimesToRepeatQuery);
         //runThroughPutReadQuery(txTraversal, numTimesToRepeatQuery);
         runLatencyCentralVertexDropTest(numTimesToRepeatQuery);
@@ -87,27 +91,33 @@ public class Tester {
         return conf;
     }
 
-    public static GraphTraversalSource createAirRoutesTraversalSource() {
-
-        TinkerGraph tinkerGraph = TinkerGraph.open(getTinkerGraphConf()); // TODO: air routes needs a specific vertex manager.
-
-        try {
-            tinkerGraph.io(graphml()).readGraph("air-routes-latest.graphml");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Unable to load air-routes");
+    public static void Commit(GraphTraversalSource g) {
+        if ( ! (GRAPH_TYPE == GRAPH_TINKER)) {
+            g.tx().commit();
         }
-
-        return tinkerGraph.traversal();
     }
 
-    public static GraphTraversalSource createTxAirRoutesTraversalSource() {
-        TinkerTransactionGraph txGraph = TinkerTransactionGraph.open(getTinkerGraphConf());
-        //Neo4jGraph txGraph = Neo4jGraph.open("tmpfs");
+    public static void Rollback(GraphTraversalSource g) {
+        if ( ! (GRAPH_TYPE == GRAPH_TINKER)) {
+            g.tx().rollback();
+        }
+    }
+    public static GraphTraversalSource createAirRoutesTraversalSource() {
+
+        Graph txGraph;
+        if (GRAPH_TYPE == GRAPH_TINKER) {
+            txGraph = TinkerGraph.open(getTinkerGraphConf()); // TODO: air routes needs a specific vertex manager.
+        } else if (GRAPH_TYPE == GRAPH_TXN) {
+            txGraph = TinkerTransactionGraph.open(getTinkerGraphConf());
+        } else if (GRAPH_TYPE == GRAPH_NEO4J) {
+            txGraph = Neo4jGraph.open("/tmp/neo4j");
+        } else {
+            throw new RuntimeException("GRAPH_TYPE " + GRAPH_TYPE + " unsupported.");
+        }
 
         try {
             txGraph.io(graphml()).readGraph("air-routes-latest.graphml");
-            txGraph.tx().commit();
+            Commit(txGraph.traversal());
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Unable to load air-routes");
@@ -116,31 +126,37 @@ public class Tester {
         return txGraph.traversal();
     }
 
+    public static void cleanup(GraphTraversalSource g) {
+        if (GRAPH_TYPE == GRAPH_TXN || GRAPH_TYPE == GRAPH_NEO4J) {
+            try {
+                g.getGraph().close();
+            } catch (Exception e) {
+                // Intentionally blank
+            }
+        }
+    }
+
     public static void runAddDirectRouteForIndirectTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
 
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vIds = g.V().id().toList();
             Long start = System.nanoTime();
 
             // TODO: this takes too long to run. Maybe reduce to 300 vertices.
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 800; i++) {
                 g.V(vIds.get(i)).as("start")
                         .in().out().as("end")
                         .where("end", neq("start"))
                         .where(out().is(neq("start")))
                         .addE("route").to("start")
                         .iterate();
-                g.tx().commit();
+                Commit(g);
             }
 
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " to add extra direct flights");
         }
@@ -150,7 +166,7 @@ public class Tester {
         for (; numTimes != 0; numTimes--) {
 
             GraphTraversalSource b = TinkerFactory.createModern().traversal();
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             Random random = new Random(5);
             Long start = System.nanoTime();
 
@@ -159,7 +175,7 @@ public class Tester {
                     for (Edge e : g.V(v.id()).outE().toList()) {
                         if (random.nextInt(3) == 0) {
                             g.E(e.id()).drop().iterate();
-                            g.tx().commit();
+                            Commit(g);
                         }
                     }
                 }
@@ -167,11 +183,7 @@ public class Tester {
 
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " to remove overloaded routes");
         }
@@ -186,7 +198,7 @@ public class Tester {
             for (int i=0; i<1000; i++) {
                 g.addV().iterate();
             }
-            g.tx().commit();
+            Commit(g);
 
             List<Vertex> vertices = g.V().toList();
 
@@ -199,14 +211,10 @@ public class Tester {
                     .inVertices(vertices.subList(0, vertices.size()/2))
                     .outVertices(vertices.subList(vertices.size()/2, vertices.size()))
                     .create().generate();
-            g.tx().commit();
+            Commit(g);
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " to create a power law 2.5 distributed graph");
         }
@@ -234,36 +242,28 @@ public class Tester {
                     .outVertices(vertices.subList(vertices.size()/2, vertices.size()))
                     .create().generate();
 
-            g.tx().rollback();
+            Rollback(g);
 
             Long end = System.nanoTime();
             System.out.println("It took " + (end-start)/1000000 + " to rollback a power law 2.5 distributed graph");
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
         }
     }
 
     public static void runLatencyCentralVertexDropTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vIds = g.V().order().by(bothE().count(), desc).id().toList();
 
             Long start = System.nanoTime();
             for (Object id : vIds) {
                 g.V(id).drop().iterate();
-                g.tx().commit();
+                Commit(g);
             }
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to drop all vertices");
         }
@@ -271,7 +271,7 @@ public class Tester {
 
     public static void runThroughputCentralVertexDropTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vIds = g.V().order().by(bothE().count(), desc).id().toList();
 
             ExecutorService threadPool = Executors.newFixedThreadPool(2);
@@ -281,7 +281,7 @@ public class Tester {
             for (Object id : vIds) {
                 futures.add(threadPool.submit(() -> {
                     g.V(id).drop().iterate();
-                    g.tx().commit();
+                    Commit(g);
                 }));
             }
 
@@ -300,11 +300,7 @@ public class Tester {
             Long end = System.nanoTime();
             System.out.println("It took " + (end-start)/1000000 + " ms to drop all vertices");
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             threadPool.shutdown();
         }
@@ -312,7 +308,7 @@ public class Tester {
 
     public static void runLatencyRandomVertexDropTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vIds = g.V().order().by(id(), desc).id().toList();
             Random random = new Random(5);
             Collections.shuffle(vIds, random);
@@ -320,15 +316,11 @@ public class Tester {
             Long start = System.nanoTime();
             for (Object id : vIds) {
                 g.V(id).drop().iterate();
-                g.tx().commit();
+                Commit(g);
             }
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to randomly drop all vertices");
         }
@@ -336,7 +328,7 @@ public class Tester {
 
     public static void runLatencyRandomVertexDropRollbackTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vIds = g.V().order().by(id(), desc).id().toList();
             Random random = new Random(5);
             Collections.shuffle(vIds, random);
@@ -344,15 +336,11 @@ public class Tester {
             Long start = System.nanoTime();
             for (Object id : vIds) {
                 g.V(id).drop().iterate();
-                g.tx().rollback();
+                Rollback(g);
             }
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to randomly rollback all dropped vertices");
         }
@@ -360,7 +348,7 @@ public class Tester {
 
     public static void runThroughputRandomVertexDropTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vIds = g.V().id().toList();
             Random random = new Random(2);
             Collections.shuffle(vIds, random);
@@ -373,7 +361,7 @@ public class Tester {
                 int index = i;
                 futures.add(threadPool.submit(() -> {
                     g.V(vIds.get(index)).drop().iterate();
-                    g.tx().commit();
+                    Commit(g);
                 }));
             }
 
@@ -392,11 +380,7 @@ public class Tester {
             Long end = System.nanoTime();
             System.out.println("It took " + (end-start)/1000000 + " ms to drop all vertices");
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             threadPool.shutdown();
         }
@@ -404,7 +388,7 @@ public class Tester {
 
     public static void runLatencyRandomEdgeDropTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> edgeIds = g.E().order().by(id(), desc).id().toList();
             Random random = new Random(5);
             Collections.shuffle(edgeIds, random);
@@ -412,16 +396,12 @@ public class Tester {
             Long start = System.nanoTime();
             for (Object id : edgeIds) {
                 g.V(id).drop().iterate();
-                g.tx().commit();
+                Commit(g);
             }
 
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to randomly drop all edges");
         }
@@ -429,7 +409,7 @@ public class Tester {
 
     public static void runLatencyRandomEdgeMoveTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vertexIds = g.V().id().toList();
             List<Map<Object,Object>> edgeElements = (List) g.E().project("id", "label", "props")
                     .by(id()).by(label()).by(propertyMap()).toList();
@@ -444,16 +424,12 @@ public class Tester {
 
                 g.V(toVertexId).addE((String) edgeElement.get("label")).from(V(fromVertexId)).property((Map<Object, Object>) edgeElement.get("props"));
                 g.E(edgeElement.get("id")).drop();
-                g.tx().commit();
+                Commit(g);
             }
 
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to randomly move all edges");
         }
@@ -461,7 +437,7 @@ public class Tester {
 
     public static void runLatencyRandomEdgeMoveRollbackTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vertexIds = g.V().id().toList();
             List<Map<Object,Object>> edgeElements = (List) g.E().project("id", "label", "props")
                     .by(id()).by(label()).by(propertyMap()).toList();
@@ -479,19 +455,15 @@ public class Tester {
                 g.E(edgeElements.get(i).get("id")).drop();
 
                 if (i % 2 != 0) {
-                    g.tx().commit();
+                    Commit(g);
                 } else {
-                    g.tx().rollback();
+                    Rollback(g);
                 }
             }
 
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to randomly move half of the edges.");
         }
@@ -499,7 +471,7 @@ public class Tester {
 
     public static void runLatencyRandomElementPropertyUpdateTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vertices = g.V().id().toList();
             List<Object> edges = g.E().id().toList();
             Random random = new Random(5);
@@ -525,16 +497,12 @@ public class Tester {
                             .property(__.coalesce(__.E(eId).properties().sample(1).key(), __.constant("newprop")), "changed")
                             .iterate();
                 }
-                g.tx().commit();
+                Commit(g);
             }
 
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to randomly update vertices and edges");
         }
@@ -544,7 +512,7 @@ public class Tester {
 
     public static void runLatencyRandomVertexPropertyAddTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vertices = g.V().id().toList();
             Random random = new Random(5);
             Collections.shuffle(vertices, random);
@@ -560,24 +528,20 @@ public class Tester {
                             .option(Merge.onMatch, CollectionFactory.asMap("newprop", "new"))
                             .iterate();
                 }
-                g.tx().commit();
+                Commit(g);
             }
 
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
-            System.out.println("It took " + (end-start)/1000000 + " ms to randomly update vertices and edges");
+            System.out.println("It took " + (end-start)/1000000 + " ms to randomly update vertices properties");
         }
     }
 
     public static void runThroughputRandomVertexPropertyAddTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vertices = g.V().id().toList();
             Random random = new Random(5);
             Collections.shuffle(vertices, random);
@@ -593,16 +557,12 @@ public class Tester {
                             .option(Merge.onMatch, CollectionFactory.asMap("newprop", "new"))
                             .iterate();
                 }
-                g.tx().commit();
+                Commit(g);
             }
 
             Long end = System.nanoTime();
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to randomly update vertices and edges");
         }
@@ -613,7 +573,7 @@ public class Tester {
         final int numVals = vals.length;
 
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createTxAirRoutesTraversalSource();
+            GraphTraversalSource g = createAirRoutesTraversalSource();
             List<Object> vertices = g.V().id().toList();
             Random random = new Random(5);
 
@@ -624,24 +584,22 @@ public class Tester {
                             .option(Merge.onCreate, CollectionFactory.asMap(vals[random.nextInt(numVals)], vals[random.nextInt(numVals)]))
                             .option(Merge.onMatch, CollectionFactory.asMap(vals[random.nextInt(numVals)], vals[random.nextInt(numVals)]))
                             .iterate();
-                g.tx().commit();
+                Commit(g);
             }
 
             Long end = System.nanoTime();
-            System.out.println("It took " + (end-start)/1000000 + " ms to randomly update vertices and edges");
+            System.out.println("It took " + (end-start)/1000000 + " ms to randomly upsert edges");
 
-            try {
-                g.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(g);
         }
     }
 
-    public static void runLatencyReadQuery(GraphTraversalSource gts, int numTimes) {
+    public static void runLatencyReadQuery(int numTimes) {
         while (numTimes != 0) {
-            GraphTraversal query = gts.V().repeat(both()).times(7);
-            System.out.println("It took " + traversalRunTime(query) + " ms to run for " + gts.getGraph());
+            GraphTraversalSource g = createAirRoutesTraversalSource();
+            GraphTraversal query = g.V().repeat(both()).times(7);
+            System.out.println("It took " + traversalRunTime(query) + " ms to run for " + g.getGraph());
+            cleanup(g);
             numTimes--;
         }
     }
