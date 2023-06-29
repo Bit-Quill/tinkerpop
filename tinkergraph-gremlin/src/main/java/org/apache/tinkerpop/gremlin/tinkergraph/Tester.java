@@ -422,8 +422,8 @@ public class Tester {
                 int fromVertexId = random.nextInt(numVertices);
                 int toVertexId = random.nextInt(numVertices);
 
-                g.V(toVertexId).addE((String) edgeElement.get("label")).from(V(fromVertexId)).property((Map<Object, Object>) edgeElement.get("props"));
-                g.E(edgeElement.get("id")).drop();
+                g.V(toVertexId).addE((String) edgeElement.get("label")).from(V(fromVertexId)).property((Map<Object, Object>) edgeElement.get("props")).iterate();
+                g.E(edgeElement.get("id")).drop().iterate();
                 Commit(g);
             }
 
@@ -451,8 +451,8 @@ public class Tester {
                 int fromVertexId = random.nextInt(numVertices);
                 int toVertexId = random.nextInt(numVertices);
 
-                g.V(toVertexId).addE((String) edgeElements.get(i).get("label")).from(V(fromVertexId)).property((Map<Object, Object>) edgeElements.get(i).get("props"));
-                g.E(edgeElements.get(i).get("id")).drop();
+                g.V(toVertexId).addE((String) edgeElements.get(i).get("label")).from(V(fromVertexId)).property((Map<Object, Object>) edgeElements.get(i).get("props")).iterate();
+                g.E(edgeElements.get(i).get("id")).drop().iterate();
 
                 if (i % 2 != 0) {
                     Commit(g);
