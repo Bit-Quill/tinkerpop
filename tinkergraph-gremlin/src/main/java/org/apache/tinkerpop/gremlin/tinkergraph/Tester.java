@@ -68,7 +68,7 @@ public class Tester {
         runLatencyCentralVertexDropTest(numTimesToRepeatQuery);
         runLatencyRandomVertexDropTest(numTimesToRepeatQuery);
         runLatencyRandomEdgeDropTest(numTimesToRepeatQuery);
-        runLatencyRandomEdgeMoveTest(numTimesToRepeatQuery);
+        runLatencyRandomEdgeMoveTestV2(numTimesToRepeatQuery);
         runLatencyRandomElementPropertyUpdateTest(numTimesToRepeatQuery);
         runLatencyRandomVertexPropertyAddTest(numTimesToRepeatQuery);
         runLatencyRandomEdgePropertyUpsertTest(numTimesToRepeatQuery);
@@ -77,7 +77,7 @@ public class Tester {
         //runThroughputRandomVertexDropTest(numTimesToRepeatQuery);
         runLatencyRollbackAddTest(numTimesToRepeatQuery);
         runLatencyRandomVertexDropRollbackTest(numTimesToRepeatQuery);
-        runLatencyRandomEdgeMoveRollbackTest(numTimesToRepeatQuery);
+        runLatencyRandomEdgeMoveRollbackTestV2(numTimesToRepeatQuery);
         runAddDirectRouteForIndirectTest(numTimesToRepeatQuery);
         runReduceAirportTrafficTest(numTimesToRepeatQuery);
     }
@@ -105,13 +105,11 @@ public class Tester {
 
         Graph txGraph;
         if (GRAPH_TYPE == GRAPH_TINKER) {
-            txGraph = TinkerGraph.open(getTinkerGraphConf()); // TODO: air routes needs a specific vertex manager.
+            txGraph = TinkerGraph.open(getTinkerGraphConf());
         } else if (GRAPH_TYPE == GRAPH_TXN_TINKER) {
             txGraph = TinkerTransactionGraph.open(getTinkerGraphConf());
         } else if (GRAPH_TYPE == GRAPH_NEO4J) {
-            txGraph = Neo4jGraph.open("/tmp/neo4j");
-            txGraph.traversal().V().drop().iterate();
-            txGraph.traversal().E().drop().iterate();
+            txGraph = Neo4jGraph.open("/tmp/neo4j/" + UUID.randomUUID());
         } else {
             throw new RuntimeException("GRAPH_TYPE " + GRAPH_TYPE + " unsupported.");
         }
@@ -408,6 +406,7 @@ public class Tester {
         }
     }
 
+    // This test is incompatible with Neo4j. Throws IAE class org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jProperty is not supported
     public static void runLatencyRandomEdgeMoveTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
             GraphTraversalSource g = createAirRoutesTraversalSource();
@@ -465,6 +464,7 @@ public class Tester {
         }
     }
 
+    // This test is incompatible with Neo4j. Throws IAE class org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jProperty is not supported
     public static void runLatencyRandomEdgeMoveRollbackTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
             GraphTraversalSource g = createAirRoutesTraversalSource();
@@ -483,6 +483,40 @@ public class Tester {
 
                 g.V(toVertexId).addE((String) edgeElements.get(i).get("label")).from(V(fromVertexId)).property((Map<Object, Object>) edgeElements.get(i).get("props")).iterate();
                 g.E(edgeElements.get(i).get("id")).drop().iterate();
+
+                if (i % 2 != 0) {
+                    Commit(g);
+                } else {
+                    Rollback(g);
+                }
+            }
+
+            Long end = System.nanoTime();
+
+            cleanup(g);
+
+            System.out.println("It took " + (end-start)/1000000 + " ms to randomly move half of the edges.");
+        }
+    }
+
+    public static void runLatencyRandomEdgeMoveRollbackTestV2(int numTimes) {
+        for (; numTimes != 0; numTimes--) {
+            GraphTraversalSource g = createAirRoutesTraversalSource();
+            List<Object> vertexIds = g.V().id().toList();
+            final long numEdgeElements  = g.E().count().next();
+            Random random = new Random(5);
+
+            final int numVertices = vertexIds.size();
+            Long start = System.nanoTime();
+            for (int i = 0; i < numEdgeElements; i++) {
+                int fromVertexId = random.nextInt(numVertices);
+                int toVertexId = random.nextInt(numVertices);
+
+                g.V(fromVertexId).as("v1")
+                        .outE().limit(1).as("e1")
+                        .V(toVertexId).addE("relatesTo").from("v1").as("e2")
+                        .sideEffect(select("e1").properties().unfold().as("p1").select("e2").property(select("p1").key(), select("p1").value()))
+                        .select("e1").drop().iterate();
 
                 if (i % 2 != 0) {
                     Commit(g);
