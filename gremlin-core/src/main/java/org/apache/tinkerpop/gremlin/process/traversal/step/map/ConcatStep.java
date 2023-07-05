@@ -22,6 +22,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent;
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement;
+import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalUtil;
 
 import java.util.Collections;
 import java.util.Set;
@@ -31,6 +32,8 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
     private String[] concatStrings;
 
     private String traversalResult;
+
+    private Traversal.Admin<S, String> concatTraversal;
 
     // flag used to propagate the null value through if all strings to be concatenated are null
     private boolean isAllNull = true;
@@ -42,7 +45,9 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
 
     public ConcatStep(Traversal.Admin traversal, final Traversal<S, String> concatTraversal) {
         super(traversal);
-        this.traversalResult = processTraversal(concatTraversal.asAdmin());
+        this.concatTraversal = this.integrateChild(concatTraversal.asAdmin());
+//        System.out.println("CONCAT TRAVERSAL PARENT=" + this.concatTraversal.getParent());
+        this.traversalResult = processTraversal(this.concatTraversal);
     }
 
     @Override
@@ -63,9 +68,13 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
 
         if (null != this.traversalResult) {
             sb.append(this.traversalResult);
+        } else if (null != this.concatTraversal) {
+            // process traversals
+            // TODO account for null injections
+            sb.append(TraversalUtil.apply(traverser, this.concatTraversal));
         }
 
-        if (null != this.concatStrings) {
+        if (null != this.concatStrings && this.concatStrings.length != 0) {
             for (final String s : this.concatStrings) {
                 if (null != s) {
                     // we know there is one non-null part in the string we concat
@@ -78,13 +87,12 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
         return this.isAllNull? null : sb.toString();
     }
 
-    private String processTraversal(final Traversal.Admin<S , String> concatTraverser) {
+    private String processTraversal(final Traversal.Admin<S , String> concatTraversal) {
         final StringBuilder sb = new StringBuilder();
-        if (null != concatTraverser) {
-            while (concatTraverser.hasNext()) {
-                String result = concatTraverser.next();
+        if (null != concatTraversal) {
+            while (concatTraversal.hasNext()) {
+                String result = concatTraversal.next();
                 if (null != result) {
-                    // we know there is one non-null part in the string we concat
                     this.isAllNull = false;
                     sb.append(result);
                 }

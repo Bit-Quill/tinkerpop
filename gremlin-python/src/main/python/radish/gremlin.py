@@ -466,6 +466,7 @@ world.gremlins = {
     'g_injectXa_bX_concat_XcX': [(lambda g:g.inject('a','b').concat('c'))], 
     'g_injectXa_b_cX_concat_d': [(lambda g, xx1=None:g.inject(xx1,'c').concat('d'))], 
     'g_V_hasLabel_value_concat_X_X_concat_XpersonX': [(lambda g:g.V().hasLabel('person').name.concat(' ').concat('person'))], 
+    'g_hasLabelXpersonX_valuesXnameX_asXaX_constantXMrX_concatXselect_aX': [(lambda g:g.V().hasLabel('person').name.as_('a').constant('Mr.').concat(__.select('a')))], 
     'g_V_connectedComponent_hasXcomponentX': [(lambda g:g.V().connectedComponent().has('gremlin.connectedComponentVertexProgram.component'))], 
     'g_V_dedup_connectedComponent_hasXcomponentX': [(lambda g:g.V().dedup().connectedComponent().has('gremlin.connectedComponentVertexProgram.component'))], 
     'g_V_hasLabelXsoftwareX_connectedComponent_project_byXnameX_byXcomponentX': [(lambda g:g.V().hasLabel('software').connectedComponent().project('name','component').by('name').by('gremlin.connectedComponentVertexProgram.component'))], 

@@ -1431,7 +1431,7 @@ public interface GraphTraversal<S, E> extends Traversal<S, E> {
      * @see <a href="http://tinkerpop.apache.org/docs/${project.version}/reference/#concat-step" target="_blank">Reference Documentation - Concat Step</a>
      * @since 3.7.0
      */
-    public default GraphTraversal<S, String> concat(String... concatStrings) {
+    public default GraphTraversal<S, String> concat(final String... concatStrings) {
         this.asAdmin().getBytecode().addStep(Symbols.concat, concatStrings);
         return this.asAdmin().addStep(new ConcatStep<>(this.asAdmin(), concatStrings));
     }

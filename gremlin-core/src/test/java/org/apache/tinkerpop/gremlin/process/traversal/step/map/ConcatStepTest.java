@@ -51,6 +51,9 @@ public class ConcatStepTest extends StepTest {
         assertArrayEquals(new String[]{"abc", "bbc"},
                 __.__("a", "b").concat(__.__("b", "c")).toList().toArray());
 
+        assertArrayEquals(new String[]{"Mr.a", "Mr.b", "Mr.c", "Mr.d"},
+                __.__("a", "b", "c", "d").as("letters").constant("Mr.").concat(__.select("letters")).toList().toArray());
+
         String nullStr = null;
         assertNull(__.inject(null).concat(nullStr).next());
     }
@@ -58,16 +61,6 @@ public class ConcatStepTest extends StepTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowWithIncomingArrayList() {
         __.__(Arrays.asList("a", "b", "c")).concat("d").next();
-    }
-
-    @Test
-    public void print() {
-
-        System.out.println(__.__("a").concat(__.__(Arrays.asList("a", "b", "c")).unfold()).next());
-
-        String nullStr = null;
-
-        System.out.println(__.inject(null).concat("hi").next());
     }
 
 }

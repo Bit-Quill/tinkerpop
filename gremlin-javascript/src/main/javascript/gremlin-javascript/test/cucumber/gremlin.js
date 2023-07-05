@@ -484,6 +484,7 @@ const gremlins = {
     g_injectXa_bX_concat_XcX: [function({g}) { return g.inject("a","b").concat("c") }], 
     g_injectXa_b_cX_concat_d: [function({g, xx1}) { return g.inject(xx1,"c").concat("d") }], 
     g_V_hasLabel_value_concat_X_X_concat_XpersonX: [function({g}) { return g.V().hasLabel("person").values("name").concat(" ").concat("person") }], 
+    g_hasLabelXpersonX_valuesXnameX_asXaX_constantXMrX_concatXselect_aX: [function({g}) { return g.V().hasLabel("person").values("name").as("a").constant("Mr.").concat(__.select("a")) }], 
     g_V_connectedComponent_hasXcomponentX: [function({g}) { return g.V().connectedComponent().has("gremlin.connectedComponentVertexProgram.component") }], 
     g_V_dedup_connectedComponent_hasXcomponentX: [function({g}) { return g.V().dedup().connectedComponent().has("gremlin.connectedComponentVertexProgram.component") }], 
     g_V_hasLabelXsoftwareX_connectedComponent_project_byXnameX_byXcomponentX: [function({g}) { return g.V().hasLabel("software").connectedComponent().project("name","component").by("name").by("gremlin.connectedComponentVertexProgram.component") }], 

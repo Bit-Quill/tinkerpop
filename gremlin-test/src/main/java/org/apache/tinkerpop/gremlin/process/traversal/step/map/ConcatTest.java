@@ -22,18 +22,24 @@ import org.apache.tinkerpop.gremlin.LoadGraphWith;
 import org.apache.tinkerpop.gremlin.process.AbstractGremlinProcessTest;
 import org.apache.tinkerpop.gremlin.process.GremlinProcessRunner;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Arrays;
 
 import static org.apache.tinkerpop.gremlin.LoadGraphWith.GraphData.MODERN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(GremlinProcessRunner.class)
 public abstract class ConcatTest extends AbstractGremlinProcessTest {
 
     public abstract Traversal<String, String> get_g_injectXnull_a_b_nullX_concat();
+    public abstract Traversal<Vertex, String> get_g_hasLabelXpersonX_valuesXnameX_asXaX_constantXMrX_concatXselect_aX();
 
     @Test
     @LoadGraphWith(MODERN)
@@ -44,9 +50,17 @@ public abstract class ConcatTest extends AbstractGremlinProcessTest {
         assertEquals("a", concatenated);
         assertTrue(traversal.hasNext());
         concatenated = traversal.next();
-        // TODO - currently null is returned as empty string, would likely need to propagate null through
+        // TODO - null will be returned as emtpy if traverser isn't all null
         assertEquals("", concatenated);
         assertFalse(traversal.hasNext());
+    }
+
+    @Test
+    @LoadGraphWith(MODERN)
+    public void g_hasLabelXpersonX_valuesXnameX_asXaX_constantXMrX_concatXselect_aX() {
+        final Traversal<Vertex, String> traversal = get_g_hasLabelXpersonX_valuesXnameX_asXaX_constantXMrX_concatXselect_aX();
+        printTraversalForm(traversal);
+        checkResults(Arrays.asList("Mr.marko", "Mr.vadas", "Mr.josh", "Mr.peter"), traversal);
     }
 
 
@@ -54,6 +68,11 @@ public abstract class ConcatTest extends AbstractGremlinProcessTest {
         @Override
         public Traversal<String, String> get_g_injectXnull_a_b_nullX_concat() {
             return g.inject("a", null).concat();
+        }
+
+        @Override
+        public Traversal<Vertex, String> get_g_hasLabelXpersonX_valuesXnameX_asXaX_constantXMrX_concatXselect_aX() {
+            return g.V().hasLabel("person").values("name").as("a").constant("Mr.").concat(__.select("a"));
         }
 
     }

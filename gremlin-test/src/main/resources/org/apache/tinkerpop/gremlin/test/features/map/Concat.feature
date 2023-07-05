@@ -71,3 +71,17 @@ Feature: Step - concat()
       | peter person |
 
     #TODO - add additional tests with modern graph
+
+  Scenario: g_hasLabelXpersonX_valuesXnameX_asXaX_constantXMrX_concatXselect_aX
+    Given the modern graph
+    And the traversal of
+      """
+      g.V().hasLabel("person").values("name").as("a").constant("Mr.").concat(__.select("a"))
+      """
+    When iterated to list
+    Then the result should be unordered
+      | result |
+      | Mr.marko |
+      | Mr.vadas |
+      | Mr.josh |
+      | Mr.peter |
