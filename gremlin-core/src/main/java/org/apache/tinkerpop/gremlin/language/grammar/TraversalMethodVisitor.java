@@ -1714,14 +1714,6 @@ public class TraversalMethodVisitor extends TraversalRootVisitor<GraphTraversal>
      * {@inheritDoc}
      */
     @Override
-    public GraphTraversal visitTraversalMethod_concat_Empty(GremlinParser.TraversalMethod_concat_EmptyContext ctx) {
-        return graphTraversal.concat();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public GraphTraversal visitTraversalMethod_concat_Traversal(GremlinParser.TraversalMethod_concat_TraversalContext ctx) {
         return graphTraversal.concat(antlr.tvisitor.visitNestedTraversal(ctx.nestedTraversal()));
     }

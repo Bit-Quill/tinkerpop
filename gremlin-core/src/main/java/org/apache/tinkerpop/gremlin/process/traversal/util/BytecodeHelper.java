@@ -196,7 +196,7 @@ public final class BytecodeHelper {
             put(GraphTraversal.Symbols.max, Arrays.asList(MaxGlobalStep.class, MaxLocalStep.class));
             put(GraphTraversal.Symbols.min, Arrays.asList(MinGlobalStep.class, MinGlobalStep.class));
             put(GraphTraversal.Symbols.mean, Arrays.asList(MeanGlobalStep.class, MeanLocalStep.class));
-            put(GraphTraversal.Symbols.concat,Collections.singletonList(ConstantStep.class));
+            put(GraphTraversal.Symbols.concat, Collections.singletonList(ConstantStep.class));
             put(GraphTraversal.Symbols.group, Arrays.asList(GroupStep.class, GroupSideEffectStep.class));
             put(GraphTraversal.Symbols.groupCount, Arrays.asList(GroupCountStep.class, GroupCountSideEffectStep.class));
             put(GraphTraversal.Symbols.tree, Arrays.asList(TreeStep.class, TreeSideEffectStep.class));

@@ -38,20 +38,19 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
     // flag used to propagate the null value through if all strings to be concatenated are null
     private boolean isAllNull = true;
 
-    public ConcatStep(Traversal.Admin traversal, final String... concatStrings) {
+    public ConcatStep(final Traversal.Admin traversal, final String... concatStrings) {
         super(traversal);
         this.concatStrings = concatStrings;
     }
 
-    public ConcatStep(Traversal.Admin traversal, final Traversal<S, String> concatTraversal) {
+    public ConcatStep(final Traversal.Admin traversal, final Traversal<S, String> concatTraversal) {
         super(traversal);
         this.concatTraversal = this.integrateChild(concatTraversal.asAdmin());
-//        System.out.println("CONCAT TRAVERSAL PARENT=" + this.concatTraversal.getParent());
         this.traversalResult = processTraversal(this.concatTraversal);
     }
 
     @Override
-    protected String map(Traverser.Admin<S> traverser) {
+    protected String map(final Traverser.Admin<S> traverser) {
         // throws when incoming traverser isn't a string
         if (null != traverser.get() && !(traverser.get() instanceof String)) {
             throw new IllegalArgumentException(
@@ -70,7 +69,6 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
             sb.append(this.traversalResult);
         } else if (null != this.concatTraversal) {
             // process traversals
-            // TODO account for null injections
             sb.append(TraversalUtil.apply(traverser, this.concatTraversal));
         }
 
@@ -91,7 +89,7 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
         final StringBuilder sb = new StringBuilder();
         if (null != concatTraversal) {
             while (concatTraversal.hasNext()) {
-                String result = concatTraversal.next();
+                final String result = concatTraversal.next();
                 if (null != result) {
                     this.isAllNull = false;
                     sb.append(result);

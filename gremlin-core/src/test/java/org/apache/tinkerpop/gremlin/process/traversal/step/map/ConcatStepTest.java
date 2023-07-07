@@ -43,6 +43,7 @@ public class ConcatStepTest extends StepTest {
         assertEquals("abc", __.__("a").concat(__.__("b", "c")).next());
         assertEquals("abcd", __.__("a").concat("b", "c", "d").next());
         assertEquals("abcd", __.__("a").concat(__.__(Arrays.asList("b", "c", "d")).unfold()).next());
+        assertEquals("", __.__("").concat("").next());
 
         assertArrayEquals(new String[]{"a", "b", "c", "d"},
                 __.__("a", "b", "c", "d").concat().toList().toArray());
