@@ -1057,8 +1057,7 @@ If the incoming traverser is a non-String value then an `IllegalArgumentExceptio
 
 [gremlin-groovy,modern]
 ----
-g.V(1).as('a').addV(constant('prefix_').
-    concat(select('a').label())).property(id, 10) <1>
+g.addV(constant("prefix_").concat(__.V(1).label())).property(id, 10) <1>
 g.V(10).label()
 g.V().hasLabel('person').values('name').as('a').
     constant('Mr.').concat(__.select('a')) <2>
