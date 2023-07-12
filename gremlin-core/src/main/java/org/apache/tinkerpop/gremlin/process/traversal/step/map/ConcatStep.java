@@ -23,13 +23,19 @@ import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent;
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalUtil;
-import org.apache.tinkerpop.gremlin.structure.util.CloseableIterator;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ConcatStep<S> extends ScalarMapStep<S, String> implements TraversalParent {
+/**
+ * Reference implementation for String concatenation step, a mid-traversal step which concatenates one or more
+ * String values together to the incoming String traverser. If the incoming traverser is a non-String value then an
+ * `IllegalArgumentException` will be thrown.
+ *
+ * @author Yang Xia (http://github.com/xiazcy)
+ */
+public final class ConcatStep<S> extends ScalarMapStep<S, String> implements TraversalParent {
 
     private String traversalResult;
     private String stringArgsResult;
@@ -94,12 +100,10 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
     private String processTraversal(final Traversal.Admin<S , String> concatTraversal) {
         final StringBuilder sb = new StringBuilder();
         if (null != concatTraversal) {
-//            System.out.println(concatTraversal.hasNext());
             while (concatTraversal.hasNext()) {
                 final String result = concatTraversal.next();
                 if (null != result) {
                     this.isNullTraversal = false;
-//                    System.out.println("CONCAT TRAVERSAL===" + result);
                     sb.append(result);
                 }
             }
