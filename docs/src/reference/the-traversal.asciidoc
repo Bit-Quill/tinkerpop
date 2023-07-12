@@ -1071,7 +1071,7 @@ g.V(1).outE().as("a").constant("").
     concat(" ").
     concat(select("a").inV().values("name")) <4>
 g.inject("hello", "hi").concat(__.V().values('name')) <5>
-g.inject("This").concat(" ").concat("is a ", "gremlin.") <5>
+g.inject("This").concat(" ").concat("is a ", "gremlin.") <6>
 ----
 
 <1> Add a new vertex with id 10 which should be labeled like an existing vertex but with some prefix attached
