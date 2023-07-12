@@ -48,7 +48,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.filter.WhereTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.AddEdgeTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.AddVertexTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.CoalesceTest;
-import org.apache.tinkerpop.gremlin.process.traversal.step.map.ConcatTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.ConstantTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.CountTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.ElementMapTest;
@@ -145,7 +144,6 @@ public class ProcessStandardSuite extends AbstractGremlinSuite {
             AddEdgeTest.Traversals.class,
             AddVertexTest.Traversals.class,
             CoalesceTest.Traversals.class,
-            ConcatTest.Traversals.class,
             ConstantTest.Traversals.class,
             CountTest.Traversals.class,
             ElementMapTest.Traversals.class,
@@ -246,7 +244,6 @@ public class ProcessStandardSuite extends AbstractGremlinSuite {
             AddEdgeTest.class,
             AddVertexTest.class,
             CoalesceTest.class,
-            ConcatTest.class,
             ConstantTest.class,
             CountTest.class,
             ElementMapTest.class,

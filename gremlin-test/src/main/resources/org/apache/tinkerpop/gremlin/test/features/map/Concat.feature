@@ -67,8 +67,8 @@ Feature: Step - concat()
     When iterated to list
     Then the result should be unordered
       | result |
-      | acd |
-      | bcd |
+      | acda |
+      | bcdb |
 
   @GraphComputerVerificationInjectionNotSupported
   Scenario: g_injectXListXa_bXcX_concat_XdX
@@ -116,6 +116,19 @@ Feature: Step - concat()
       | result |
       | b |
       | ab |
+
+  @GraphComputerVerificationInjectionNotSupported
+  Scenario: g_injectXhello_hiX_concat_XV_valuesXnameXX
+    Given the modern graph
+    And the traversal of
+      """
+      g.inject("hello", "hi").concat(__.V().values("name"))
+      """
+    When iterated to list
+    Then the result should be unordered
+      | result |
+      | hellomarkovadaslopjoshripplepeter |
+      | himarkovadaslopjoshripplepeter |
 
   Scenario: g_V_hasLabel_value_concat_X_X_concat_XpersonX
     Given the modern graph

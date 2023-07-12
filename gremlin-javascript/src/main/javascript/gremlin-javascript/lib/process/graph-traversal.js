@@ -1490,6 +1490,7 @@ const statics = {
   choose: (...args) => callOnEmptyTraversal('choose', args),
   coalesce: (...args) => callOnEmptyTraversal('coalesce', args),
   coin: (...args) => callOnEmptyTraversal('coin', args),
+  concat: (...args) => callOnEmptyTraversal('concat', args),
   constant: (...args) => callOnEmptyTraversal('constant', args),
   count: (...args) => callOnEmptyTraversal('count', args),
   cyclicPath: (...args) => callOnEmptyTraversal('cyclicPath', args),

@@ -40,23 +40,33 @@ public class ConcatStepTest extends StepTest {
 
     @Test
     public void testReturnTypes() {
-        assertEquals("abc", __.__("a").concat(__.__("b", "c")).next());
+        assertEquals("abc", __.__("a").concat(__.constant("").inject("b", "c")).next());
         assertEquals("abcd", __.__("a").concat("b", "c", "d").next());
-        assertEquals("abcd", __.__("a").concat(__.__(Arrays.asList("b", "c", "d")).unfold()).next());
+        assertEquals("abcda", __.__("a").concat(__.inject(Arrays.asList("b", "c", "d")).unfold()).next());
         assertEquals("", __.__("").concat("").next());
 
         assertArrayEquals(new String[]{"a", "b", "c", "d"},
                 __.__("a", "b", "c", "d").concat().toList().toArray());
         assertArrayEquals(new String[]{"ade", "bde", "cde"},
                 __.__("a", "b", "c").concat("d", "e").toList().toArray());
+
+        // for child traversal inject as side effect will also return parent traverser value for concatenation
+        // constant empty string can be used to replace the parent traverser value
+        assertArrayEquals(new String[]{"abca", "bbcb"},
+                __.__("a", "b").concat(__.inject("b", "c")).toList().toArray());
         assertArrayEquals(new String[]{"abc", "bbc"},
-                __.__("a", "b").concat(__.__("b", "c")).toList().toArray());
+                __.__("a", "b").concat(__.constant("").inject("b", "c")).toList().toArray());
 
         assertArrayEquals(new String[]{"Mr.a", "Mr.b", "Mr.c", "Mr.d"},
                 __.__("a", "b", "c", "d").as("letters").constant("Mr.").concat(__.select("letters")).toList().toArray());
 
         String nullStr = null;
         assertNull(__.inject(null).concat(nullStr).next());
+        assertArrayEquals(new String[]{"a", "b", null},
+                __.__("a", "b", null).concat(nullStr).toList().toArray());
+        assertArrayEquals(new String[]{"acd", "bcd", "cd"},
+                __.__("a", "b", null).concat("c", "d", nullStr).toList().toArray());
+
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -1714,7 +1714,7 @@ public class TraversalMethodVisitor extends TraversalRootVisitor<GraphTraversal>
      * {@inheritDoc}
      */
     @Override
-    public GraphTraversal visitTraversalMethod_concat_Traversal(GremlinParser.TraversalMethod_concat_TraversalContext ctx) {
+    public GraphTraversal visitTraversalMethod_concat_Traversal(final GremlinParser.TraversalMethod_concat_TraversalContext ctx) {
         return graphTraversal.concat(antlr.tvisitor.visitNestedTraversal(ctx.nestedTraversal()));
     }
 
@@ -1722,7 +1722,7 @@ public class TraversalMethodVisitor extends TraversalRootVisitor<GraphTraversal>
      * {@inheritDoc}
      */
     @Override
-    public GraphTraversal visitTraversalMethod_concat_String(GremlinParser.TraversalMethod_concat_StringContext ctx) {
+    public GraphTraversal visitTraversalMethod_concat_String(final GremlinParser.TraversalMethod_concat_StringContext ctx) {
         return graphTraversal.concat(antlr.genericVisitor.parseStringVarargs(ctx.stringLiteralVarargs()));
     }
 

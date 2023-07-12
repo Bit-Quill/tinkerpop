@@ -1070,6 +1070,7 @@ g.V(1).outE().as("a").constant("").
     concat(select("a").label()).
     concat(" ").
     concat(select("a").inV().values("name")) <4>
+g.inject("hello", "hi").concat(__.V().values('name')) <5>
 g.inject("This").concat(" ").concat("is a ", "gremlin.") <5>
 ----
 
@@ -1077,12 +1078,14 @@ g.inject("This").concat(" ").concat("is a ", "gremlin.") <5>
 <2> Attach the prefix "Mr." to all the names using the `constant()`-step
 <3> Generate a string of software names and the language they use
 <4> Generate a string description for each of marko's outgoing edges
-<5> A generic use of `concat()` to join strings together
+<5> The `concat()` step will join all traverser results from the child traversal
+<6> A generic use of `concat()` to join strings together
 
 *Additional References*
 
 link:++https://tinkerpop.apache.org/javadocs/x.y.z/core/org/apache/tinkerpop/gremlin/process/traversal/dsl/graph/GraphTraversal.html#concat-String++[`concat(String...)`]
 link:++https://tinkerpop.apache.org/javadocs/x.y.z/core/org/apache/tinkerpop/gremlin/process/traversal/dsl/graph/GraphTraversal.html#concat-Traversal++[`concat(Traversal)`]
+link:++https://tinkerpop.apache.org/docs/x.y.z/dev/provider/#concat-step++[`Semantics`]
 
 [[connectedcomponent-step]]
 === ConnectedComponent Step

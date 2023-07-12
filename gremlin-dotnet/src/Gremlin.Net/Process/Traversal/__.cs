@@ -314,19 +314,19 @@ namespace Gremlin.Net.Process.Traversal
         /// <summary>
         ///     Spawns a <see cref="GraphTraversal{SType, EType}" /> and adds the concat step to that traversal.
         /// </summary>
-        public static GraphTraversal<object, E2> Concat<E2>(ITraversal concatTraversal)
+        public static GraphTraversal<object, object> Concat<E2> (ITraversal concatTraversal)
         {
-            return new GraphTraversal<object, E2>().Concat<E2>(concatTraversal);          
+            return new GraphTraversal<object, object>().Concat<E2>(concatTraversal);          
         }
 
         /// <summary>
         ///     Spawns a <see cref="GraphTraversal{SType, EType}" /> and adds the concat step to that traversal.
         /// </summary>
-        public static GraphTraversal<object, E2> Concat<E2>(params string?[] concatStrings)
+        public static GraphTraversal<object, object> Concat<E2>(params string?[] concatStrings)
         {
             return concatStrings is { Length: 0 }
-                ? new GraphTraversal<object, E2>().Concat<E2>()
-                : new GraphTraversal<object, E2>().Concat<E2>(concatStrings);          
+                ? new GraphTraversal<object, object>().Concat<E2>()
+                : new GraphTraversal<object, object>().Concat<E2>(concatStrings);          
         }
 
         /// <summary>

@@ -23,24 +23,27 @@ import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent;
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalUtil;
+import org.apache.tinkerpop.gremlin.structure.util.CloseableIterator;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 
 public class ConcatStep<S> extends ScalarMapStep<S, String> implements TraversalParent {
 
-    private String[] concatStrings;
-
     private String traversalResult;
+    private String stringArgsResult;
 
     private Traversal.Admin<S, String> concatTraversal;
 
     // flag used to propagate the null value through if all strings to be concatenated are null
-    private boolean isAllNull = true;
+    private boolean isNullTraverser = true;
+    private boolean isNullTraversal = true;
+    private boolean isNullString = true;
 
     public ConcatStep(final Traversal.Admin traversal, final String... concatStrings) {
         super(traversal);
-        this.concatStrings = concatStrings;
+        this.stringArgsResult = processStrings(concatStrings);
     }
 
     public ConcatStep(final Traversal.Admin traversal, final Traversal<S, String> concatTraversal) {
@@ -61,42 +64,61 @@ public class ConcatStep<S> extends ScalarMapStep<S, String> implements Traversal
         // all null values are skipped during appending, as StringBuilder will otherwise append "null" as a string
         if (null != traverser.get()) {
             // we know there is one non-null part in the string we concat
-            this.isAllNull = false;
+            this.isNullTraverser = false;
             sb.append(traverser.get());
         }
 
-        if (null != this.traversalResult) {
+        if (!this.isNullTraversal) {
             sb.append(this.traversalResult);
-        } else if (null != this.concatTraversal) {
-            // process traversals
-            sb.append(TraversalUtil.apply(traverser, this.concatTraversal));
         }
-
-        if (null != this.concatStrings && this.concatStrings.length != 0) {
-            for (final String s : this.concatStrings) {
-                if (null != s) {
-                    // we know there is one non-null part in the string we concat
-                    this.isAllNull = false;
-                    sb.append(s);
-                }
+        if (null != this.concatTraversal) {
+            // For the child traversal, we process and concatenate all traverser results onto the incoming traverser
+            final Iterator<String> stringResults = TraversalUtil.applyAll(traverser, this.concatTraversal);
+            while (stringResults.hasNext()) {
+                sb.append(stringResults.next());
             }
         }
 
-        return this.isAllNull? null : sb.toString();
+        if (!this.isNullString) {
+            sb.append(this.stringArgsResult);
+        }
+
+        if (this.isNullTraverser && this.isNullTraversal && this.isNullString) {
+            return null;
+        } else {
+            this.isNullTraverser = true;
+            return sb.toString();
+        }
     }
 
     private String processTraversal(final Traversal.Admin<S , String> concatTraversal) {
         final StringBuilder sb = new StringBuilder();
         if (null != concatTraversal) {
+//            System.out.println(concatTraversal.hasNext());
             while (concatTraversal.hasNext()) {
                 final String result = concatTraversal.next();
                 if (null != result) {
-                    this.isAllNull = false;
+                    this.isNullTraversal = false;
+//                    System.out.println("CONCAT TRAVERSAL===" + result);
                     sb.append(result);
                 }
             }
         }
-        return this.isAllNull? null : sb.toString();
+        return this.isNullTraversal? null : sb.toString();
+    }
+
+    private String processStrings(final String[] concatStrings) {
+        final StringBuilder sb = new StringBuilder();
+        if (null != concatStrings && concatStrings.length != 0) {
+            for (final String s : concatStrings) {
+                if (null != s) {
+                    // we know there is one non-null part in the string we concat
+                    this.isNullString = false;
+                    sb.append(s);
+                }
+            }
+        }
+        return this.isNullString? null : sb.toString();
     }
 
     @Override

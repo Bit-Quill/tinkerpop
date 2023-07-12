@@ -620,7 +620,7 @@ If the incoming traverser is a non-String value then an `IllegalArgumentExceptio
 [width="100%",options="header"]
 |=========================================================
 |Start Step |Mid Step |Modulated |Domain |Range
-|N |Y |N |`Map` |`String`
+|N |Y |N |`String` |`String`
 |=========================================================
 
 *Arguments:*
@@ -628,6 +628,9 @@ If the incoming traverser is a non-String value then an `IllegalArgumentExceptio
 * `String...` - If one or more String values are provided, they will be concatenated with the
 incoming traverser. If no argument is provided, the String value from the incoming traverser is returned.
 * `Traversal` - The `Traversal` value must resolve to a `String`.
+
+Any `null` String values will be skipped when concatenated with non-`null` String values. If two `null` value are
+concatenated, the `null` value will be propagated and returned.
 
 See: link:https://github.com/apache/tinkerpop/tree/x.y.z/gremlin-core/src/main/java/org/apache/tinkerpop/gremlin/process/traversal/step/map/ConcatStep.java[source],
 link:https://tinkerpop.apache.org/docs/x.y.z/reference/#concat-step[reference]

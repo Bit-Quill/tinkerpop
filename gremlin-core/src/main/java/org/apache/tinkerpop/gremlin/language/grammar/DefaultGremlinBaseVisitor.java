@@ -915,16 +915,12 @@ public class DefaultGremlinBaseVisitor<T> extends AbstractParseTreeVisitor<T> im
 	 * {@inheritDoc}
 	 */
 	@Override
-	public T visitTraversalMethod_concat_Traversal(GremlinParser.TraversalMethod_concat_TraversalContext ctx) {
-		notImplemented(ctx); return null;
-	}
+	public T visitTraversalMethod_concat_Traversal(final GremlinParser.TraversalMethod_concat_TraversalContext ctx) { notImplemented(ctx); return null; }
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public T visitTraversalMethod_concat_String(GremlinParser.TraversalMethod_concat_StringContext ctx) {
-		notImplemented(ctx); return null;
-	}
+	public T visitTraversalMethod_concat_String(final GremlinParser.TraversalMethod_concat_StringContext ctx) { notImplemented(ctx); return null; }
 	/**
 	 * {@inheritDoc}
 	 */

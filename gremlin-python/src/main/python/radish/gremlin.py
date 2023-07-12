@@ -470,6 +470,7 @@ world.gremlins = {
     'g_injectXaX_concat_Xinject_List_b_cX': [(lambda g, xx1=None:g.inject('a').concat(__.inject(xx1)))], 
     'g_injectXnullX_concat_XinjectX': [(lambda g:g.inject(None).concat())], 
     'g_injectXnull_aX_concat_Xnull_bX': [(lambda g:g.inject(None,'a').concat(None,'b'))], 
+    'g_injectXhello_hiX_concat_XV_valuesXnameXX': [(lambda g:g.inject('hello','hi').concat(__.V().name))], 
     'g_V_hasLabel_value_concat_X_X_concat_XpersonX': [(lambda g:g.V().hasLabel('person').name.concat(' ').concat('person'))], 
     'g_hasLabelXpersonX_valuesXnameX_asXaX_constantXMrX_concatXselectXaX': [(lambda g:g.V().hasLabel('person').name.as_('a').constant('Mr.').concat(__.select('a')))], 
     'g_hasLabelXsoftwareX_asXaX_valuesXnameX_concatXusesX_concatXselectXaXvaluesXlangX': [(lambda g:g.V().hasLabel('software').as_('a').name.concat(' uses ').concat(__.select('a').lang))], 
