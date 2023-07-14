@@ -30,10 +30,11 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.process.traversal.strategy.decoration.SeedStrategy;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalInterruptedException;
 import org.apache.tinkerpop.gremlin.structure.*;
+import org.apache.tinkerpop.gremlin.structure.util.TransactionException;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerTransactionGraph;
-import org.apache.tinkerpop.gremlin.util.tools.CollectionFactory;
+import org.apache.tinkerpop.gremlin.util.CollectionUtil;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -63,8 +64,6 @@ public class Tester {
         System.out.println("Running test v1 for " + numTimesToRepeatQuery + " times and type " + GRAPH_TYPE);
 
         runLatencyReadQuery(numTimesToRepeatQuery);
-        //runThroughPutReadQuery(tinkerTraversal, numTimesToRepeatQuery);
-        //runThroughPutReadQuery(txTraversal, numTimesToRepeatQuery);
         runLatencyCentralVertexDropTest(numTimesToRepeatQuery);
         runLatencyRandomVertexDropTest(numTimesToRepeatQuery);
         runLatencyRandomEdgeDropTest(numTimesToRepeatQuery);
@@ -73,13 +72,28 @@ public class Tester {
         runLatencyRandomVertexPropertyAddTest(numTimesToRepeatQuery);
         runLatencyRandomEdgePropertyUpsertTest(numTimesToRepeatQuery);
         runLatencySingleCommitAddTest(numTimesToRepeatQuery);
-        //runThroughputCentralVertexDropTest(numTimesToRepeatQuery);
-        //runThroughputRandomVertexDropTest(numTimesToRepeatQuery);
         runLatencyRollbackAddTest(numTimesToRepeatQuery);
         runLatencyRandomVertexDropRollbackTest(numTimesToRepeatQuery);
         runLatencyRandomEdgeMoveRollbackTestV2(numTimesToRepeatQuery);
         runAddDirectRouteForIndirectTest(numTimesToRepeatQuery);
         runReduceAirportTrafficTest(numTimesToRepeatQuery);
+
+        runThroughPutReadQuery(numTimesToRepeatQuery);
+        runThroughputAddDropVertexTest(numTimesToRepeatQuery);
+        runThroughputAddEdgeTest(numTimesToRepeatQuery);
+        runThroughputAddVertexPropertyTest(numTimesToRepeatQuery);
+        runThroughputAddEdgePropertyTest(numTimesToRepeatQuery);
+
+        //runFunctionalAddRemoveVertexTest();
+        //runFunctionalAddRemoveVertexRollbackTest();
+        //runFunctionalAddRemoveEdgeTest();
+        //runFunctionalUpdateVertexPropertyTest();
+        //runFunctionalRollbackVertexPropertyTest();
+        //runFunctionalMergeVertexPropertyTest();
+        //runFunctionalUpdateEdgePropertyTest();
+        //runFunctionalRollbackEdgePropertyTest();
+        //runFunctionalDropVertexTest();
+        //runFunctionalDropCentralVertexTest();
     }
 
     private static Configuration getTinkerGraphConf() {
@@ -103,6 +117,20 @@ public class Tester {
     }
     public static GraphTraversalSource createAirRoutesTraversalSource() {
 
+        Graph txGraph = createGraph();
+
+        try {
+            txGraph.io(graphml()).readGraph("air-routes-latest.graphml");
+            Commit(txGraph.traversal());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Unable to load air-routes");
+        }
+
+        return txGraph.traversal();
+    }
+
+    public static Graph createGraph() {
         Graph txGraph;
         if (GRAPH_TYPE == GRAPH_TINKER) {
             txGraph = TinkerGraph.open(getTinkerGraphConf());
@@ -114,15 +142,7 @@ public class Tester {
             throw new RuntimeException("GRAPH_TYPE " + GRAPH_TYPE + " unsupported.");
         }
 
-        try {
-            txGraph.io(graphml()).readGraph("air-routes-latest.graphml");
-            Commit(txGraph.traversal());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Unable to load air-routes");
-        }
-
-        return txGraph.traversal();
+        return txGraph;
     }
 
     public static void cleanup(GraphTraversalSource g) {
@@ -268,39 +288,212 @@ public class Tester {
         }
     }
 
-    public static void runThroughputCentralVertexDropTest(int numTimes) {
+    public static void runThroughputAddDropVertexTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createAirRoutesTraversalSource();
-            List<Object> vIds = g.V().order().by(bothE().count(), desc).id().toList();
+            GraphTraversalSource g = createGraph().traversal();
 
-            ExecutorService threadPool = Executors.newFixedThreadPool(2);
+            ExecutorService threadPool = Executors.newFixedThreadPool(6);
             List<Future<?>> futures = new ArrayList<>();
 
             Long start = System.nanoTime();
-            for (Object id : vIds) {
+            for (int numMaxQueries=0; numMaxQueries < 1000000; numMaxQueries++) {
                 futures.add(threadPool.submit(() -> {
-                    g.V(id).drop().iterate();
-                    Commit(g);
+                    boolean completed = false;
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            for (int k=0; k<5; k++) {
+                                g.addV().property("someval", "someotherVal").iterate();
+                            }
+                            g.V().drop().iterate();
+                            Commit(g);
+                            completed = true;
+                            break;
+                        } catch (TransactionException te) {
+                            g.tx().rollback();
+                        }
+                    }
+                    if (completed == false) System.out.println("not completed");
                 }));
             }
 
-            while (futures.size() != 0) {
-                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
-                try {
-                    for (Future<?> future : completed) {
-                        future.get();
-                    }
-                    futures.removeAll(completed);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                Thread.sleep(5000);
+                threadPool.shutdownNow();
+                Long end = System.nanoTime();
+                System.out.println("Total Runtime is: " + (end - start)/1000000 + " ms.");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            Long end = System.nanoTime();
-            System.out.println("It took " + (end-start)/1000000 + " ms to drop all vertices");
+            long numDoneNormally = 0;
+            for (Future<?> future : futures.stream().filter(Future::isDone).collect(Collectors.toList())) {
+                try {
+                    future.get();
+                    numDoneNormally++;
+                } catch (Exception e) {
+                    if (!(e.getCause() instanceof TraversalInterruptedException)) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            System.out.println("Completed " + numDoneNormally + " add and drop vertex queries.");
 
             cleanup(g);
+            threadPool.shutdown();
+        }
+    }
 
+    public static void runThroughputAddEdgeTest(int numTimes) {
+        for (; numTimes != 0; numTimes--) {
+            GraphTraversalSource g = createGraph().traversal();
+            for (int numVerticesToAdd=0; numVerticesToAdd<1000; numVerticesToAdd++) {
+                g.addV().iterate();
+            }
+            Commit(g);
+            List<Vertex> vertices = g.V().toList();
+            int numVertices = vertices.size();
+
+            ExecutorService threadPool = Executors.newFixedThreadPool(6);
+            List<Future<?>> futures = new ArrayList<>();
+            Random random = new Random(19);
+
+            Long start = System.nanoTime();
+            for (int numMaxQueries=0; numMaxQueries < 1000000; numMaxQueries++) {
+                futures.add(threadPool.submit(() -> {
+                    try {
+                        g.addE("edge").from(vertices.get(random.nextInt(numVertices))).to(vertices.get(random.nextInt(numVertices))).iterate();
+                        Commit(g);
+                    } catch (TransactionException te) {
+                        g.tx().rollback();
+                    }
+                }));
+            }
+
+            try {
+                Thread.sleep(5000);
+                threadPool.shutdownNow();
+                Long end = System.nanoTime();
+                System.out.println("Total Runtime is: " + (end - start)/1000000 + " ms.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            long numDoneNormally = 0;
+            for (Future<?> future : futures.stream().filter(Future::isDone).collect(Collectors.toList())) {
+                try {
+                    future.get();
+                    numDoneNormally++;
+                } catch (Exception e) {
+                    if (!(e.getCause() instanceof TraversalInterruptedException)) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            System.out.println("Completed " + numDoneNormally + " add and drop edge queries.");
+
+            cleanup(g);
+            threadPool.shutdown();
+        }
+    }
+
+    public static void runThroughputAddVertexPropertyTest(int numTimes) {
+        for (; numTimes != 0; numTimes--) {
+            GraphTraversalSource g = createGraph().traversal();
+            Object vId = g.addV().id().next();
+            Commit(g);
+
+            ExecutorService threadPool = Executors.newFixedThreadPool(6);
+            List<Future<?>> futures = new ArrayList<>();
+            Random random = new Random(19);
+
+            Long start = System.nanoTime();
+            for (int numMaxQueries=0; numMaxQueries < 3000000; numMaxQueries++) {
+                String propKey = String.valueOf(numMaxQueries);
+                futures.add(threadPool.submit(() -> {
+                    try {
+                        g.V(vId).property(propKey, "abc").iterate();
+                        Commit(g);
+                    } catch (TransactionException te) {
+                        g.tx().rollback();
+                    }
+                }));
+            }
+
+            try {
+                Thread.sleep(5000);
+                threadPool.shutdownNow();
+                Long end = System.nanoTime();
+                System.out.println("Total Runtime is: " + (end - start)/1000000 + " ms.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            long numDoneNormally = 0;
+            for (Future<?> future : futures.stream().filter(Future::isDone).collect(Collectors.toList())) {
+                try {
+                    future.get();
+                    numDoneNormally++;
+                } catch (Exception e) {
+                    if (!(e.getCause() instanceof TraversalInterruptedException)) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            System.out.println("Completed " + numDoneNormally + " add vertex PROPERTY queries.");
+
+            cleanup(g);
+            threadPool.shutdown();
+        }
+    }
+
+    public static void runThroughputAddEdgePropertyTest(int numTimes) {
+        for (; numTimes != 0; numTimes--) {
+            GraphTraversalSource g = createGraph().traversal();
+            Vertex v1 = g.addV().next();
+            Vertex v2 = g.addV().next();
+            Edge e1 = g.addE("edge").from(v1).to(v2).next();
+            Object eId = e1.id();
+            Commit(g);
+
+            ExecutorService threadPool = Executors.newFixedThreadPool(6);
+            List<Future<?>> futures = new ArrayList<>();
+
+            Long start = System.nanoTime();
+            for (int numMaxQueries=0; numMaxQueries < 3000000; numMaxQueries++) {
+                String propKey = String.valueOf(numMaxQueries);
+                futures.add(threadPool.submit(() -> {
+                    try {
+                        g.E(eId).property(propKey, "abc").iterate();
+                        Commit(g);
+                    } catch (TransactionException te) {
+                        g.tx().rollback();
+                    }
+                }));
+            }
+
+            try {
+                Thread.sleep(5000);
+                threadPool.shutdownNow();
+                Long end = System.nanoTime();
+                System.out.println("Total Runtime is: " + (end - start)/1000000 + " ms.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            long numDoneNormally = 0;
+            for (Future<?> future : futures.stream().filter(Future::isDone).collect(Collectors.toList())) {
+                try {
+                    future.get();
+                    numDoneNormally++;
+                } catch (Exception e) {
+                    if (!(e.getCause() instanceof TraversalInterruptedException)) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            System.out.println("Completed " + numDoneNormally + " add edge PROPERTY queries.");
+
+            cleanup(g);
             threadPool.shutdown();
         }
     }
@@ -345,22 +538,33 @@ public class Tester {
         }
     }
 
-    public static void runThroughputRandomVertexDropTest(int numTimes) {
+
+    public static void runThroughputAddVertexTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
             GraphTraversalSource g = createAirRoutesTraversalSource();
-            List<Object> vIds = g.V().id().toList();
-            Random random = new Random(2);
-            Collections.shuffle(vIds, random);
 
-            ExecutorService threadPool = Executors.newFixedThreadPool(2);
+            ExecutorService threadPool = Executors.newFixedThreadPool(6);
             List<Future<?>> futures = new ArrayList<>();
 
+            Long numVertices = g.V().count().next();
+
+            final int numVerticesToModify = 5;
             Long start = System.nanoTime();
-            for (int i=0 ; i < vIds.size()/5; i++) {
-                int index = i;
+            for (; numVertices > numVerticesToModify; numVertices-=numVerticesToModify) {
                 futures.add(threadPool.submit(() -> {
-                    g.V(vIds.get(index)).drop().iterate();
-                    Commit(g);
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            List<Object> ids = g.V().limit(numVerticesToModify).id().toList();
+                            for (int k = 0; k < numVerticesToModify; k++) {
+                                g.V(ids.get(k)).drop().iterate();
+                            }
+                            Commit(g);
+                            if (j != 0) System.out.println("j is " + j);
+                            break;
+                        } catch (TransactionException te) {
+                            g.tx().rollback();
+                        }
+                    }
                 }));
             }
 
@@ -572,8 +776,6 @@ public class Tester {
         }
     }
 
-
-
     public static void runLatencyRandomVertexPropertyAddTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
             GraphTraversalSource g = createAirRoutesTraversalSource();
@@ -588,8 +790,8 @@ public class Tester {
                 int numVerticesToModify = random.nextInt(3);
                 for (int j = 0; j < numVerticesToModify; j++) {
                     Object vId = vertices.get(random.nextInt(numVertices));
-                    g.mergeV(CollectionFactory.asMap(T.id, vId))
-                            .option(Merge.onMatch, CollectionFactory.asMap("newprop", "new"))
+                    g.mergeV(CollectionUtil.asMap(T.id, vId))
+                            .option(Merge.onMatch, CollectionUtil.asMap("newprop", "new"))
                             .iterate();
                 }
                 Commit(g);
@@ -600,35 +802,6 @@ public class Tester {
             cleanup(g);
 
             System.out.println("It took " + (end-start)/1000000 + " ms to randomly update vertices properties");
-        }
-    }
-
-    public static void runThroughputRandomVertexPropertyAddTest(int numTimes) {
-        for (; numTimes != 0; numTimes--) {
-            GraphTraversalSource g = createAirRoutesTraversalSource();
-            List<Object> vertices = g.V().id().toList();
-            Random random = new Random(5);
-            Collections.shuffle(vertices, random);
-
-            final int numVertices = vertices.size();
-            final int halfNumVertices = numVertices/2;
-            Long start = System.nanoTime();
-            for (int i = 0; i < halfNumVertices; i++) {
-                int numVerticesToModify = random.nextInt(3);
-                for (int j = 0; j < numVerticesToModify; j++) {
-                    Object vId = vertices.get(random.nextInt(numVertices));
-                    g.mergeV(CollectionFactory.asMap(T.id, vId))
-                            .option(Merge.onMatch, CollectionFactory.asMap("newprop", "new"))
-                            .iterate();
-                }
-                Commit(g);
-            }
-
-            Long end = System.nanoTime();
-
-            cleanup(g);
-
-            System.out.println("It took " + (end-start)/1000000 + " ms to randomly update vertices and edges");
         }
     }
 
@@ -644,9 +817,9 @@ public class Tester {
             final int numVertices = vertices.size();
             Long start = System.nanoTime();
             for (int i = 0; i < 100000; i++) {
-                    g.mergeE(CollectionFactory.asMap(Direction.from, vertices.get(random.nextInt(numVertices)), Direction.to, vertices.get(random.nextInt(numVertices))))
-                            .option(Merge.onCreate, CollectionFactory.asMap(vals[random.nextInt(numVals)], vals[random.nextInt(numVals)]))
-                            .option(Merge.onMatch, CollectionFactory.asMap(vals[random.nextInt(numVals)], vals[random.nextInt(numVals)]))
+                    g.mergeE(CollectionUtil.asMap(Direction.from, vertices.get(random.nextInt(numVertices)), Direction.to, vertices.get(random.nextInt(numVertices))))
+                            .option(Merge.onCreate, CollectionUtil.asMap(vals[random.nextInt(numVals)], vals[random.nextInt(numVals)]))
+                            .option(Merge.onMatch, CollectionUtil.asMap(vals[random.nextInt(numVals)], vals[random.nextInt(numVals)]))
                             .iterate();
                 Commit(g);
             }
@@ -667,8 +840,9 @@ public class Tester {
             numTimes--;
         }
     }
-    public static void runThroughPutReadQuery(GraphTraversalSource gts, int numTimes) {
+    public static void runThroughPutReadQuery(int numTimes) {
         final int NUM_QUERIES = 100000;
+        GraphTraversalSource gts = createAirRoutesTraversalSource();
 
         while (numTimes != 0) {
             ExecutorService jobPool = Executors.newFixedThreadPool(16);
@@ -680,14 +854,10 @@ public class Tester {
             }
 
             try {
-                Thread.sleep(20000);
-                Long end = System.nanoTime();
-                while (end - start < 21000) {
-                    Thread.sleep(10);
-                    end = System.nanoTime();
-                }
+                Thread.sleep(10000);
                 jobPool.shutdownNow();
-                System.out.println("Total Runtime is: " + (end - start) + " ms.");
+                Long end = System.nanoTime();
+                System.out.println("Total Runtime is: " + (end - start)/1000000 + " ms.");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -704,11 +874,7 @@ public class Tester {
                 }
             }
             System.out.println("Completed " + numDoneNormally + " queries.");
-            try {
-                gts.getGraph().close();
-            } catch (Exception e) {
-                // Intentionally do nothing.
-            }
+            cleanup(gts);
 
             numTimes--;
         }
@@ -717,5 +883,617 @@ public class Tester {
         long startTime = System.nanoTime();
         traversal.iterate();
         return (System.nanoTime() - startTime)/1000000;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////  FUNCTIONAL TESTS //////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static void runFunctionalAddRemoveVertexTest() {
+        ExecutorService threadPool = Executors.newFixedThreadPool(12);
+        List<Future<?>> futures = new ArrayList<>();
+
+        GraphTraversalSource g = createGraph().traversal();
+        Commit(g);
+
+        for (int h=0; h<1000; h++) {
+            for (int i = 0; i < 100; i++) {
+                futures.add(threadPool.submit(() -> {
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            g.addV().property(T.id, 5).iterate();
+                            g.V(5).drop().iterate();
+                            Commit(g);
+                            break;
+                        } catch (TransactionException|IllegalArgumentException te) {
+                            g.tx().rollback();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }));
+            }
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (g.V().count().next() != 0) {
+                System.out.println("Expected 0 count");
+            }
+
+        }
+        cleanup(g);
+        threadPool.shutdown();
+    }
+
+    public static void runFunctionalAddRemoveVertexRollbackTest() {
+        ExecutorService threadPool = Executors.newFixedThreadPool(12);
+        List<Future<?>> futures = new ArrayList<>();
+
+        GraphTraversalSource g = createGraph().traversal();
+        Commit(g);
+
+        for (int h=0; h<10000; h++) {
+            for (int i = 0; i < 100; i++) {
+                futures.add(threadPool.submit(() -> {
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            g.addV().property(T.id, 5).iterate();
+                            g.V(5).drop().iterate();
+                            Rollback(g);
+                            break;
+                        } catch (TransactionException|IllegalArgumentException te) {
+                            g.tx().rollback();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }));
+            }
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (g.V().count().next() != 0) {
+                System.out.println("Expected 0 count");
+            }
+
+        }
+        cleanup(g);
+        threadPool.shutdown();
+    }
+
+    public static void runFunctionalAddRemoveEdgeTest() {
+        ExecutorService threadPool = Executors.newFixedThreadPool(12);
+        List<Future<?>> futures = new ArrayList<>();
+
+        GraphTraversalSource g = createGraph().traversal();
+        Vertex v = g.addV().next();
+        Commit(g);
+
+        for (int h=0; h<1000; h++) {
+            for (int i = 0; i < 100; i++) {
+                futures.add(threadPool.submit(() -> {
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            g.addE("e").property(T.id, 5).from(v).to(v).iterate();
+                            g.E(5).drop().iterate();
+                            Commit(g);
+                            break;
+                        } catch (TransactionException|IllegalArgumentException te) {
+                            g.tx().rollback();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }));
+            }
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (g.E().count().next() != 0) {
+                System.out.println("Expected 0 count");
+            }
+
+        }
+        cleanup(g);
+        threadPool.shutdown();
+    }
+
+    public static void runFunctionalUpdateVertexPropertyTest() {
+        List<Map<Object, Object>> properties = new ArrayList<>();
+        properties.add(CollectionUtil.asMap("a", "1", "b", "1", "c", "1", "d", "1", "e", "1"));
+        properties.add(CollectionUtil.asMap("a", "2", "b", "2", "c", "2", "d", "2", "e", "2"));
+        properties.add(CollectionUtil.asMap("a", "3", "b", "3", "c", "3", "d", "3", "e", "3"));
+        properties.add(CollectionUtil.asMap("a", "4", "b", "4", "c", "4", "d", "4", "e", "4"));
+        properties.add(CollectionUtil.asMap("a", "5", "b", "5", "c", "5", "d", "5", "e", "5"));
+
+        Random random = new Random(5);
+        ExecutorService threadPool = Executors.newFixedThreadPool(8);
+        List<Future<?>> futures = new ArrayList<>();
+
+        GraphTraversalSource g = createGraph().traversal();
+        Vertex v = g.addV().next();
+        Commit(g);
+        Object vId = v.id();
+
+        for (int h=0; h<1000; h++) {
+            for (int i = 0; i < 100; i++) {
+                futures.add(threadPool.submit(() -> {
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            g.V(vId).property(properties.get(random.nextInt(5))).iterate();
+                            Commit(g);
+                            break;
+                        } catch (TransactionException te) {
+                            g.tx().rollback();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }));
+            }
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Vertex finalV = g.V().next();
+            Iterator<VertexProperty<Object>> it = finalV.properties("a", "b", "c", "d", "e");
+            String commonResult = it.next().value().toString();
+            while (it.hasNext()) {
+                Property<Object> result = it.next();
+                if (result.value().toString() != commonResult) {
+                    throw new RuntimeException("Expected " + commonResult + " but got " + result.value());
+                }
+            }
+        }
+        cleanup(g);
+        threadPool.shutdown();
+    }
+
+
+    public static void runFunctionalMergeVertexPropertyTest() {
+        List<Map<Object, Object>> properties = new ArrayList<>();
+        properties.add(CollectionUtil.asMap("a", "1", "b", "1", "c", "1", "d", "1", "e", "1"));
+        properties.add(CollectionUtil.asMap("a", "2", "b", "2", "c", "2", "d", "2", "e", "2"));
+        properties.add(CollectionUtil.asMap("a", "3", "b", "3", "c", "3", "d", "3", "e", "3"));
+        properties.add(CollectionUtil.asMap("a", "4", "b", "4", "c", "4", "d", "4", "e", "4"));
+        properties.add(CollectionUtil.asMap("a", "5", "b", "5", "c", "5", "d", "5", "e", "5"));
+
+        Random random = new Random();
+        ExecutorService threadPool = Executors.newFixedThreadPool(12);
+        List<Future<?>> futures = new ArrayList<>();
+
+        GraphTraversalSource g = createGraph().traversal();
+        Vertex v = g.addV().next();
+        Commit(g);
+        Object vId = v.id();
+
+        for (int h=0; h<1000; h++) {
+            for (int i = 0; i < 100; i++) {
+                futures.add(threadPool.submit(() -> {
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            g.V(vId).property(properties.get(random.nextInt(5))).iterate();
+                            g.mergeV(CollectionUtil.asMap(T.id, vId))
+                                    .option(Merge.onMatch, properties.get(random.nextInt(5)))
+                                    .iterate();
+                            Commit(g);
+                            break;
+                        } catch (TransactionException te) {
+                            g.tx().rollback();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }));
+            }
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Vertex finalV = g.V().next();
+            Iterator<VertexProperty<Object>> it = finalV.properties("a", "b", "c", "d", "e");
+            String commonResult = it.next().value().toString();
+            while (it.hasNext()) {
+                Property<Object> result = it.next();
+                if (result.value().toString() != commonResult) {
+                    throw new RuntimeException("Expected " + commonResult + " but got " + result.value());
+                }
+            }
+        }
+        cleanup(g);
+        threadPool.shutdown();
+    }
+
+    public static void runFunctionalRollbackVertexPropertyTest() {
+        List<Map<Object, Object>> properties = new ArrayList<>();
+        properties.add(CollectionUtil.asMap("a", "1", "b", "1", "c", "1", "d", "1", "e", "1"));
+        properties.add(CollectionUtil.asMap("a", "2", "b", "2", "c", "2", "d", "2", "e", "2"));
+        properties.add(CollectionUtil.asMap("a", "3", "b", "3", "c", "3", "d", "3", "e", "3"));
+        properties.add(CollectionUtil.asMap("a", "4", "b", "4", "c", "4", "d", "4", "e", "4"));
+        properties.add(CollectionUtil.asMap("a", "5", "b", "5", "c", "5", "d", "5", "e", "5"));
+
+        Random random = new Random(5);
+        ExecutorService threadPool = Executors.newFixedThreadPool(2);
+        List<Future<?>> futures = new ArrayList<>();
+
+        GraphTraversalSource g = createGraph().traversal();
+        Vertex v = g.addV().property(CollectionUtil.asMap("a", "7", "b", "7", "c", "7", "d", "7", "e", "7")).next();
+        Commit(g);
+        Object vId = v.id();
+
+        for (int h=0; h<10000; h++) {
+            for (int i = 0; i < 30; i++) {
+                futures.add(threadPool.submit(() -> {
+                    try {
+                        g.V(vId).property(properties.get(random.nextInt(5))).iterate();
+                        Rollback(g);
+                    } catch (TransactionException te) {
+                        g.tx().rollback();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }));
+            }
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Vertex finalV = g.V().next();
+            Iterator<VertexProperty<Object>> it = finalV.properties("a", "b", "c", "d", "e");
+            String commonResult = "7";
+            while (it.hasNext()) {
+                Property<Object> result = it.next();
+                if (result.value().toString() != commonResult) {
+                    throw new RuntimeException("Expected " + commonResult + " but got " + result.value());
+                }
+            }
+        }
+        cleanup(g);
+        threadPool.shutdown();
+    }
+
+    public static void runFunctionalUpdateEdgePropertyTest() {
+        List<Map<Object, Object>> properties = new ArrayList<>();
+        properties.add(CollectionUtil.asMap("a", "1", "b", "1", "c", "1", "d", "1", "e", "1"));
+        properties.add(CollectionUtil.asMap("a", "2", "b", "2", "c", "2", "d", "2", "e", "2"));
+        properties.add(CollectionUtil.asMap("a", "3", "b", "3", "c", "3", "d", "3", "e", "3"));
+        properties.add(CollectionUtil.asMap("a", "4", "b", "4", "c", "4", "d", "4", "e", "4"));
+        properties.add(CollectionUtil.asMap("a", "5", "b", "5", "c", "5", "d", "5", "e", "5"));
+
+        Random random = new Random(5);
+        ExecutorService threadPool = Executors.newFixedThreadPool(12);
+        List<Future<?>> futures = new ArrayList<>();
+
+        GraphTraversalSource g = createGraph().traversal();
+        g.addV().as("a").addV().as("b").addE("edge").from("a").to("b").iterate();
+        Commit(g);
+
+        Object eId = g.E().id().next();
+
+        for (int h=0; h<1000; h++) {
+            for (int i = 0; i < 50; i++) {
+                futures.add(threadPool.submit(() -> {
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            g.E(eId).as("e").property(properties.get(random.nextInt(5))).iterate();
+                            Commit(g);
+                            break;
+                        } catch (TransactionException te) {
+                            g.tx().rollback();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }));
+            }
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+
+            }
+
+            Edge e = g.E().next();
+            Iterator<Property<Object>> it = e.properties("a", "b", "c", "d", "e");
+            String commonResult = it.next().value().toString();
+            while (it.hasNext()) {
+                Property<Object> result = it.next();
+                if (result.value().toString() != commonResult) {
+                    throw new RuntimeException("Expected " + commonResult + " but got " + result.value());
+                }
+            }
+        }
+        cleanup(g);
+        threadPool.shutdown();
+    }
+
+    public static void runFunctionalRollbackEdgePropertyTest() {
+        List<Map<Object, Object>> properties = new ArrayList<>();
+        properties.add(CollectionUtil.asMap("a", "1", "b", "1", "c", "1", "d", "1", "e", "1"));
+        properties.add(CollectionUtil.asMap("a", "2", "b", "2", "c", "2", "d", "2", "e", "2"));
+        properties.add(CollectionUtil.asMap("a", "3", "b", "3", "c", "3", "d", "3", "e", "3"));
+        properties.add(CollectionUtil.asMap("a", "4", "b", "4", "c", "4", "d", "4", "e", "4"));
+        properties.add(CollectionUtil.asMap("a", "5", "b", "5", "c", "5", "d", "5", "e", "5"));
+
+        Random random = new Random(5);
+        ExecutorService threadPool = Executors.newFixedThreadPool(12);
+        List<Future<?>> futures = new ArrayList<>();
+
+        GraphTraversalSource g = createGraph().traversal();
+        g.addV().as("a").addV().as("b").addE("edge").from("a").to("b").iterate();
+        g.E().property(CollectionUtil.asMap("a", "7", "b", "7", "c", "7", "d", "7", "e", "7")).iterate();
+        Commit(g);
+
+        Object eId = g.E().id().next();
+
+        for (int h=0; h<1000; h++) {
+            for (int i = 0; i < 50; i++) {
+                futures.add(threadPool.submit(() -> {
+                    try {
+                        g.E(eId).as("e").property(properties.get(random.nextInt(5))).iterate();
+                        Rollback(g);
+                    } catch (TransactionException te) {
+                        g.tx().rollback();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }));
+            }
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+
+            }
+
+            Edge e = g.E().next();
+            Iterator<Property<Object>> it = e.properties("a", "b", "c", "d", "e");
+            String commonResult = it.next().value().toString();
+            while (it.hasNext()) {
+                Property<Object> result = it.next();
+                if (result.value().toString() != commonResult) {
+                    System.out.println("Expected " + commonResult + " but got " + result.value());
+                }
+            }
+        }
+        cleanup(g);
+        threadPool.shutdown();
+    }
+
+    public static void runFunctionalDropVertexTest() {
+        ExecutorService threadPool = Executors.newFixedThreadPool(12);
+        List<Future<?>> futures = new ArrayList<>();
+        Random random = new Random(9);
+
+        final int NUM_VERTICES_TO_KEEP = 1000;
+        for (int h=0; h<10; h++) {
+            GraphTraversalSource g = createAirRoutesTraversalSource();
+            List<Object> vIds = g.V().id().toList();
+            int numVertices = vIds.size();
+            Collections.shuffle(vIds, random);
+
+            List<Object> subsetOfVids = vIds.subList(numVertices - NUM_VERTICES_TO_KEEP, numVertices);
+            List<Object> vIdsToKeep = new ArrayList<>(subsetOfVids);
+            subsetOfVids.clear();
+            numVertices = vIds.size();
+
+            Set<Object> eIdsToKeep = new HashSet<>();
+            for (int i=0; i<vIdsToKeep.size(); i++) {
+                List<Edge> potentialEdgeToKeep = g.V(vIdsToKeep.get(i)).bothE().toList();
+                for (Edge potentialE : potentialEdgeToKeep) {
+                    if (vIdsToKeep.contains(potentialE.inVertex().id()) && vIdsToKeep.contains(potentialE.outVertex().id())) {
+                        eIdsToKeep.add(potentialE.id());
+                    }
+                }
+            }
+
+
+            for (int i = 0; i < numVertices; i++) {
+                int index = i;
+                futures.add(threadPool.submit(() -> {
+                    boolean finished = false;
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            g.V(vIds.get(index)).drop().iterate();
+                            Commit(g);
+                            finished = true;
+                            break;
+                        } catch (TransactionException te) {
+                            g.tx().rollback();
+                        }
+                    }
+                    if (!finished) System.out.println("not finished");
+                }));
+            }
+
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+
+            }
+
+            List<Vertex> remainingVertices = g.V().toList();
+            if (remainingVertices.size() != vIdsToKeep.size()) System.out.println("Size mismatch");
+            for (Vertex v : remainingVertices) {
+                if (!vIdsToKeep.contains(v.id())) System.out.println("Vertex not expected: " + v);
+            }
+
+            List<Object> remainingEdges = g.E().id().toList();
+            if (remainingEdges.size() != eIdsToKeep.size()) System.out.println("Mismatched number of edges");
+            System.out.println("remainingEdges size = " + remainingEdges.size());
+            for (Object eId : remainingEdges) {
+                if (!eIdsToKeep.contains(eId)) System.out.println("Edge not expected: " + eId);
+            }
+
+            cleanup(g);
+        }
+
+        threadPool.shutdown();
+    }
+
+    public static void runFunctionalDropCentralVertexTest() {
+        ExecutorService threadPool = Executors.newFixedThreadPool(12);
+        List<Future<?>> futures = new ArrayList<>();
+
+        final int NUM_VERTICES_TO_KEEP = 1500;
+        for (int h=0; h<10; h++) {
+            GraphTraversalSource g = createAirRoutesTraversalSource();
+            List<Object> vIds = g.V().order().by(bothE().count(), desc).id().toList();
+            int numVertices = vIds.size();
+
+            List<Object> subsetOfVids = vIds.subList(numVertices - NUM_VERTICES_TO_KEEP, numVertices);
+            List<Object> vIdsToKeep = new ArrayList<>(subsetOfVids);
+            subsetOfVids.clear();
+            numVertices = vIds.size();
+
+            Set<Object> eIdsToKeep = new HashSet<>();
+            for (int i=0; i<vIdsToKeep.size(); i++) {
+                List<Edge> potentialEdgeToKeep = g.V(vIdsToKeep.get(i)).bothE().toList();
+                for (Edge potentialE : potentialEdgeToKeep) {
+                    if (vIdsToKeep.contains(potentialE.inVertex().id()) && vIdsToKeep.contains(potentialE.outVertex().id())) {
+                        eIdsToKeep.add(potentialE.id());
+                    }
+                }
+            }
+
+
+            for (int i = 0; i < numVertices; i++) {
+                int index = i;
+                futures.add(threadPool.submit(() -> {
+                    boolean finished = false;
+                    for (int j = 0; j < 10000; j++) {
+                        try {
+                            g.V(vIds.get(index)).drop().iterate();
+                            Commit(g);
+                            finished = true;
+                            break;
+                        } catch (TransactionException te) {
+                            g.tx().rollback();
+                        }
+                    }
+                    if (!finished) System.out.println("not finished");
+                }));
+            }
+
+            while (futures.size() != 0) {
+                List<Future<?>> completed = futures.stream().filter(Future::isDone).collect(Collectors.toList());
+                try {
+                    for (Future<?> future : completed) {
+                        future.get();
+                    }
+                    futures.removeAll(completed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+
+            }
+
+            List<Vertex> remainingVertices = g.V().toList();
+            if (remainingVertices.size() != vIdsToKeep.size()) System.out.println("Size mismatch");
+            for (Vertex v : remainingVertices) {
+                if (!vIdsToKeep.contains(v.id())) System.out.println("Vertex not expected: " + v);
+            }
+
+            List<Object> remainingEdges = g.E().id().toList();
+            if (remainingEdges.size() != eIdsToKeep.size()) System.out.println("Mismatched number of edges");
+            System.out.println("remainingEdges size = " + remainingEdges.size());
+            for (Object eId : remainingEdges) {
+                if (!eIdsToKeep.contains(eId)) System.out.println("Edge not expected: " + eId);
+            }
+
+            cleanup(g);
+        }
+
+        threadPool.shutdown();
     }
 }
