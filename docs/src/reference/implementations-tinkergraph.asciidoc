@@ -27,7 +27,7 @@ limitations under the License.
 ----
 
 image:tinkerpop-character.png[width=100,float=left] TinkerGraph is a single machine, in-memory (with optional
-persistence), non-transactional graph engine that provides both OLTP and OLAP functionality. It is deployed with
+persistence), transactional graph engine that provides both OLTP and OLAP functionality. It is deployed with
 TinkerPop and serves as the reference implementation for other providers to study in order to understand the
 semantics of the various methods of the TinkerPop API. Its status as a reference implementation does not however imply
 that it is not suitable for production. TinkerGraph has many practical use cases in production applications and their
@@ -198,3 +198,60 @@ g = traversal().withEmbedded(graph)
 g.io("data/tinkerpop-crew.kryo").read().iterate()
 g.V().properties()
 ----
+
+=== Transactions
+
+As of 3.7.0, there is the option to use TinkerTransactionGraph, a transactional TinkerGraph class, to perform traversal
+transactions. This will eliminate the need to use the Neo4j plugin to enable TinkerGraph transactions.
+
+The TinkerTransactionGraph has `read committed` isolation level, which is the same as the
+Neo4j plugin. It only imposes write-only locks, to reduce the impact of transactions on performance for reading. As well,
+only `ThreadLocal` transaction is implemented, therefore for embedded TinkerTransactionGraph, all traversal sources spawn
+from the graph will operate within the same transaction scope.
+
+Constructing a simple graph using TinkerTransactionGraph in Java is presented below:
+
+[source,java]
+----
+Graph graph = TinkerTransactionGraph.open();
+GraphTraversalSource gtx = graph.tx().begin();
+
+try {
+  Vertex marko = gtx.addV("person").property("name","marko").property("age",29).next();
+  Vertex lop = gtx.addV("software").property("name","lop").property("lang","java").next();
+  gtx.addE("created").from(marko).to(lop).property("weight",0.6d).iterate();
+
+  gtx.tx().commit();
+} catch (Exception ex) {
+  gtx.tx().rollback();
+}
+----
+
+The above Gremlin creates two vertices named "marko" and "lop" and connects them via a created-edge with a weight=0.6
+property. In case of any errors `rollback()` will be called and no changes will be performed.
+
+To use the embedded TinkerTransactionGraph in Gremlin Console:
+
+[gremlin-groovy]
+----
+gremlin> graph = TinkerTransactionGraph.open() <1>
+gremlin> g = traversal().withEmbedded(graph) <2>
+gremlin> g.addV('test').property('name','one')
+gremlin> g.tx().commit() <3>
+gremlin> g.V().valueMap()
+gremlin> g.addV('test').property('name','two') <4>
+gremlin> g.V().valueMap()
+gremlin> g.tx().rollback() <5>
+gremlin> g.V().valueMap()
+----
+
+<1> Open transactional graph.
+<2> Spawn a GraphTraversalSource with transactional graph.
+<3> Commit the add vertex operation
+<4> Add a second vertex without committing
+<5> Rollback the change
+
+Using the TinkerTransactionGraph should have no functional impact aside from the added transactional capabilities.
+Performance is on par for read operations, however, performance testing has shown that there is a 20% decrease in
+performance for write operations and 50% decrease for drop operations. Thus, we recommend to use the TransactionTinkerGraph
+for testing only. See
