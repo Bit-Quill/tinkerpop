@@ -27,7 +27,7 @@ limitations under the License.
 ----
 
 image:tinkerpop-character.png[width=100,float=left] TinkerGraph is a single machine, in-memory (with optional
-persistence), transactional graph engine that provides both OLTP and OLAP functionality. It is deployed with
+persistence), non-transactional graph engine that provides both OLTP and OLAP functionality. It is deployed with
 TinkerPop and serves as the reference implementation for other providers to study in order to understand the
 semantics of the various methods of the TinkerPop API. Its status as a reference implementation does not however imply
 that it is not suitable for production. TinkerGraph has many practical use cases in production applications and their
@@ -201,13 +201,14 @@ g.V().properties()
 
 === Transactions
 
-As of 3.7.0, there is the option to use TinkerTransactionGraph, a transactional TinkerGraph class, to perform traversal
-transactions. This will eliminate the need to use the Neo4j plugin to enable TinkerGraph transactions.
+As of 3.7.0, `TinkerGraph` includes optional transaction support and thread-safety through the `TinkerTransactionGraph` class. The default configuration of TinkerGraph remains non-transactional.
 
-The TinkerTransactionGraph has `read committed` isolation level, which is the same as the
-Neo4j plugin. It only imposes write-only locks, to reduce the impact of transactions on performance for reading. As well,
+`TinkerTransactionGraph` has `read committed` isolation level, which is the same as the
+Neo4j gremlin plugin. It only imposes write-only locks, to reduce the impact of transactions on performance for reading. As well,
 only `ThreadLocal` transaction is implemented, therefore for embedded TinkerTransactionGraph, all traversal sources spawn
 from the graph will operate within the same transaction scope.
+
+While transactions impose minimal impact for read-based workloads, users should expect significant performance degradation for write-intensive work relative to the non-transactional configuration.
 
 Constructing a simple graph using TinkerTransactionGraph in Java is presented below:
 

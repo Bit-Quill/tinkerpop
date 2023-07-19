@@ -135,13 +135,13 @@ See: link:https://issues.apache.org/jira/browse/TINKERPOP-2957[TINKERPOP-2957]
 
 ===== Introduction
 
-Previously, we need to use the Neo4j plugin to perform transactions in TinkerGraph. Unfortunately, the maintenance
+Previously, we need to use the Neo4j gremlin plugin to perform transactions in TinkerGraph. Unfortunately, the maintenance
 around this plugin has largely been abandoned and is only compatible with Neo4j version 3.4, which reached end of
 life in March 2020.
 
 As of this version, we are introducing the transactional TinkerGraph, TinkerTransactionGraph, which is TinkerGraph with
 transaction capabilities. The TinkerTransactionGraph has `read committed` isolation level, which is the same as the
-Neo4j plugin. It only imposes write-only locks, to reduce the impact of transactions on performance for reading. As well,
+Neo4j gremlin plugin. It only imposes write-only locks, to reduce the impact of transactions on performance for reading. As well,
 only ThreadLocal transaction is implemented, therefore embedded graph transactions may not be fully supported.
 
 ===== Usage examples
