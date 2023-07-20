@@ -183,11 +183,9 @@ public abstract class AbstractGremlinServerIntegrationTest {
         return (directory.delete());
     }
 
-    protected static void tryIncludeNeo4jGraph(final Settings settings) {
-        if (isNeo4jPresent()) {
-            deleteDirectory(new File("/tmp/neo4j"));
-            settings.graphs.put("graph", "conf/neo4j-empty.properties");
-        }
+    protected static void useTinkerTransactionGraph(final Settings settings) {
+        logger.info("Running transactional tests using TinkerTransactionGraph");
+        settings.graphs.put("graph", "conf/tinkertransactiongraph-empty.properties");
     }
 
     protected static boolean isNeo4jPresent() {
@@ -200,8 +198,7 @@ public abstract class AbstractGremlinServerIntegrationTest {
     }
 
     protected static void assumeNeo4jIsPresent() {
-        boolean neo4jIncludedForTesting = isNeo4jPresent();
-        assumeThat("Neo4j implementation was not included for testing - run with -DincludeNeo4j", neo4jIncludedForTesting, is(true));
+        System.out.println("===PERFORMING TRANSACTION TEST===");
     }
 
     private boolean shouldTestUnified() {

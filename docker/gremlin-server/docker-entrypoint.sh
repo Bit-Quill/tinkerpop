@@ -30,7 +30,7 @@ function usage {
           "\nStart Gremlin Server instances that match the Maven integration test environment." \
           "\n\nOptions are:\n" \
           "\n\t<version> This value is optional and if unspecified will build the current version" \
-          "\n\t-n, --neo4j              include Neo4j to make transactions testable" \
+          "\n\t-n, --neo4j              include Neo4j to run neo4j-gremlin tests" \
           "\n\t-h, --help               show this message" \
           "\n"
 }
@@ -51,10 +51,6 @@ echo "ws://${IP}:45940/gremlin with anonymous access"
 echo "ws://${IP}:45941/gremlin with basic authentication (stephen/password)"
 echo "ws://${IP}:45942/gremlin with kerberos authentication (stephen/password)"
 echo
-if [ ! -z "${INCLUDE_NEO4J}" ]; then
-  echo Installing Neo4j to the environment: transactions are testable on port 45940
-  echo
-fi
 echo "See docker/gremlin-server/docker-entrypoints.sh for transcripts per GLV."
 echo "#############################################################################"
 
@@ -64,15 +60,6 @@ java -version
 
 dos2unix /opt/gremlin-server/bin/gremlin-server.sh
 dos2unix /opt/gremlin-server/bin/gremlin-server.conf
-
-# dynamically installs Neo4j libraries so that we can test variants with transactions,
-# but only only port 45940 is configured with the neo4j graph as the neo4j-empty.properties
-# is statically pointing at a temp directory and that space can only be accessed by one
-# graph at a time
-if [ ! -z "${INCLUDE_NEO4J}" ]; then
-  sed -i 's/graphs: {/graphs: {\n  tx: conf\/neo4j-empty.properties,/' ${TINKERPOP_HOME}/conf/gremlin-server-integration.yaml
-  /opt/gremlin-server/bin/gremlin-server.sh install org.apache.tinkerpop neo4j-gremlin ${GREMLIN_SERVER_VERSION}
-fi
 
 /opt/gremlin-server/bin/gremlin-server.sh ${TINKERPOP_HOME}/conf/gremlin-server-integration.yaml &
 

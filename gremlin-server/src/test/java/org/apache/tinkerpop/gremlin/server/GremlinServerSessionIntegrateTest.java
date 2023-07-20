@@ -131,7 +131,7 @@ public class GremlinServerSessionIntegrateTest extends AbstractGremlinServerInte
             case "shouldExecuteInSessionWithTransactionManagement":
             case "shouldRollbackOnEvalExceptionForManagedTransaction":
             case "shouldNotExecuteQueuedRequestsIfOneInFrontOfItFails":
-                tryIncludeNeo4jGraph(settings);
+                useTinkerTransactionGraph(settings);
                 break;
             case "shouldEnsureSessionBindingsAreThreadSafe":
                 settings.threadPoolWorker = 2;

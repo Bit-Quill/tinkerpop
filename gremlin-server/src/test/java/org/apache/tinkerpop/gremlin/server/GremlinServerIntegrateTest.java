@@ -252,7 +252,7 @@ public class GremlinServerIntegrateTest extends AbstractGremlinServerIntegration
                 break;
             case "shouldRespondToTimeoutCancelledWsRequest":
             case "shouldRespondToTimeoutCancelledSessionRequest":
-                tryIncludeNeo4jGraph(settings);
+                useTinkerTransactionGraph(settings);
                 settings.evaluationTimeout = 5000;
                 settings.gremlinPool = POOL_SIZE_FOR_TIMEOUT_TESTS;
                 settings.channelizer = WebSocketChannelizer.class.getName();
@@ -263,7 +263,7 @@ public class GremlinServerIntegrateTest extends AbstractGremlinServerIntegration
                 settings.channelizer = UnifiedChannelizer.class.getName();
                 break;
             case "shouldRespondToTimeoutCancelledMultiTaskUnifiedRequest":
-                tryIncludeNeo4jGraph(settings);
+                useTinkerTransactionGraph(settings);
                 settings.evaluationTimeout = 30000;
                 settings.sessionLifetimeTimeout = 5000; // This needs to be shorter because of the delay in scheduling session task.
                 settings.gremlinPool = POOL_SIZE_FOR_TIMEOUT_TESTS;

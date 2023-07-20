@@ -56,8 +56,7 @@ public class GremlinSessionTxIntegrateTest extends AbstractGremlinServerIntegrat
     public Settings overrideSettings(final Settings settings) {
         final String nameOfTest = name.getMethodName();
 
-        deleteDirectory(new File("/tmp/neo4j"));
-        settings.graphs.put("graph", "conf/neo4j-empty.properties");
+        settings.graphs.put("graph", "conf/tinkertransactiongraph-empty.properties");
 
         switch (nameOfTest) {
             case "shouldExecuteBytecodeInSession":
