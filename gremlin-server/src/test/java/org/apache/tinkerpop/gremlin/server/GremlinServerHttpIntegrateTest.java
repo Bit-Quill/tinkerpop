@@ -559,7 +559,6 @@ public class GremlinServerHttpIntegrateTest extends AbstractGremlinServerIntegra
 
     @Test
     public void should200OnPOSTTransactionalGraph() throws Exception {
-        assumeNeo4jIsPresent();
 
         final CloseableHttpClient httpclient = HttpClients.createDefault();
         final HttpPost httppost = new HttpPost(TestClientFactory.createURLString());
@@ -592,7 +591,6 @@ public class GremlinServerHttpIntegrateTest extends AbstractGremlinServerIntegra
 
     @Test
     public void should200OnPOSTTransactionalGraphInStrictMode() throws Exception {
-        assumeNeo4jIsPresent();
 
         final CloseableHttpClient httpclient = HttpClients.createDefault();
         final HttpPost httppost = new HttpPost(TestClientFactory.createURLString());

@@ -188,19 +188,6 @@ public abstract class AbstractGremlinServerIntegrationTest {
         settings.graphs.put("graph", "conf/tinkertransactiongraph-empty.properties");
     }
 
-    protected static boolean isNeo4jPresent() {
-        try {
-            Class.forName("org.neo4j.tinkerpop.api.impl.Neo4jGraphAPIImpl");
-            return true;
-        } catch (Throwable ex) {
-            return false;
-        }
-    }
-
-    protected static void assumeNeo4jIsPresent() {
-        System.out.println("===PERFORMING TRANSACTION TEST===");
-    }
-
     private boolean shouldTestUnified() {
         // ignore all tests in the UnifiedChannelizerIntegrateTest package as they are already rigged to test
         // over the various channelizer implementations

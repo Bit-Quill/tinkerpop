@@ -23,21 +23,17 @@ cp /opt/test/scripts/* ${TINKERPOP_HOME}/scripts
 
 IP=$(hostname -i)
 
-INCLUDE_NEO4J=
-
 function usage {
   echo -e "\nUsage: `basename $0` <version> [OPTIONS]" \
           "\nStart Gremlin Server instances that match the Maven integration test environment." \
           "\n\nOptions are:\n" \
           "\n\t<version> This value is optional and if unspecified will build the current version" \
-          "\n\t-n, --neo4j              include Neo4j to run neo4j-gremlin tests" \
           "\n\t-h, --help               show this message" \
           "\n"
 }
 
 while [ ! -z "$1" ]; do
   case "$1" in
-    -n | --neo4j ) INCLUDE_NEO4J=true; shift ;;
     -h | --help ) usage; exit 0 ;;
     *) usage 1>&2; exit 1 ;;
   esac
