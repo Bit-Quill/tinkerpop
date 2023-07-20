@@ -135,14 +135,29 @@ See: link:https://issues.apache.org/jira/browse/TINKERPOP-2957[TINKERPOP-2957]
 
 ===== Introduction
 
-Previously, we need to use the Neo4j gremlin plugin to perform transactions in TinkerGraph. Unfortunately, the maintenance
-around this plugin has largely been abandoned and is only compatible with Neo4j version 3.4, which reached end of
-life in March 2020.
+Previously, there was no reference implementation provided for the `Transaction` API as this feature wasn't supported by
+TinkerGraph. Users were instead directed towards the Neo4jGraph provided in `neo4j-gremlin` if they wanted to get access
+to a `Graph` implementation that supported transactions. Unfortunately, the maintenance around this plugin has largely
+been abandoned and is only compatible with Neo4j version 3.4, which reached end of life in March 2020.
 
 As of this version, we are introducing the transactional TinkerGraph, TinkerTransactionGraph, which is TinkerGraph with
 transaction capabilities. The TinkerTransactionGraph has `read committed` isolation level, which is the same as the
-Neo4j gremlin plugin. It only imposes write-only locks, to reduce the impact of transactions on performance for reading. As well,
-only ThreadLocal transaction is implemented, therefore embedded graph transactions may not be fully supported.
+Neo4jGraph provided in `neo4j-gremlin`. It only imposes write-only locks, to reduce the impact of transactions on
+performance for reading. As well, only ThreadLocal transactions are implemented, therefore embedded graph transactions
+may not be fully supported. You can think of the transaction as belonging to a thread, so any traversals executed within
+the same thread will share the same transaction even if you attempted to start a new transaction.
+
+TinkerTransactionGraph employs optimistic locking as its locking strategy. This reduces complexity in the design as
+there are fewer timeouts that the user needs to manage. However, a consequence of this approach is that a transaction
+will throw a `TransactionException` if two different transactions attempt to lock the same element. Users should follow
+the try-catch-rollback pattern described in the
+link:https://tinkerpop.apache.org/docs/x.y.z/reference/#transactions[transactions] section in combination with
+exponential backoff based retries to mitigate this issue. As mentioned before, TinkerTransactionGraph has
+`read committed` isolation level, so it only guards against dirty reads. These transaction semantics may not fit the use
+case for many production scenarios that require strict ACID-like transactions. Therefore, it is recommended that
+TinkerTransactionGraphbe used as a Graph for test environments where you still require access to a Graph that supports
+transactions. Once you are ready to put your system into production then you can choose a Graph provider that has the
+transaction semantics that fit your application's needs.
 
 ===== Usage examples
 

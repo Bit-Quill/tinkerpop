@@ -201,14 +201,43 @@ g.V().properties()
 
 === Transactions
 
-As of 3.7.0, `TinkerGraph` includes optional transaction support and thread-safety through the `TinkerTransactionGraph` class. The default configuration of TinkerGraph remains non-transactional.
+As of 3.7.0, `TinkerGraph` includes optional transaction support and thread-safety through the `TinkerTransactionGraph`
+class. The default configuration of TinkerGraph remains non-transactional.
 
-`TinkerTransactionGraph` has `read committed` isolation level, which is the same as the
-Neo4j gremlin plugin. It only imposes write-only locks, to reduce the impact of transactions on performance for reading. As well,
-only `ThreadLocal` transaction is implemented, therefore for embedded TinkerTransactionGraph, all traversal sources spawn
-from the graph will operate within the same transaction scope.
+==== Transaction Semantics
 
-While transactions impose minimal impact for read-based workloads, users should expect significant performance degradation for write-intensive work relative to the non-transactional configuration.
+TinkerTransactionGraph only has support for ThreadLocal transactions, so embedded graph transactions may not be fully
+supported. You can think of the transaction as belonging to a thread, any traversals executed within the same thread
+will share the same transaction even if you attempt to start a new transaction.
+
+TinkerTransactionGraph implements `read committed` isolation level, so it only guards against dirty reads.
+Additionally, it employs optimistic locking as its locking strategy. This reduces complexity in the design as
+there are fewer timeouts that the user needs to manage. However, a consequence of this approach is that a transaction
+will throw a `TransactionException` if two different transactions attempt to lock the same element (see "Best Practices" below).
+
+==== Use Cases
+
+These transaction semantics described above may not fit use cases for many production scenarios that require strict ACID-like transactions.
+Therefore, it is recommended that TinkerTransactionGraph be used as a Graph for test environments where you still require access to a Graph that supports
+transactions. TinkerTransactionGraph does fully support TinkerPop's `Transaction` interface which still makes it a useful Graph for
+exploring the Transaction API.
+
+Once you are ready to put your system into production then you can choose a Graph provider that has the
+transaction semantics that fit your application's needs.
+
+==== Best Practices
+
+Errors can occur before a transaction gets committed. Specifically for TinkerTransactionGraph, you may encounter many `TransactionException`s
+in a highly concurrent environment due its optimistic approach to locking.
+Users should follow the try-catch-rollback pattern described in the
+link:https://tinkerpop.apache.org/docs/x.y.z/reference/#transactions[transactions] section in combination with
+exponential backoff based retries to mitigate this issue.
+
+==== Performance Considerations
+
+While transactions impose minimal impact for read-based workloads, users should expect significant performance
+degradation for write-intensive work relative to the non-transactional configuration. However, its approach to locking (write-only, optimistic)
+and its in-memory nature, TinkerTransactionGraph is likely much faster than other Graph implementations that support transactions.
 
 Constructing a simple graph using TinkerTransactionGraph in Java is presented below:
 
