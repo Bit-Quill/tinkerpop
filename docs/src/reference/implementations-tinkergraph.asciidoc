@@ -213,31 +213,39 @@ will share the same transaction even if you attempt to start a new transaction.
 TinkerTransactionGraph implements `read committed` isolation level, so it only guards against dirty reads.
 Additionally, it employs optimistic locking as its locking strategy. This reduces complexity in the design as
 there are fewer timeouts that the user needs to manage. However, a consequence of this approach is that a transaction
-will throw a `TransactionException` if two different transactions attempt to lock the same element (see "Best Practices" below).
+will throw a `TransactionException` if two different transactions attempt to lock the same element (see "Best Practices"
+below).
 
 ==== Use Cases
 
-These transaction semantics described above may not fit use cases for many production scenarios that require strict ACID-like transactions.
-Therefore, it is recommended that TinkerTransactionGraph be used as a Graph for test environments where you still require access to a Graph that supports
-transactions. TinkerTransactionGraph does fully support TinkerPop's `Transaction` interface which still makes it a useful Graph for
-exploring the Transaction API.
+These transaction semantics described above may not fit use cases for some production scenarios that require strict
+ACID-like transactions. Therefore, it is recommended that TinkerTransactionGraph be used as a Graph for test
+environments where you still require access to a Graph that supports transactions. TinkerTransactionGraph does fully
+support TinkerPop's `Transaction` interface which still makes it a useful Graph for exploring the Transaction API.
 
 Once you are ready to put your system into production then you can choose a Graph provider that has the
 transaction semantics that fit your application's needs.
 
 ==== Best Practices
 
-Errors can occur before a transaction gets committed. Specifically for TinkerTransactionGraph, you may encounter many `TransactionException`s
-in a highly concurrent environment due its optimistic approach to locking.
-Users should follow the try-catch-rollback pattern described in the
+Errors can occur before a transaction gets committed. Specifically for TinkerTransactionGraph, you may encounter many
+`TransactionException`s in a highly concurrent environment due its optimistic approach to locking. Users should follow
+the try-catch-rollback pattern described in the
 link:https://tinkerpop.apache.org/docs/x.y.z/reference/#transactions[transactions] section in combination with
 exponential backoff based retries to mitigate this issue.
 
 ==== Performance Considerations
 
-While transactions impose minimal impact for read-based workloads, users should expect significant performance
-degradation for write-intensive work relative to the non-transactional configuration. However, its approach to locking (write-only, optimistic)
-and its in-memory nature, TinkerTransactionGraph is likely much faster than other Graph implementations that support transactions.
+While transactions impose minimal impact for mutating workloads, users should expect performance degradation for
+read-only work relative to the non-transactional configuration. However, its approach to locking
+(write-only, optimistic) and its in-memory nature, TinkerTransactionGraph is likely faster than other Graph
+implementations that support transactions.
+
+==== Limitations
+
+Indices are currently only enabled for read-only queries. Any transaction that modifies that graph won't use indices.
+
+==== Examples
 
 Constructing a simple graph using TinkerTransactionGraph in Java is presented below:
 
@@ -280,8 +288,3 @@ gremlin> g.V().valueMap()
 <3> Commit the add vertex operation
 <4> Add a second vertex without committing
 <5> Rollback the change
-
-Using the TinkerTransactionGraph should have no functional impact aside from the added transactional capabilities.
-Performance is on par for read operations, however, performance testing has shown that there is a 20% decrease in
-performance for write operations and 50% decrease for drop operations. Thus, we recommend to use the TransactionTinkerGraph
-for testing only. See
