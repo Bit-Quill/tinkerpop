@@ -211,7 +211,7 @@ public class Tester {
     public static void runLatencySingleCommitAddTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
 
-            TinkerTransactionGraph tg = TinkerTransactionGraph.open(getTinkerGraphConf());
+            Graph tg = createGraph();
             GraphTraversalSource g = tg.traversal();
             Long start = System.nanoTime();
             for (int i=0; i<1000; i++) {
@@ -242,7 +242,7 @@ public class Tester {
     public static void runLatencyRollbackAddTest(int numTimes) {
         for (; numTimes != 0; numTimes--) {
 
-            TinkerTransactionGraph tg = TinkerTransactionGraph.open(getTinkerGraphConf());
+            Graph tg = createGraph();
             GraphTraversalSource g = tg.traversal();
             Long start = System.nanoTime();
             for (int i=0; i<1000; i++) {
@@ -339,7 +339,6 @@ public class Tester {
             System.out.println("Completed " + numDoneNormally + " add and drop vertex queries.");
 
             cleanup(g);
-            threadPool.shutdown();
         }
     }
 
@@ -392,7 +391,6 @@ public class Tester {
             System.out.println("Completed " + numDoneNormally + " add and drop edge queries.");
 
             cleanup(g);
-            threadPool.shutdown();
         }
     }
 
@@ -442,7 +440,6 @@ public class Tester {
             System.out.println("Completed " + numDoneNormally + " add vertex PROPERTY queries.");
 
             cleanup(g);
-            threadPool.shutdown();
         }
     }
 
@@ -494,7 +491,6 @@ public class Tester {
             System.out.println("Completed " + numDoneNormally + " add edge PROPERTY queries.");
 
             cleanup(g);
-            threadPool.shutdown();
         }
     }
 
@@ -874,10 +870,12 @@ public class Tester {
                 }
             }
             System.out.println("Completed " + numDoneNormally + " queries.");
-            cleanup(gts);
+
 
             numTimes--;
         }
+
+        cleanup(gts);
     }
     public static long traversalRunTime(GraphTraversal traversal) {
         long startTime = System.nanoTime();
