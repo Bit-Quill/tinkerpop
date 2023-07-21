@@ -241,10 +241,6 @@ read-only work relative to the non-transactional configuration. However, its app
 (write-only, optimistic) and its in-memory nature, TinkerTransactionGraph is likely faster than other Graph
 implementations that support transactions.
 
-==== Limitations
-
-Indices are currently only enabled for read-only queries. Any transaction that modifies that graph won't use indices.
-
 ==== Examples
 
 Constructing a simple graph using TinkerTransactionGraph in Java is presented below:
