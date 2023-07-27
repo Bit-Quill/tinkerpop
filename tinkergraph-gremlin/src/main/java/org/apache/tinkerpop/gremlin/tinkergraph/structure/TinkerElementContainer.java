@@ -54,6 +54,11 @@ final class TinkerElementContainer<T extends TinkerElement> {
     private ThreadLocal<Boolean> isModifiedInTx = ThreadLocal.withInitial(() -> false);
 
     /**
+     * Marker for element read in current transaction.
+     */
+    private ThreadLocal<Boolean> isReadInTx = ThreadLocal.withInitial(() -> false);
+
+    /**
      * Count of usages of container in different transactions.
      * Needed to understand whether this element is used in other transactions or it can be deleted during rollback.
      */
@@ -89,6 +94,8 @@ final class TinkerElementContainer<T extends TinkerElement> {
 
         final T cloned = (T) element.clone();
         transactionUpdatedValue.set(cloned);
+        isReadInTx.set(true);
+        usesInTransactions.incrementAndGet();
         return cloned;
     }
 
@@ -208,6 +215,8 @@ final class TinkerElementContainer<T extends TinkerElement> {
             usesInTransactions.decrementAndGet();
         if (isModifiedInTx.get())
             usesInTransactions.decrementAndGet();
+        if (isReadInTx.get())
+            usesInTransactions.decrementAndGet();
     }
 
     /**
@@ -225,6 +234,7 @@ final class TinkerElementContainer<T extends TinkerElement> {
         transactionUpdatedValue.remove();
         isDeletedInTx.set(false);
         isModifiedInTx.set(false);
+        isReadInTx.set(false);
     }
 
     /**
