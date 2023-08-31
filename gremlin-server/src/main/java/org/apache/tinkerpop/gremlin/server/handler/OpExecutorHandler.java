@@ -57,6 +57,11 @@ public class OpExecutorHandler extends SimpleChannelInboundHandler<Pair<RequestM
         this.scheduledExecutorService = scheduledExecutorService;
     }
 
+    // todo: !!! one more dirty hack
+    public void handle(final ChannelHandlerContext ctx, final Pair<RequestMessage, ThrowingConsumer<Context>> objects) throws Exception {
+        channelRead0(ctx, objects);
+    }
+
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final Pair<RequestMessage, ThrowingConsumer<Context>> objects) throws Exception {
         final RequestMessage msg = objects.getValue0();

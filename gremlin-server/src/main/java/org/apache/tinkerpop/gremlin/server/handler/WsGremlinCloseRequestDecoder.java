@@ -23,6 +23,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import org.apache.tinkerpop.gremlin.server.ServiceContext;
 import org.apache.tinkerpop.gremlin.util.MessageSerializer;
 import org.apache.tinkerpop.gremlin.util.message.RequestMessage;
 import org.apache.tinkerpop.gremlin.util.ser.SerializationException;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +50,11 @@ public class WsGremlinCloseRequestDecoder extends MessageToMessageDecoder<CloseW
 
     public WsGremlinCloseRequestDecoder(final Map<String, MessageSerializer<?>> serializers) {
         this.serializers = serializers;
+    }
+
+    public WsGremlinCloseRequestDecoder(final ServiceContext serviceContext) {
+        // todo: get from serviceContext. Use ServerSerializers.DEFAULT_TEXT_SERIALIZER for PoC
+        this.serializers = new HashMap<>();
     }
 
     @Override
