@@ -19,7 +19,6 @@
 package org.apache.tinkerpop.gremlin.server;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.EventLoopGroup;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import org.apache.tinkerpop.gremlin.groovy.engine.GremlinExecutor;
@@ -52,7 +51,7 @@ public class GremlinHttpService implements GremlinService {
     private Map<String, MessageSerializer<?>> serializers = new HashMap<>();
     private HttpGremlinEndpointHandler httpGremlinEndpointHandler;
 
-    private List<HttpMethod> protocols = Arrays.asList(HttpMethod.GET, HttpMethod.POST);
+    private List<HttpMethod> protocols = Arrays.asList(HttpMethod.GET, HttpMethod.POST, HttpMethod.HEAD);
     private static String endpoint = "/text";
 
     // better to pass all parameters only with serviceContext
