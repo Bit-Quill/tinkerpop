@@ -24,7 +24,7 @@ public interface GremlinService {
 
     public void init(final ServiceContext serviceContext);
     public void start();
-    public boolean canHandle(final Object msg);
+    public boolean canHandle(final ChannelHandlerContext ctx, final Object msg);
     // return true when request is finished
     // todo: replace ChannelHandlerContext with abstraction
     public boolean handle(final ChannelHandlerContext ctx, final Object msg) throws Exception;

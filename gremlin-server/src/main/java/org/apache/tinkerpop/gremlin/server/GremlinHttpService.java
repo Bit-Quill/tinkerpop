@@ -89,7 +89,7 @@ public class GremlinHttpService implements GremlinService {
     }
 
     @Override
-    public boolean canHandle(final Object msg) {
+    public boolean canHandle(final ChannelHandlerContext ctx, final Object msg) {
         if (msg instanceof FullHttpRequest) {
             final FullHttpRequest httpRequest = (FullHttpRequest) msg;
 

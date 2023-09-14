@@ -113,7 +113,7 @@ public class GremlinWsService implements GremlinService {
     }
 
     @Override
-    public boolean canHandle(final Object msg) {
+    public boolean canHandle(final ChannelHandlerContext ctx, final Object msg) {
         // RequestMessage
         return msg instanceof RequestMessage;
     }

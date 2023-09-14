@@ -47,7 +47,7 @@ public class RoutingHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         for (GremlinService service : services) {
             // more than 1 service can handle same request. For example auth and gremlin
-            if (service.canHandle(msg) && service.handle(ctx, msg))
+            if (service.canHandle(ctx, msg) && service.handle(ctx, msg))
                 return;
         }
 
