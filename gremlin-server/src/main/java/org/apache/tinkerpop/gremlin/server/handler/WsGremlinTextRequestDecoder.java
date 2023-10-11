@@ -18,6 +18,7 @@
  */
 package org.apache.tinkerpop.gremlin.server.handler;
 
+import org.apache.tinkerpop.gremlin.server.ServiceContext;
 import org.apache.tinkerpop.gremlin.util.MessageSerializer;
 import org.apache.tinkerpop.gremlin.util.message.RequestMessage;
 import org.apache.tinkerpop.gremlin.util.ser.MessageTextSerializer;
@@ -29,6 +30,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +48,11 @@ public class WsGremlinTextRequestDecoder extends MessageToMessageDecoder<TextWeb
 
     public WsGremlinTextRequestDecoder(final Map<String, MessageSerializer<?>> serializers) {
         this.serializers = serializers;
+    }
+
+    public WsGremlinTextRequestDecoder(final ServiceContext serviceContext) {
+        // todo: get from serviceContext. Use ServerSerializers.DEFAULT_TEXT_SERIALIZER for PoC
+        this.serializers = new HashMap<>();
     }
 
     @Override
