@@ -1456,6 +1456,18 @@ public interface GraphTraversal<S, E> extends Traversal<S, E> {
     }
 
     /**
+     * Concatenate strings.
+     *
+     * @return the traversal with an appended {@link ConcatStep}.
+     * @see <a href="http://tinkerpop.apache.org/docs/${project.version}/reference/#concat-step" target="_blank">Reference Documentation - Concat Step</a>
+     * @since 3.7.0 <- TODO
+     */
+    public default GraphTraversal<S, String> concat(final Traversal<?, String>... concatTraversals) {
+        this.asAdmin().getBytecode().addStep(Symbols.concat, concatTraversals);
+        return this.asAdmin().addStep(new ConcatStep<>(this.asAdmin(), concatTraversals));
+    }
+
+    /**
      * Returns the value of incoming traverser as strings. Null values are returned as a string value "null".
      *
      * @return the traversal with an appended {@link AsStringStep}.

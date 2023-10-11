@@ -62,6 +62,8 @@ public class ConcatStepTest extends StepTest {
         assertArrayEquals(new String[]{"acd", "bcd", "cd"},
                 __.__("a", "b", null).concat("c", "d", nullStr).toList().toArray());
 
+        assertEquals("", __.__("").concat(__.inject("")).next());
+        assertEquals("", __.__("").concat(getTraversals().get(0), getTraversals().get(0)).next());
     }
 
     @Test(expected = IllegalArgumentException.class)

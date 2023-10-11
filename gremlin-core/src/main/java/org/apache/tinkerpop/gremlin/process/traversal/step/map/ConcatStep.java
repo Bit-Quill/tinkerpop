@@ -23,6 +23,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.InjectStep;
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement;
+import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalRing;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalUtil;
 import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
 
@@ -43,6 +44,8 @@ public final class ConcatStep<S> extends ScalarMapStep<S, String> implements Tra
 
     private Traversal.Admin<S, String> concatTraversal;
 
+    private final TraversalRing<S,E> concatTraversals = null;
+
     // flag used to propagate the null value through if all strings to be concatenated are null
     private boolean isNullTraverser = true;
     private boolean isNullTraversal = true;
@@ -56,6 +59,14 @@ public final class ConcatStep<S> extends ScalarMapStep<S, String> implements Tra
     public ConcatStep(final Traversal.Admin traversal, final Traversal<S, String> concatTraversal) {
         super(traversal);
         this.concatTraversal = this.integrateChild(concatTraversal.asAdmin());
+    }
+
+    public ConcatStep(final Traversal.Admin traversal, final Traversal<S, String>... concatTraversals) {
+        super(traversal);
+//        this.concatTraversals = concatTraversals.forEach(this::integrateChild);
+        for (Traversal<S,String> tr : concatTraversals) {
+            this.integrateChild(tr.asAdmin());
+        }
     }
 
     @Override
