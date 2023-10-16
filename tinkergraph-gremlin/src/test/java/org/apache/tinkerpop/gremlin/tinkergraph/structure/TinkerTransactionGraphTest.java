@@ -37,7 +37,9 @@ import static org.apache.tinkerpop.gremlin.structure.Graph.Features.EdgeFeatures
 import static org.apache.tinkerpop.gremlin.structure.Graph.Features.EdgeFeatures.FEATURE_REMOVE_EDGES;
 import static org.apache.tinkerpop.gremlin.structure.Graph.Features.ElementFeatures.FEATURE_ADD_PROPERTY;
 import static org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures.FEATURE_TRANSACTIONS;
-import static org.apache.tinkerpop.gremlin.structure.Graph.Features.VertexFeatures.*;
+import static org.apache.tinkerpop.gremlin.structure.Graph.Features.VertexFeatures.FEATURE_ADD_VERTICES;
+import static org.apache.tinkerpop.gremlin.structure.Graph.Features.VertexFeatures.FEATURE_REMOVE_VERTICES;
+import static org.apache.tinkerpop.gremlin.structure.Graph.Features.VertexFeatures.FEATURE_META_PROPERTIES;
 import static org.apache.tinkerpop.gremlin.structure.Graph.Features.VertexPropertyFeatures.FEATURE_USER_SUPPLIED_IDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
