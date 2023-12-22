@@ -58,6 +58,10 @@ func (connection *connection) errorCallback() {
 	connection.syncLock.Lock()
 	defer connection.syncLock.Unlock()
 
+	if connection.state == closed || connection.state == closedDueToError {
+		return
+	}
+
 	connection.logHandler.log(Error, errorCallback)
 	connection.state = closedDueToError
 
