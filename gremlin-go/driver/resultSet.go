@@ -166,7 +166,8 @@ func (channelResultSet *channelResultSet) Channel() chan *Result {
 // The value of ok is true if the value received was delivered by a successful send operation to the channel,
 // or false if it is a zero value generated because the channel is closed and empty.
 func (channelResultSet *channelResultSet) One() (*Result, bool, error) {
-	if channelResultSet.err != nil {
+	err := channelResultSet.err
+	if err != nil {
 		return nil, false, channelResultSet.err
 	}
 	result, ok := <-channelResultSet.channel
