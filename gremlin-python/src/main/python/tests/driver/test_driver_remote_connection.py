@@ -31,13 +31,20 @@ from gremlin_python.structure.graph import Vertex
 from gremlin_python.process.strategies import SubgraphStrategy, ReservedKeysVerificationStrategy, SeedStrategy
 from gremlin_python.structure.io.util import HashableDict
 from gremlin_python.driver.serializer import GraphSONSerializersV2d0
+from gremlin_python.statics import GremlinType
 
 __author__ = 'Marko A. Rodriguez (http://markorodriguez.com)'
 
 gremlin_server_url = os.environ.get('GREMLIN_SERVER_URL', 'ws://localhost:{}/gremlin')
-test_no_auth_url = gremlin_server_url.format(45940)
+test_no_auth_url = gremlin_server_url.format(8182)
 
 class TestDriverRemoteConnection(object):
+    def test_QQQ(self, remote_connection):
+        statics.load_statics(globals())
+        g = traversal().withRemote(remote_connection)
+        g.addV("test").property('test', GremlinType('test')).next()
+
+
     def test_traversals(self, remote_connection):
         statics.load_statics(globals())
         g = traversal().withRemote(remote_connection)
