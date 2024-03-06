@@ -47,6 +47,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -272,7 +273,7 @@ public abstract class Client {
      *
      * @param gremlin the gremlin script to execute
      */
-    public CompletableFuture<ResultSet> submitAsync(final String gremlin) {
+    public CompletableFuture<ResultSet> submitAsync(final String gremlin) throws ExecutionException, InterruptedException, TimeoutException {
         return submitAsync(gremlin, RequestOptions.build().create());
     }
 
@@ -283,7 +284,7 @@ public abstract class Client {
      * @param gremlin    the gremlin script to execute
      * @param parameters a map of parameters that will be bound to the script on execution
      */
-    public CompletableFuture<ResultSet> submitAsync(final String gremlin, final Map<String, Object> parameters) {
+    public CompletableFuture<ResultSet> submitAsync(final String gremlin, final Map<String, Object> parameters) throws ExecutionException, InterruptedException, TimeoutException {
         final RequestOptions.Builder options = RequestOptions.build();
         if (parameters != null && !parameters.isEmpty()) {
             parameters.forEach(options::addParameter);
@@ -303,7 +304,7 @@ public abstract class Client {
      */
     @Deprecated
     public CompletableFuture<ResultSet> submitAsync(final String gremlin, final String graphOrTraversalSource,
-                                                    final Map<String, Object> parameters) {
+                                                    final Map<String, Object> parameters) throws ExecutionException, InterruptedException, TimeoutException {
         Map<String, String> aliases = null;
         if (graphOrTraversalSource != null && !graphOrTraversalSource.isEmpty()) {
             aliases = makeDefaultAliasMap(graphOrTraversalSource);
@@ -325,7 +326,7 @@ public abstract class Client {
      */
     @Deprecated
     public CompletableFuture<ResultSet> submitAsync(final String gremlin, final Map<String, String> aliases,
-                                                    final Map<String, Object> parameters) {
+                                                    final Map<String, Object> parameters) throws ExecutionException, InterruptedException, TimeoutException {
         final RequestOptions.Builder options = RequestOptions.build();
         if (aliases != null && !aliases.isEmpty()) {
             aliases.forEach(options::addAlias);
@@ -347,7 +348,7 @@ public abstract class Client {
      * @param gremlin the gremlin script to execute
      * @param options the options to supply for this request
      */
-    public CompletableFuture<ResultSet> submitAsync(final String gremlin, final RequestOptions options) {
+    public CompletableFuture<ResultSet> submitAsync(final String gremlin, final RequestOptions options) throws ExecutionException, InterruptedException, TimeoutException {
         final int batchSize = options.getBatchSize().orElse(cluster.connectionPoolSettings().resultIterationBatchSize);
 
         // need to call buildMessage() right away to get client specific configurations, that way request specific
@@ -371,7 +372,7 @@ public abstract class Client {
     /**
      * A low-level method that allows the submission of a manually constructed {@link RequestMessage}.
      */
-    public CompletableFuture<ResultSet> submitAsync(final RequestMessage msg) {
+    public CompletableFuture<ResultSet> submitAsync(final RequestMessage msg) throws ExecutionException, InterruptedException, TimeoutException {
         if (isClosing()) throw new IllegalStateException("Client is closed");
 
         if (!initialized)
@@ -672,7 +673,7 @@ public abstract class Client {
         }
 
         @Override
-        public CompletableFuture<ResultSet> submitAsync(final RequestMessage msg) {
+        public CompletableFuture<ResultSet> submitAsync(final RequestMessage msg) throws ExecutionException, InterruptedException, TimeoutException {
             final RequestMessage.Builder builder = RequestMessage.from(msg);
 
             // only add aliases which aren't already present. if they are present then they represent request level

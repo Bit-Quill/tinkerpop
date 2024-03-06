@@ -18,7 +18,8 @@
 host: localhost
 port: 8182
 evaluationTimeout: 30000
-channelizer: org.apache.tinkerpop.gremlin.server.channel.HttpChannelizer
+# channelizer: org.apache.tinkerpop.gremlin.server.channel.HttpChannelizer
+channelizer: org.apache.tinkerpop.gremlin.server.channel.WsAndHttpChannelizer
 graphs: {
   graph: conf/tinkergraph-empty.properties}
 scriptEngines: {

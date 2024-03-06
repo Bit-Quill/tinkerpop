@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -99,17 +100,25 @@ public class ProfilingApplication {
             final long start = System.nanoTime();
             IntStream.range(0, requests).forEach(i -> {
                 final String s = exercise ? chooseScript() : script;
-                client.submitAsync(s).thenAcceptAsync(r -> {
-                    try {
-                        r.all().get(tooSlowThreshold, TimeUnit.MILLISECONDS);
-                    } catch (TimeoutException ex) {
-                        tooSlow.incrementAndGet();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    } finally {
-                        latch.countDown();
-                    }
-                }, executor);
+                try {
+                    client.submitAsync(s).thenAcceptAsync(r -> {
+                        try {
+                            r.all().get(tooSlowThreshold, TimeUnit.MILLISECONDS);
+                        } catch (TimeoutException ex) {
+                            tooSlow.incrementAndGet();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        } finally {
+                            latch.countDown();
+                        }
+                    }, executor);
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (TimeoutException e) {
+                    throw new RuntimeException(e);
+                }
             });
 
             // finish once all requests are accounted for
