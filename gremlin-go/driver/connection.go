@@ -39,6 +39,7 @@ type connection struct {
 	protocol   protocol
 	results    *synchronizedMap
 	state      connectionState
+	syncLock   sync.Mutex
 }
 
 type connectionSettings struct {
@@ -54,6 +55,13 @@ type connectionSettings struct {
 }
 
 func (connection *connection) errorCallback() {
+	connection.syncLock.Lock()
+	defer connection.syncLock.Unlock()
+
+	if connection.state == closed || connection.state == closedDueToError {
+		return
+	}
+
 	connection.logHandler.log(Error, errorCallback)
 	connection.state = closedDueToError
 
@@ -65,6 +73,9 @@ func (connection *connection) errorCallback() {
 }
 
 func (connection *connection) close() error {
+	connection.syncLock.Lock()
+	defer connection.syncLock.Unlock()
+
 	if connection.state != established {
 		return newError(err0101ConnectionCloseError)
 	}
@@ -106,6 +117,7 @@ func createConnection(url string, logHandler *logHandler, connSettings *connecti
 		nil,
 		&synchronizedMap{map[string]ResultSet{}, sync.Mutex{}},
 		initialized,
+		sync.Mutex{},
 	}
 	logHandler.log(Info, connectConnection)
 	protocol, err := newGremlinServerWSProtocol(logHandler, Gorilla, url, connSettings, conn.results, conn.errorCallback)

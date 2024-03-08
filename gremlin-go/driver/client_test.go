@@ -378,30 +378,28 @@ func TestClientAgainstSocketServer(t *testing.T) {
 	 * purposes. See https://issues.apache.org/jira/browse/TINKERPOP-2845.
 	 * This test should be uncommented with the resolution of TINKERPOP-2845
 	 */
-	/*
-		t.Run("Should try create new connection if closed by server", func(t *testing.T) {
-			skipTestsIfNotEnabled(t, integrationTestSuiteName, testNoAuthEnable)
-			client, err := NewClient(testSocketServerUrl)
-			defer client.Close()
-			assert.Nil(t, err)
-			assert.NotNil(t, client)
-			resultSet, err := client.SubmitWithOptions("1", new(RequestOptionsBuilder).
-				SetRequestId(settings.CLOSE_CONNECTION_REQUEST_ID).Create())
-			assert.Nil(t, err)
-			assert.NotNil(t, resultSet)
+	t.Run("Should try create new connection if closed by server", func(t *testing.T) {
+		skipTestsIfNotEnabled(t, integrationTestSuiteName, testNoAuthEnable)
+		client, err := NewClient(testSocketServerUrl)
+		defer client.Close()
+		assert.Nil(t, err)
+		assert.NotNil(t, client)
+		resultSet, err := client.SubmitWithOptions("1", new(RequestOptionsBuilder).
+			SetRequestId(settings.CLOSE_CONNECTION_REQUEST_ID).Create())
+		assert.Nil(t, err)
+		assert.NotNil(t, resultSet)
 
-			result, ok, err := resultSet.One()
+		result, ok, err := resultSet.One()
 
-			assert.EqualError(t, err, "websocket: close 1005 (no status)")
+		assert.EqualError(t, err, "websocket: close 1005 (no status)")
 
-			resultSet, err = client.SubmitWithOptions("1", new(RequestOptionsBuilder).
-				SetRequestId(settings.SINGLE_VERTEX_REQUEST_ID).Create())
-			assert.Nil(t, err)
-			assert.NotNil(t, resultSet)
-			result, ok, err = resultSet.One()
-			assert.Nil(t, err)
-			assert.True(t, ok)
-			assert.NotNil(t, result)
-		})
-	*/
+		resultSet, err = client.SubmitWithOptions("1", new(RequestOptionsBuilder).
+			SetRequestId(settings.SINGLE_VERTEX_REQUEST_ID).Create())
+		assert.Nil(t, err)
+		assert.NotNil(t, resultSet)
+		result, ok, err = resultSet.One()
+		assert.Nil(t, err)
+		assert.True(t, ok)
+		assert.NotNil(t, result)
+	})
 }
