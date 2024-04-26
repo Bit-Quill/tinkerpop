@@ -39,7 +39,7 @@ public final class ResponseMessage {
     private final ResponseStatus responseStatus;
     private final ResponseResult responseResult;
 
-    private ResponseMessage(final UUID requestId, final ResponseStatus responseStatus,
+    public ResponseMessage(final UUID requestId, final ResponseStatus responseStatus,
                             final ResponseResult responseResult) {
         this.requestId = requestId;
         this.responseResult = responseResult;
