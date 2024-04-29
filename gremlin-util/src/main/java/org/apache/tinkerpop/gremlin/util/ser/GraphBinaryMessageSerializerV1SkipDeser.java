@@ -31,21 +31,16 @@ import org.apache.tinkerpop.gremlin.structure.io.binary.TypeSerializerRegistry;
 import org.apache.tinkerpop.gremlin.structure.io.binary.types.CustomTypeSerializer;
 import org.apache.tinkerpop.gremlin.util.message.RequestMessage;
 import org.apache.tinkerpop.gremlin.util.message.ResponseMessage;
-import org.apache.tinkerpop.gremlin.util.message.ResponseResult;
-import org.apache.tinkerpop.gremlin.util.message.ResponseStatus;
-import org.apache.tinkerpop.gremlin.util.message.ResponseStatusCode;
 import org.apache.tinkerpop.gremlin.util.ser.binary.RequestMessageSerializer;
-import org.apache.tinkerpop.gremlin.util.ser.binary.ResponseMessageSerializer;
+import org.apache.tinkerpop.gremlin.util.ser.binary.ResponseMessageSerializer2;
 import org.javatuples.Pair;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -67,7 +62,7 @@ public class GraphBinaryMessageSerializerV1SkipDeser extends AbstractMessageSeri
     private GraphBinaryReader reader;
     private GraphBinaryWriter writer;
     private RequestMessageSerializer requestSerializer;
-    private ResponseMessageSerializer responseSerializer;
+    private ResponseMessageSerializer2 responseSerializer;
     private GraphBinaryMapper mapper;
 
     /**
@@ -83,7 +78,7 @@ public class GraphBinaryMessageSerializerV1SkipDeser extends AbstractMessageSeri
         mapper = new GraphBinaryMapper(writer, reader);
 
         requestSerializer = new RequestMessageSerializer();
-        responseSerializer = new ResponseMessageSerializer();
+        responseSerializer = new ResponseMessageSerializer2();
     }
 
     public GraphBinaryMessageSerializerV1SkipDeser(final TypeSerializerRegistry.Builder builder) {
@@ -141,7 +136,7 @@ public class GraphBinaryMessageSerializerV1SkipDeser extends AbstractMessageSeri
         writer = new GraphBinaryWriter(registry);
 
         requestSerializer = new RequestMessageSerializer();
-        responseSerializer = new ResponseMessageSerializer();
+        responseSerializer = new ResponseMessageSerializer2();
     }
 
     @Override
@@ -219,20 +214,12 @@ public class GraphBinaryMessageSerializerV1SkipDeser extends AbstractMessageSeri
 
     @Override
     public ResponseMessage deserializeResponse(final String msg) throws SerializationException {
-        UUID uuid = UUID.randomUUID();
-        Map<String,Object> map = new HashMap<>();
-        ResponseStatus responseStatus = new ResponseStatus(ResponseStatusCode.NO_CONTENT, "", map);
-        ResponseResult responseResult = new ResponseResult(1, map);
-        return new ResponseMessage(uuid, responseStatus, responseResult);
+        return deserializeResponse(convertToByteBuf(msg));
     }
 
     @Override
     public ResponseMessage deserializeResponse(final ByteBuf msg) throws SerializationException {
-        UUID uuid = UUID.randomUUID();
-        Map<String,Object> map = new HashMap<>();
-        ResponseStatus responseStatus = new ResponseStatus(ResponseStatusCode.NO_CONTENT, "", map);
-        ResponseResult responseResult = new ResponseResult(1, map);
-        return new ResponseMessage(uuid, responseStatus, responseResult);
+        return responseSerializer.readValue(msg, reader);
     }
 
     private byte[] convertToBytes(final ByteBuf bb) {

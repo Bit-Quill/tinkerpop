@@ -36,9 +36,13 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-@Warmup(iterations = 1)
-@Measurement(iterations = 2)
+
+@Warmup(time = 2001, timeUnit = MILLISECONDS, iterations = 1)
+@Measurement(time = 2002, timeUnit = MILLISECONDS, iterations = 2)
+//@Warmup(iterations = 1)
+//@Measurement(iterations = 2)
 @BenchmarkMode(Mode.AverageTime)
 public class SimpleBenchmark extends AbstractBenchmarkBase2 {
     @State(Scope.Thread)
@@ -59,6 +63,9 @@ public class SimpleBenchmark extends AbstractBenchmarkBase2 {
         @TearDown(Level.Trial)
         public void doTearDown() throws Exception {
             cluster.close();
+            skipClient.close();
+            simpleClient.close();
+            client.close();
         }
     }
 
@@ -100,7 +107,7 @@ public class SimpleBenchmark extends AbstractBenchmarkBase2 {
         // 0.047s (slow iterations, doesn't exit)
     }
 
-    @Benchmark
+//    @Benchmark
     public Iterator<ResponseMessage> both2IteratorSimple(BenchmarkState state) throws Exception {
         Iterator<ResponseMessage> res = state.simpleClient.submit("ggrateful.V().both().both();")
                 .iterator();
@@ -122,14 +129,18 @@ public class SimpleBenchmark extends AbstractBenchmarkBase2 {
     }
 
 
-//    @Benchmark
+    @Benchmark
     public List<ResponseMessage> simpleSkipDeser(BenchmarkState state) throws Exception {
         final List<ResponseMessage> res = state.skipClient.submit("g.V().count()");
         return res;
         // 0.046s (slow iterations, doesn't exit)
     }
 
-//    @Benchmark
+    public static void main(String[] args) throws Exception {
+        SimpleClient skipClient = TestClientFactory.createWebSocketClientSkipDeser(URI.create("ws://ec2-35-91-97-124.us-west-2.compute.amazonaws.com:45940/gremlin"));
+        final List<ResponseMessage> res = skipClient.submit("ggrateful.V().count();");
+    }
+    @Benchmark
     public List<ResponseMessage> countGratefulSkipDeser(BenchmarkState state) throws Exception {
         final List<ResponseMessage> res = state.skipClient.submit("ggrateful.V().count();");
         return res;

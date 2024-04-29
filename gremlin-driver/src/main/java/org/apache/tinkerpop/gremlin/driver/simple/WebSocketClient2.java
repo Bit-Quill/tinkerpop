@@ -109,7 +109,7 @@ public class WebSocketClient2 extends AbstractClient {
                                     new HttpClientCodec(),
                                     new HttpObjectAggregator(65536),
                                     wsHandler,
-                                    new WebSocketGremlinRequestEncoder(true, serializer),
+                                    new WebSocketGremlinRequestEncoder(true, skipDeserializer),
                                     new WebSocketGremlinResponseDecoder(skipDeserializer),
                                     callbackResponseHandler);
                         }
