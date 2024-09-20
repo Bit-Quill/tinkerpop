@@ -273,9 +273,9 @@ public class HttpHandlerUtil {
         sendAndCleanupConnection(ctx, keepAlive, response);
     }
 
-    static void sendAndCleanupConnection(final ChannelHandlerContext ctx,
-                                         final boolean keepAlive,
-                                         final FullHttpResponse response) {
+    public static void sendAndCleanupConnection(final ChannelHandlerContext ctx,
+                                                final boolean keepAlive,
+                                                final FullHttpResponse response) {
         HttpUtil.setKeepAlive(response, keepAlive);
         HttpUtil.setContentLength(response, response.content().readableBytes());
 

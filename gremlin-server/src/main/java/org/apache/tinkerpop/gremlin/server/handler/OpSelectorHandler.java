@@ -20,6 +20,7 @@ package org.apache.tinkerpop.gremlin.server.handler;
 
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import org.apache.tinkerpop.gremlin.util.function.ThrowingConsumer;
 import org.apache.tinkerpop.gremlin.util.message.RequestMessage;
 import org.apache.tinkerpop.gremlin.util.message.ResponseMessage;
 import org.apache.tinkerpop.gremlin.util.message.ResponseStatusCode;
@@ -63,6 +64,32 @@ public class OpSelectorHandler extends MessageToMessageDecoder<RequestMessage> {
         this.gremlinExecutor = gremlinExecutor;
         this.scheduledExecutorService = scheduledExecutorService;
         this.channelizer = channelizer;
+    }
+
+    // todo: !!! one more dirty hack
+    public Pair<RequestMessage, ThrowingConsumer<Context>> selectOp(final ChannelHandlerContext ctx, final RequestMessage msg) {
+        final Context gremlinServerContext = new Context(msg, ctx, settings,
+                graphManager, gremlinExecutor, this.scheduledExecutorService);
+        try {
+            // choose a processor to do the work based on the request message.
+            final Optional<OpProcessor> processor = OpLoader.getProcessor(msg.getProcessor());
+
+            if (processor.isPresent())
+                // the processor is known so use it to evaluate the message
+                return Pair.with(msg, processor.get().select(gremlinServerContext));
+            else {
+                // invalid op processor selected so write back an error by way of OpProcessorException.
+                final String errorMessage = String.format("Invalid OpProcessor requested [%s]", msg.getProcessor());
+                throw new OpProcessorException(errorMessage, ResponseMessage.build(msg)
+                        .code(ResponseStatusCode.REQUEST_ERROR_INVALID_REQUEST_ARGUMENTS)
+                        .statusMessage(errorMessage).create());
+            }
+        } catch (OpProcessorException ope) {
+            logger.warn(ope.getMessage(), ope);
+            gremlinServerContext.writeAndFlush(ope.getResponseMessage());
+        }
+
+        return null;
     }
 
     @Override

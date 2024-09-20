@@ -18,6 +18,8 @@
  */
 package org.apache.tinkerpop.gremlin.server.handler;
 
+import org.apache.tinkerpop.gremlin.server.GremlinBootstrapper;
+import org.apache.tinkerpop.gremlin.server.ServiceContext;
 import org.apache.tinkerpop.gremlin.util.MessageSerializer;
 import org.apache.tinkerpop.gremlin.util.message.RequestMessage;
 import org.apache.tinkerpop.gremlin.util.ser.SerializationException;
@@ -30,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +52,12 @@ public class WsGremlinBinaryRequestDecoder extends MessageToMessageDecoder<Binar
 
     public WsGremlinBinaryRequestDecoder(final Map<String, MessageSerializer<?>> serializers) {
         this.serializers = serializers;
+    }
+
+    public WsGremlinBinaryRequestDecoder(final ServiceContext serviceContext) {
+        GremlinBootstrapper.init(serviceContext);
+
+        this.serializers = (Map<String, MessageSerializer<?>>)serviceContext.getService("serializers");
     }
 
     @Override
